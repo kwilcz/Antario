@@ -50,7 +50,7 @@ public:
 
     bool Hook(std::size_t index, void* fnNew)
     {
-        if (index > this->indexCount && index < 0 )   // check if given index is invalid
+        if (index > this->indexCount) // check if given index is invalid
             return false;
 
         this->pNewVMT[index] = reinterpret_cast<std::uintptr_t>(fnNew);
@@ -59,7 +59,7 @@ public:
 
     bool Unhook(std::size_t index)
     {
-        if (index > this->indexCount && index < 0)
+        if (index > this->indexCount)
             return false;
 
         this->pNewVMT[index] = this->pOriginalVMT[index];
