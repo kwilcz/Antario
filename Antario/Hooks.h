@@ -1,31 +1,44 @@
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include <Windows.h>
-#include <memory>
+#include "SDK\Interfaces.h"
+#include "SDK\CInput.h"
+#include <d3d9.h>
 
 class VMTHook;
 
+/*---------------------------------------------*/
+/*-------------Hook prototypes-----------------*/
+/*---------------------------------------------*/
+typedef bool(__thiscall* CreateMove_t)  (IClientMode*, float, CUserCmd*);
+typedef long(__stdcall* EndScene_t)     (IDirect3DDevice9* device);
+typedef long(__stdcall* Reset_t)        (IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* pp);
+typedef long(__stdcall* Present_t)      (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
+
+
 class Hooks
 {
+public:    
+    static void Init(); // Initialization setup, called on injection
+
 public:
-    Hooks();
-    ~Hooks();
-    static void Init();
+/*---------------------------------------------*/
+/*-------------Hooked functions----------------*/
+/*---------------------------------------------*/
+    static bool     __stdcall CreateMove(float sample_input_frametime, CUserCmd* cmd);
+    //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
+    //static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
+    //static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
 
 private:
     std::unique_ptr<VMTHook> pD3DDevice9Hook;
     std::unique_ptr<VMTHook> pClientModeHook;
 };
-extern Hooks hooks;
+extern std::unique_ptr<Hooks> g_pHooks;
 
 class VMTHook
 {
 public:
-    VMTHook(std::uintptr_t** ppClass)
+    VMTHook(void* ppClass)
     {
-        this->ppBaseClass = ppClass;
+        this->ppBaseClass = static_cast<std::uintptr_t**>(ppClass);
 
         // loop through all valid class indexes. When it will hit invalid (not existing) it will end the loop
         while (static_cast<std::uintptr_t*>(*this->ppBaseClass)[this->indexCount])
@@ -50,7 +63,7 @@ public:
 
     bool Hook(std::size_t index, void* fnNew)
     {
-        if (index > this->indexCount && index < 0 )   // check if given index is invalid
+        if (index > this->indexCount)   // check if given index is valid
             return false;
 
         this->pNewVMT[index] = reinterpret_cast<std::uintptr_t>(fnNew);
@@ -59,13 +72,12 @@ public:
 
     bool Unhook(std::size_t index)
     {
-        if (index > this->indexCount && index < 0)
+        if (index > this->indexCount)
             return false;
 
         this->pNewVMT[index] = this->pOriginalVMT[index];
         return true;
     };
-
 
 private:
     std::unique_ptr<std::uintptr_t[]> pNewVMT = nullptr; // Actual used pointer of VMT hook

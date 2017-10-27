@@ -72,15 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -102,11 +110,15 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;ANTARIO_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -127,14 +139,15 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;ANTARIO_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile />
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,11 +158,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Antario\Hooks.cpp" />
-    <ClCompile Include="Antario\dllmain.cpp" />
+    <ClCompile Include="Antario\DLLMain.cpp" />
+    <ClCompile Include="Antario\SDK\Interfaces.cpp" />
+    <ClCompile Include="Antario\Utils\NetvarManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Antario\Hooks.h" />
+    <ClInclude Include="Antario\SDK\CGlobalVarsBase.h" />
+    <ClInclude Include="Antario\SDK\CHandle.h" />
+    <ClInclude Include="Antario\SDK\CEntity.h" />
+    <ClInclude Include="Antario\SDK\CInput.h" />
+    <ClInclude Include="Antario\SDK\ClientClass.h" />
+    <ClInclude Include="Antario\SDK\Definitions.h" />
+    <ClInclude Include="Antario\SDK\IBaseClientDll.h" />
+    <ClInclude Include="Antario\SDK\IClientEntity.h" />
     <ClInclude Include="Antario\SDK\IClientMode.h" />
+    <ClInclude Include="Antario\SDK\IClientNetworkable.h" />
+    <ClInclude Include="Antario\SDK\IClientRenderable.h" />
+    <ClInclude Include="Antario\SDK\IClientThinkable.h" />
+    <ClInclude Include="Antario\SDK\IClientUnknown.h" />
+    <ClInclude Include="Antario\SDK\Interfaces.h" />
+    <ClInclude Include="Antario\SDK\Recv.h" />
+    <ClInclude Include="Antario\SDK\Vector.h" />
+    <ClInclude Include="Antario\SDK\VMatrix.h" />
+    <ClInclude Include="Antario\Utils\NetvarManager.h" />
+    <ClInclude Include="Antario\Utils\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
