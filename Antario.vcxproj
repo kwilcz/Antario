@@ -159,7 +159,7 @@
   <ItemGroup>
     <ClCompile Include="Antario\Hooks.cpp" />
     <ClCompile Include="Antario\DLLMain.cpp" />
-    <ClCompile Include="Antario\SDK\Interfaces.cpp" />
+    <ClCompile Include="Antario\Utils\Interfaces.cpp" />
     <ClCompile Include="Antario\Utils\NetvarManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -177,7 +177,7 @@
     <ClInclude Include="Antario\SDK\IClientRenderable.h" />
     <ClInclude Include="Antario\SDK\IClientThinkable.h" />
     <ClInclude Include="Antario\SDK\IClientUnknown.h" />
-    <ClInclude Include="Antario\SDK\Interfaces.h" />
+    <ClInclude Include="Antario\Utils\Interfaces.h" />
     <ClInclude Include="Antario\SDK\Recv.h" />
     <ClInclude Include="Antario\SDK\Vector.h" />
     <ClInclude Include="Antario\SDK\VMatrix.h" />

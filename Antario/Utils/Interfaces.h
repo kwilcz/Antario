@@ -3,16 +3,13 @@
 #include <Windows.h>
 #endif
 #include <memory>
-#include "IClientMode.h"
-#include "IBaseClientDll.h"
+#include "..\SDK\IClientMode.h"
+#include "..\SDK\IBaseClientDll.h"
 
 
-class Interfaces
+namespace Interfaces
 {
-public:
     void Init();
-private:
     void GetIClientDll();
     void GetIClientMode();
 };
-extern Interfaces* g_pInterfaces;

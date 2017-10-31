@@ -8,7 +8,7 @@
 class Utils
 {
 public:
-    static uint64_t FindSignature(const char* szModule, const char* szSignature)
+    static uintptr_t FindSignature(const char* szModule, const char* szSignature)
     {
         const char* pat = szSignature;
         DWORD firstMatch = 0;

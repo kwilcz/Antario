@@ -24,7 +24,7 @@
     <ClCompile Include="Antario\Utils\NetvarManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Antario\SDK\Interfaces.cpp">
+    <ClCompile Include="Antario\Utils\Interfaces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,9 +33,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\SDK\IClientMode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Antario\SDK\Interfaces.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\SDK\Vector.h">
@@ -87,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\SDK\CInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\Utils\Interfaces.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
