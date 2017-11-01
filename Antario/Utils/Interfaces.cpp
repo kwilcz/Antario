@@ -31,7 +31,6 @@ namespace Interfaces
     }
     void GetIClientMode()
     {
-        auto uAddress = *(DWORD*)(g_pUtils->FindSignature("client.dll", "8B 0D ? ? ? ? 8B 01 5D FF") + 2);
-        g_pClientMode = *(IClientMode**)(uAddress);
+        g_pClientMode = **(IClientMode***)((*(uintptr_t**)g_pClientDll)[10] + 0x5);
     }
 }
