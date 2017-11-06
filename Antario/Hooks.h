@@ -11,13 +11,14 @@ class Hooks
 public:   
     // Initialization setup, called on injection
     static void Init(); 
+    static void Restore();
 
 public:
     /*---------------------------------------------*/
     /*-------------Hooked functions----------------*/
     /*---------------------------------------------*/
 
-    static bool     __stdcall CreateMove(float sample_input_frametime, CUserCmd* cmd);
+    static bool     __fastcall CreateMove(IClientMode* thisptr, void* edx, float sampleInputFrametime, CUserCmd* cmd);
     //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
     //static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     //static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
@@ -40,7 +41,7 @@ private:
     typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
     typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 };
-extern std::unique_ptr<Hooks> g_pHooks;
+extern Hooks g_Hooks;
 
 
 

@@ -44,4 +44,4 @@ public:
         return NULL;
     }
 };
-extern Utils* g_pUtils;
+extern Utils g_Utils;

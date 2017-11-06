@@ -1,7 +1,7 @@
 #include "Interfaces.h"
 #include "Utils.h"
 
-Utils*          g_pUtils;
+Utils           g_pUtils;
 // Initializing global interfaces
 
 IBaseClientDLL* g_pClientDll    = nullptr;
