@@ -89,5 +89,17 @@
     <ClInclude Include="Antario\Utils\Interfaces.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Antario\SDK\IClientEntityList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\SDK\IVEngineClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\SDK\PlayerInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\SDK\Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

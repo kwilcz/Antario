@@ -54,7 +54,7 @@ private:
     int GetOffsetRecursive(MapType &map, int acc, const char *name, args_t ...args)
     {
         const auto &node = map[name];
-        return GetOffsetRecursive(node->nodes, acc + node->offset, args...);
+        return this->GetOffsetRecursive(node->nodes, acc + node->offset, args...);
     }
 
 public:
@@ -69,6 +69,7 @@ public:
     int GetOffset(const char *name, args_t ...args)
     {
         const auto &node = nodes[name];
-        return GetOffsetRecursive(node->nodes, node->offset, args...);
+        return this->GetOffsetRecursive(node->nodes, node->offset, args...);
     }
 };
+extern NetvarTree g_Netvars;

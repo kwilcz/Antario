@@ -2,6 +2,8 @@
 #include "NetvarManager.h"
 #include "..\SDK\IBaseClientDll.h"
 
+NetvarTree g_Netvars;
+
 /**
 * netvar_tree - Constructor
 NetvarTree
@@ -16,7 +18,7 @@ NetvarTree::NetvarTree()
         const auto classInfo = std::make_shared<Node>(0);
         RecvTable* recvTable = clientClass->m_pRecvTable;
 
-        PopulateNodes(recvTable, &classInfo->nodes);
+        this->PopulateNodes(recvTable, &classInfo->nodes);
         nodes.emplace(recvTable->GetName(), classInfo);
 
         clientClass = clientClass->m_pNext;
@@ -38,7 +40,7 @@ void NetvarTree::PopulateNodes(RecvTable *m_recvTable, MapType *m_mapType)
         const auto  propInfo = std::make_shared<Node>(prop->GetOffset());
 
         if (prop->GetType() == SendPropType::DPT_DataTable)
-            PopulateNodes(prop->GetDataTable(), &propInfo->nodes);
+            this->PopulateNodes(prop->GetDataTable(), &propInfo->nodes);
 
         m_mapType->emplace(prop->GetName(), propInfo);
     }

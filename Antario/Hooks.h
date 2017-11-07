@@ -1,4 +1,5 @@
 #include "Utils\Interfaces.h"
+#include "SDK\IClientMode.h"
 #include "SDK\CInput.h"
 #include <d3d9.h>
 
@@ -18,7 +19,7 @@ public:
     /*-------------Hooked functions----------------*/
     /*---------------------------------------------*/
 
-    static bool     __fastcall CreateMove(IClientMode* thisptr, void* edx, float sampleInputFrametime, CUserCmd* cmd);
+    static bool     __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sampleInputFrametime, CUserCmd* cmd);
     //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
     //static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     //static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
@@ -92,8 +93,8 @@ public:
     };
 
 private:
-    std::unique_ptr<std::uintptr_t[]> pNewVMT = nullptr; // Actual used pointer of VMT hook
-    std::uintptr_t** ppBaseClass  = nullptr;             // Saved pointer to our VMT hook
-    std::uintptr_t*  pOriginalVMT = nullptr;             // Saved original pointer to the VMT
-    std::size_t		 indexCount   = 0;                   // Count of indexes inside out f-ction
+    std::unique_ptr<std::uintptr_t[]> pNewVMT = nullptr;    // Actual used pointer of VMT hook
+    std::uintptr_t**    ppBaseClass  = nullptr;             // Saved pointer to our VMT hook
+    std::uintptr_t*     pOriginalVMT = nullptr;             // Saved original pointer to the VMT
+    std::size_t         indexCount = 0;                     // Count of indexes inside out f-ction
 };

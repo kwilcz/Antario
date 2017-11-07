@@ -1,5 +1,6 @@
 #pragma once
 #include <Psapi.h>
+#include "..\SDK\IVEngineClient.h"
 
 #define INRANGE(x,a,b)    (x >= a && x <= b)
 #define getByte( x )    (getBits(x[0]) << 4 | getBits(x[1]))
@@ -43,5 +44,52 @@ public:
         }
         return NULL;
     }
+
+    static bool ScreenTransform(const Vector& point, Vector& screen)
+    {
+        static ptrdiff_t viewMatrixPrt;
+        if (!viewMatrixPrt)
+        {
+            viewMatrixPrt = static_cast<ptrdiff_t>(Utils::FindSignature("client.dll", "0F 10 05 ? ? ? ? 8D 85 ? ? ? ? B9"));
+            viewMatrixPrt += 0x3;
+            viewMatrixPrt = *reinterpret_cast<uintptr_t*>(viewMatrixPrt);
+            viewMatrixPrt += 176;
+        }
+
+        const VMatrix& w2sMatrix = *(VMatrix*)viewMatrixPrt;
+        screen.x = w2sMatrix.m[0][0] * point.x + w2sMatrix.m[0][1] * point.y + w2sMatrix.m[0][2] * point.z + w2sMatrix.m[0][3];
+        screen.y = w2sMatrix.m[1][0] * point.x + w2sMatrix.m[1][1] * point.y + w2sMatrix.m[1][2] * point.z + w2sMatrix.m[1][3];
+        screen.z = 0.0f;
+
+        float w = w2sMatrix.m[3][0] * point.x + w2sMatrix.m[3][1] * point.y + w2sMatrix.m[3][2] * point.z + w2sMatrix.m[3][3];
+
+        if (w < 0.001f) {
+            screen.x *= 100000;
+            screen.y *= 100000;
+            return true;
+        }
+
+        float invw = 1.0f / w;
+        screen.x *= invw;
+        screen.y *= invw;
+
+        return false;
+    }
+
+    static bool WorldToScreen(const Vector &origin, Vector &screen)
+    {
+        if (!ScreenTransform(origin, screen))
+        {
+            int iScreenWidth, iScreenHeight;
+            g_pEngineClient->GetScreenSize(iScreenWidth, iScreenHeight);
+
+            screen.x = (iScreenWidth * 0.5f) + (screen.x * iScreenWidth) * 0.5f;
+            screen.y = (iScreenHeight * 0.5f) - (screen.y * iScreenHeight) * 0.5f;
+
+            return true;
+        }
+        return false;
+    }
+
 };
 extern Utils g_Utils;

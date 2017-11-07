@@ -1,6 +1,7 @@
 #pragma once
 
-typedef void* (*CreateInterfaceFn)(const char *pName, int *pReturnCode);
+typedef void*   (*CreateInterfaceFn)        (const char *pName, int *pReturnCode);
+typedef void    (*pfnDemoCustomDataCallback)(unsigned char *pData, size_t iSize);
 
 enum class EClassIds : int
 {
