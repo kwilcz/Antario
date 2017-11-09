@@ -19,8 +19,10 @@ IVEngineClient*     g_pEngineClient = nullptr;
 namespace Interfaces
 {
     template<typename T>
-    T* CaptureInterface(CreateInterfaceFn pfnFactory, const char* szInterfaceVersion)
+    T* CaptureInterface(const char* szModuleName, const char* szInterfaceVersion)
     {
+        CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA(szModuleName), "CreateInterface");
+        
         return (T*)pfnFactory(szInterfaceVersion, NULL);
     }
     
@@ -36,8 +38,7 @@ namespace Interfaces
 
     void GetIClientDll()
     {
-        CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA("client.dll"), "CreateInterface");
-        g_pClientDll = CaptureInterface<IBaseClientDLL>(pfnFactory, "VClient018");
+        g_pClientDll = CaptureInterface<IBaseClientDLL>("client.dll", "VClient018");
     }
     void GetIClientMode()
     {
@@ -45,12 +46,10 @@ namespace Interfaces
     }
     void GetIClientEntityList()
     {
-        CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA("client.dll"), "CreateInterface");
-        g_pEntityList = CaptureInterface<IClientEntityList>(pfnFactory, "VClientEntityList003");
+        g_pEntityList = CaptureInterface<IClientEntityList>("client.dll", "VClientEntityList003");
     }
     void GetIVEngineClient()
     {
-        CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA("client.dll"), "CreateInterface");
-        g_pEngineClient = CaptureInterface<IVEngineClient>(pfnFactory, "VClientEntityList003");
+        g_pEngineClient = CaptureInterface<IVEngineClient>("client.dll", "VClientEntityList003");
     }
 }
