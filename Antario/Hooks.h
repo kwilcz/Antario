@@ -19,7 +19,7 @@ public:
     /*-------------Hooked functions----------------*/
     /*---------------------------------------------*/
 
-    static bool     __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sampleInputFrametime, CUserCmd* cmd);
+    static bool     __fastcall CreateMove(IClientMode* thisptr, void* edx, float sampleInputFrametime, CUserCmd* cmd);
     //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
     //static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     //static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);

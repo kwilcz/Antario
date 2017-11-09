@@ -49,7 +49,7 @@ private:
     template <class T>
     T GetValue(int offset)
     {
-        return *GetPointer(offset);
+        return *(T*)((std::uintptr_t)this + offset);
     }
 public:
     /// in progress
