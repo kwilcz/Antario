@@ -72,4 +72,4 @@ public:
         return this->GetOffsetRecursive(node->nodes, node->offset, args...);
     }
 };
-extern NetvarTree g_Netvars;
+extern std::unique_ptr<NetvarTree> g_pNetvars;

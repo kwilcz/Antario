@@ -2,7 +2,7 @@
 #include "NetvarManager.h"
 #include "..\SDK\IBaseClientDll.h"
 
-NetvarTree g_Netvars;
+std::unique_ptr<NetvarTree> g_pNetvars;
 
 /**
 * netvar_tree - Constructor
@@ -11,7 +11,7 @@ NetvarTree
 */
 NetvarTree::NetvarTree()
 {
-    const auto *clientClass = g_pClientDll->GetAllClasses();
+    const ClientClass* clientClass = g_pClientDll->GetAllClasses();
 
     while (clientClass != nullptr) 
     {
@@ -33,9 +33,10 @@ NetvarTree::NetvarTree()
 * Add info for every prop in the recv table to the node map. If a prop is a
 * datatable itself, initiate a recursive call to create more branches.
 */
-void NetvarTree::PopulateNodes(RecvTable *m_recvTable, MapType *m_mapType)
+void NetvarTree::PopulateNodes(RecvTable* m_recvTable, MapType* m_mapType)
 {
-    for (auto i = 0; i < m_recvTable->GetNumProps(); i++) {
+    for (auto i = 0; i < m_recvTable->GetNumProps(); i++) 
+    {
         const RecvProp* prop = m_recvTable->GetProp(i);
         const auto  propInfo = std::make_shared<Node>(prop->GetOffset());
 
