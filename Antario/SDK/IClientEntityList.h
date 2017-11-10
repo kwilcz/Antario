@@ -14,4 +14,4 @@ public:
     virtual void                  SetMaxEntities(int maxEnts) = 0;
     virtual int                   GetMaxEntities() = 0;
 };
-extern IClientEntityList*  g_pEngine;
+extern IClientEntityList*  g_pEntityList;

@@ -3,8 +3,6 @@
 #include "SDK\CInput.h"
 #include <d3d9.h>
 
-extern HANDLE g_hConsoleHandle;
-
 class VMTHook;
 class Hooks
 {

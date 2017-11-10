@@ -313,4 +313,4 @@ public:
     virtual void                  ForceVoiceRecordOn(void) = 0;
     virtual bool                  IsReplay(void) = 0;
 };
-extern IVEngineClient* g_pEngineClient;
+extern IVEngineClient* g_pEngine;
