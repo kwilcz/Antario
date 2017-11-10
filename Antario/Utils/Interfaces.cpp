@@ -7,13 +7,15 @@
 #include "..\SDK\IVEngineClient.h"
 
 // Initializing global variables with no cpp file matching the header
+
 Utils g_pUtils;
+
 // Initializing global interfaces
 
-IBaseClientDLL*     g_pClientDll = nullptr;
-IClientMode*        g_pClientMode = nullptr;
+IBaseClientDLL*     g_pClientDll    = nullptr;
+IClientMode*        g_pClientMode   = nullptr;
 IClientEntityList*  g_pEntityList   = nullptr;
-IVEngineClient*     g_pEngineClient = nullptr;
+IVEngineClient*     g_pEngine       = nullptr;
 
 
 namespace Interfaces
@@ -50,6 +52,6 @@ namespace Interfaces
     }
     void GetIVEngineClient()
     {
-        g_pEngineClient = CaptureInterface<IVEngineClient>("client.dll", "VClientEntityList003");
+        g_pEngine = CaptureInterface<IVEngineClient>("client.dll", "VEngineClient014");
     }
 }
