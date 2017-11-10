@@ -91,5 +91,10 @@ public:
         return false;
     }
 
+    static void LogToConsole(std::wstring str)
+    {
+        WriteConsole(g_hConsoleHandle, str.c_str(), str.length(), NULL, NULL);
+    }
+
 };
 extern Utils g_Utils;

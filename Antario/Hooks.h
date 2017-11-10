@@ -6,7 +6,6 @@
 extern HANDLE g_hConsoleHandle;
 
 class VMTHook;
-
 class Hooks
 {
 public:   
