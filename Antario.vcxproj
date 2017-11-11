@@ -163,6 +163,7 @@
     <ClCompile Include="Antario\Utils\NetvarManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Antario\Features\Misc.h" />
     <ClInclude Include="Antario\Hooks.h" />
     <ClInclude Include="Antario\SDK\CGlobalVarsBase.h" />
     <ClInclude Include="Antario\SDK\CHandle.h" />

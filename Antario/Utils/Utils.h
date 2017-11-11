@@ -11,7 +11,7 @@ extern HANDLE g_hConsoleHandle;
 class Utils
 {
 public:
-    static uintptr_t FindSignature(const char* szModule, const char* szSignature)
+    uintptr_t FindSignature(const char* szModule, const char* szSignature)
     {
         const char* pat = szSignature;
         DWORD firstMatch = 0;
@@ -36,7 +36,7 @@ public:
                     pat += 3;
 
                 else
-                    pat += 2; //one ?
+                    pat += 2;
             }
             else
             {
@@ -47,7 +47,41 @@ public:
         return NULL;
     }
 
-    static bool ScreenTransform(const Vector& point, Vector& screen)
+    bool WorldToScreen(const Vector &origin, Vector &screen)
+    {
+        if (!ScreenTransform(origin, screen))
+        {
+            int iScreenWidth, iScreenHeight;
+            g_pEngine->GetScreenSize(iScreenWidth, iScreenHeight);
+
+            screen.x = (iScreenWidth * 0.5f) + (screen.x * iScreenWidth) * 0.5f;
+            screen.y = (iScreenHeight * 0.5f) - (screen.y * iScreenHeight) * 0.5f;
+
+            return true;
+        }
+        return false;
+    }
+
+    void LogToConsole(std::wstring str, ...)
+    {
+        WriteConsole(hConsoleHandle, str.c_str(), str.length(), NULL, NULL);
+    }
+
+    template <typename T>
+    T CallVFunc(void* ppClass, int iIndex)
+    {
+        return (*(T**)ppClass)[iIndex];
+    }
+
+    void SetConsoleHandle(HANDLE hHandle)
+    {
+        hConsoleHandle = hHandle;
+    }
+
+private:
+    HANDLE hConsoleHandle;
+
+    bool ScreenTransform(const Vector& point, Vector& screen)
     {
         static ptrdiff_t viewMatrixPrt;
         if (!viewMatrixPrt)
@@ -77,32 +111,5 @@ public:
 
         return false;
     }
-
-    static bool WorldToScreen(const Vector &origin, Vector &screen)
-    {
-        if (!ScreenTransform(origin, screen))
-        {
-            int iScreenWidth, iScreenHeight;
-            g_pEngine->GetScreenSize(iScreenWidth, iScreenHeight);
-
-            screen.x = (iScreenWidth * 0.5f) + (screen.x * iScreenWidth) * 0.5f;
-            screen.y = (iScreenHeight * 0.5f) - (screen.y * iScreenHeight) * 0.5f;
-
-            return true;
-        }
-        return false;
-    }
-
-    static void LogToConsole(std::wstring str)
-    {
-        WriteConsole(g_hConsoleHandle, str.c_str(), str.length(), NULL, NULL);
-    }
-
-    template <typename T>
-    T CallVFunc(void* ppClass, int iIndex)
-    {
-        return (*(T**)ppClass)[iIndex];
-    }
-
 };
 extern Utils g_Utils;

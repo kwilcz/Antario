@@ -9,7 +9,7 @@
 
 // Initializing global variables with no cpp file matching the header
 
-Utils g_pUtils;
+Utils g_Utils;
 
 // Initializing global interfaces
 
