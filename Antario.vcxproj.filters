@@ -101,5 +101,8 @@
     <ClInclude Include="Antario\SDK\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Antario\SDK\CPrediction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

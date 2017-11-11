@@ -98,5 +98,11 @@ public:
         WriteConsole(g_hConsoleHandle, str.c_str(), str.length(), NULL, NULL);
     }
 
+    template <typename T>
+    T CallVFunc(void* ppClass, int iIndex)
+    {
+        return (*(T**)ppClass)[iIndex];
+    }
+
 };
 extern Utils g_Utils;

@@ -9,10 +9,4 @@ namespace Interfaces
 {
     // Used to initialize all the interfaces at one time
     void Init();
-
-
-    void GetIClientDll();
-    void GetIClientMode();
-    void GetIClientEntityList();
-    void GetIVEngineClient();
 };

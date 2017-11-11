@@ -170,6 +170,7 @@
     <ClInclude Include="Antario\SDK\CInput.h" />
     <ClInclude Include="Antario\SDK\ClientClass.h" />
     <ClInclude Include="Antario\SDK\Color.h" />
+    <ClInclude Include="Antario\SDK\CPrediction.h" />
     <ClInclude Include="Antario\SDK\Definitions.h" />
     <ClInclude Include="Antario\SDK\IBaseClientDll.h" />
     <ClInclude Include="Antario\SDK\IClientEntity.h" />

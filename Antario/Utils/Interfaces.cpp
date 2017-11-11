@@ -5,6 +5,7 @@
 #include "..\SDK\IBaseClientDll.h"
 #include "..\SDK\IClientEntityList.h"
 #include "..\SDK\IVEngineClient.h"
+#include "..\SDK\CPrediction.h"
 
 // Initializing global variables with no cpp file matching the header
 
@@ -16,6 +17,7 @@ IBaseClientDLL*     g_pClientDll    = nullptr;
 IClientMode*        g_pClientMode   = nullptr;
 IClientEntityList*  g_pEntityList   = nullptr;
 IVEngineClient*     g_pEngine       = nullptr;
+CPrediction*        g_pPrediction   = nullptr;
 
 
 namespace Interfaces
@@ -29,28 +31,10 @@ namespace Interfaces
     
     void Init()
     {
-        GetIClientDll();
-        GetIClientMode();
-        GetIClientEntityList();
-        GetIVEngineClient();
-    }
-
-
-
-    void GetIClientDll()
-    {
-        g_pClientDll = CaptureInterface<IBaseClientDLL>("client.dll", "VClient018");
-    }
-    void GetIClientMode()
-    {
-        g_pClientMode = **(IClientMode***)((*(uintptr_t**)g_pClientDll)[10] + 0x5);
-    }
-    void GetIClientEntityList()
-    {
-        g_pEntityList = CaptureInterface<IClientEntityList>("client.dll", "VClientEntityList003");
-    }
-    void GetIVEngineClient()
-    {
-        g_pEngine = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient014");
+        g_pClientDll    = CaptureInterface<IBaseClientDLL>("client.dll", "VClient018");             // Get IBaseClientDLL
+        g_pClientMode   = **(IClientMode***)((*(uintptr_t**)g_pClientDll)[10] + 0x5);               // Get IClientMode
+        g_pEntityList   = CaptureInterface<IClientEntityList>("client.dll", "VClientEntityList003");// Get IClientEntityList
+        g_pEngine       = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient014");       // Get IVEngineClient
+        g_pPrediction   = CaptureInterface<CPrediction>("client.dll", "VClientPrediction001");      // Get CPrediction
     }
 }
