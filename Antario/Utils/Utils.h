@@ -6,8 +6,6 @@
 #define getByte( x )    (getBits(x[0]) << 4 | getBits(x[1]))
 #define getBits( x )    (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
 
-extern HANDLE g_hConsoleHandle;
-
 class Utils
 {
 public:
