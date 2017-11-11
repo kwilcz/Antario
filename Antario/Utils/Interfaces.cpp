@@ -23,8 +23,7 @@ namespace Interfaces
     template<typename T>
     T* CaptureInterface(const char* szModuleName, const char* szInterfaceVersion)
     {
-        CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA(szModuleName), "CreateInterface");
-        
+        CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA(szModuleName), "CreateInterface");        
         return (T*)pfnFactory(szInterfaceVersion, NULL);
     }
     
@@ -52,6 +51,6 @@ namespace Interfaces
     }
     void GetIVEngineClient()
     {
-        g_pEngine = CaptureInterface<IVEngineClient>("client.dll", "VEngineClient014");
+        g_pEngine = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient014");
     }
 }
