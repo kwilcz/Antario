@@ -19,6 +19,8 @@
 *.sbr
 *.log
 *.opendb
+*.iobj
+*.ipdb
 
 # Precompiled Headers
 *.gch
