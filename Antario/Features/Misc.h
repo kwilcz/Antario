@@ -2,6 +2,7 @@
 #include "..\SDK\CInput.h"
 #include "..\SDK\CEntity.h"
 #include "..\SDK\IVEngineClient.h"
+#include "..\Settings.h"
 
 class Misc
 {
@@ -12,7 +13,8 @@ public:
         this->pLocal = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer()); // To be replaced with a global var
         if (this->pLocal)
         {
-            this->DoBhop();
+            if (settings.bBhopEnabled)
+                this->DoBhop();
             // sum future shit
         }
     }

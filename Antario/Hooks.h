@@ -1,7 +1,7 @@
+#include "Utils\DrawManager.h"
 #include "Utils\Interfaces.h"
 #include "SDK\IClientMode.h"
 #include "SDK\CInput.h"
-#include <d3d9.h>
 
 class VMTHook;
 class Hooks
