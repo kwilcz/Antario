@@ -1,4 +1,5 @@
 #pragma once
+#include <Windows.h>
 
 typedef void*   (*CreateInterfaceFn)        (const char *pName, int *pReturnCode);
 typedef void    (*pfnDemoCustomDataCallback)(unsigned char *pData, size_t iSize);
@@ -258,6 +259,24 @@ enum class EClassIds : int
     SmokeTrail,
     SporeExplosion,
     SporeTrail
+};
+
+enum class MoveType_t
+{
+    MOVETYPE_NONE = 0,
+    MOVETYPE_ISOMETRIC,
+    MOVETYPE_WALK,
+    MOVETYPE_STEP,
+    MOVETYPE_FLY,
+    MOVETYPE_FLYGRAVITY,
+    MOVETYPE_VPHYSICS,
+    MOVETYPE_PUSH,
+    MOVETYPE_NOCLIP,
+    MOVETYPE_LADDER,
+    MOVETYPE_OBSERVER,
+    MOVETYPE_CUSTOM,
+    MOVETYPE_LAST = MOVETYPE_CUSTOM,
+    MOVETYPE_MAX_BITS = 4
 };
 
 enum class EntityFlags

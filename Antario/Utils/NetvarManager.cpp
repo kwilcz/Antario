@@ -2,6 +2,8 @@
 #include "NetvarManager.h"
 #include "..\SDK\IBaseClientDll.h"
 
+#undef GetProp  // fucnik recvtable and windoze usin the same namings :angery:
+
 std::unique_ptr<NetvarTree> g_pNetvars;
 
 /**

@@ -11,13 +11,13 @@ public:
     float     frametime;
     int       maxClients;
     int       tickcount;
-    float     interval_per_tick;
-    float     interpolation_amount;
+    float     intervalPerTick;
+    float     interpolationAmount;
     int       simTicksThisFrame;
-    int       network_protocol;
+    int       networkProtocol;
     void*     pSaveData;
-    bool      m_bClient;
-    bool      m_bRemoteClient;
+    bool      bClient;
+    bool      bRemoteClient;
 
 private:
     // 100 (i.e., tickcount is rounded down to this base and then the "delta" from this base is networked
@@ -26,3 +26,4 @@ private:
     //  all of the entities from forcing a new PackedEntity on the same tick (i.e., prevents them from getting lockstepped on this)
     int       nTimestampRandomizeWindow;
 };
+extern CGlobalVarsBase* g_pGlobalVars;

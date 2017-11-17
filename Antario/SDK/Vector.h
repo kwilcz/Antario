@@ -6,6 +6,7 @@
 #define Assert(x)
 #endif
 
+#include "Definitions.h"
 #include <sstream>
 #include <math.h>
 

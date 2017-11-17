@@ -1,5 +1,4 @@
 #pragma once
-#include <rpcndr.h>
 #include "Vector.h"
 
 struct cplane_t

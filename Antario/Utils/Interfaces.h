@@ -2,7 +2,6 @@
 #pragma once
 #include <Windows.h>
 #endif
-#include <memory>
 
 
 namespace Interfaces

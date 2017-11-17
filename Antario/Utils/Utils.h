@@ -44,7 +44,6 @@ public:
         }
         return NULL;
     }
-
     bool WorldToScreen(const Vector &origin, Vector &screen)
     {
         if (!ScreenTransform(origin, screen))
@@ -59,18 +58,15 @@ public:
         }
         return false;
     }
-
     void LogToConsole(std::wstring str, ...)
     {
         WriteConsole(hConsoleHandle, str.c_str(), str.length(), NULL, NULL);
     }
-
     template <typename T>
     T CallVFunc(void* ppClass, int iIndex)
     {
         return (*(T**)ppClass)[iIndex];
     }
-
     void SetConsoleHandle(HANDLE hHandle)
     {
         hConsoleHandle = hHandle;

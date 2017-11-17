@@ -1,4 +1,5 @@
 #pragma once
+#include "..\Utils\Utils.h"
 
 #define MAX_SPLITSCREEN_PLAYERS 1
 
@@ -40,6 +41,7 @@ public:
 
     virtual void    SetupMovementBounds(CMoveData *pMove) = 0;
 };
+extern IGameMovement* g_pMovement;
 
 class CPrediction
 {

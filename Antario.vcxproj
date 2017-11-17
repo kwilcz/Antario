@@ -169,6 +169,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Antario\Features\EnginePrediction.cpp" />
     <ClCompile Include="Antario\Hooks.cpp" />
     <ClCompile Include="Antario\DLLMain.cpp" />
     <ClCompile Include="Antario\Utils\DrawManager.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Antario\Utils\NetvarManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Antario\Features\EnginePrediction.h" />
     <ClInclude Include="Antario\Features\Misc.h" />
     <ClInclude Include="Antario\Hooks.h" />
     <ClInclude Include="Antario\SDK\CGlobalVarsBase.h" />
