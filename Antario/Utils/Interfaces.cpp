@@ -34,8 +34,8 @@ namespace Interfaces
     void Init()
     {
         g_pClientDll    = CaptureInterface<IBaseClientDLL>("client.dll", "VClient018");                 // Get IBaseClientDLL
-        g_pClientMode   = **reinterpret_cast<IClientMode***>    ((*reinterpret_cast<uintptr_t**>(g_pClientDll))[10] + 0x5);  // Get IClientMode
-        g_pGlobalVars   = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(g_pClientDll))[0]  + 0x1B); // Get CGlobalVarsBase
+        g_pClientMode   = **reinterpret_cast<IClientMode***>    ((*reinterpret_cast<uintptr_t**>(g_pClientDll))[10] + 0x5u);  // Get IClientMode
+        g_pGlobalVars   = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(g_pClientDll))[0]  + 0x1Bu); // Get CGlobalVarsBase
         g_pEntityList   = CaptureInterface<IClientEntityList>("client.dll", "VClientEntityList003");    // Get IClientEntityList
         g_pEngine       = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient014");           // Get IVEngineClient
         g_pPrediction   = CaptureInterface<CPrediction>("client.dll", "VClientPrediction001");          // Get CPrediction
