@@ -18,6 +18,7 @@ void DrawManager::Init(LPDIRECT3DDEVICE9 pDevice)
     // Save the device internally
     this->pDevice = pDevice;
 
+    ///TODO: Create a proper font atlas using bitmap & sprites to save fps. ID3D9Font interface sucks with performance
     // Create a new font
     D3DXCreateFontA(this->pDevice, 12, 0, FW_NORMAL, 1, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, "Tahoma", &this->pFont);
 }
