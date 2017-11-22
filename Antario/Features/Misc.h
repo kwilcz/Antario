@@ -23,7 +23,7 @@ private:
 
     void DoBhop()
     {
-        if (!(this->pLocal->GetFlags() & static_cast<int>(EntityFlags::FL_ONGROUND)) && this->pLocal->GetMoveType() != MoveType_t::MOVETYPE_NOCLIP)
+        if (!(this->pLocal->GetFlags() & static_cast<int>(EntityFlags::FL_ONGROUND)) || this->pLocal->GetMoveType() != MoveType_t::MOVETYPE_NOCLIP)
             if (this->pCmd->buttons & IN_JUMP)
                 this->pCmd->buttons &= ~IN_JUMP;
     }
