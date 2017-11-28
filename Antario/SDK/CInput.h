@@ -90,22 +90,22 @@ public:
         return crc;
     }
 
-    int       command_number;     // 0x04
-    int       tick_count;         // 0x08
-    QAngle    viewangles;         // 0x0C
-    Vector    aimdirection;       // 0x18
-    float     forwardmove;        // 0x24
-    float     sidemove;           // 0x28
-    float     upmove;             // 0x2C
-    int       buttons;            // 0x30
-    byte      impulse;            // 0x34
-    int       weaponselect;       // 0x38
-    int       weaponsubtype;      // 0x3C
-    int       random_seed;        // 0x40
-    short     mousedx;            // 0x44
-    short     mousedy;            // 0x46
-    bool      hasbeenpredicted;   // 0x48
-    char      pad_0x4C[0x18];     // 0x4C
+    int       command_number;     // For matching server and client commands for debugging
+    int       tick_count;         // The tick the client created this command
+    QAngle    viewangles;         // Player instantaneous view angles.
+    Vector    aimdirection;       // 
+    float     forwardmove;        // Forward velocity
+    float     sidemove;           // Sideways velocity
+    float     upmove;             // Upward velocity
+    int       buttons;            // Attack button states
+    byte      impulse;            // Impulse command issued.
+    int       weaponselect;       // Current weapon id
+    int       weaponsubtype;      // 
+    int       random_seed;        // For shared random functions
+    short     mousedx;            // Mouse accum in x from create move
+    short     mousedy;            // Mouse accum in y from create move
+    bool      hasbeenpredicted;   // Client only, tracks whether we've predicted this command at least once
+    char      pad_0x4C[0x18];     
 
 };
 

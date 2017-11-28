@@ -34,10 +34,10 @@ public:
         static int m_iTeamNum = g_pNetvars->GetOffset("DT_BaseEntity", "m_iTeamNum");
         return GetValue<int>(m_iTeamNum);
     }
-    int& GetFlags()
+    EntityFlags GetFlags()
     {
         static int m_fFlags = g_pNetvars->GetOffset("DT_BasePlayer", "m_fFlags");
-        return *(int*)((std::uintptr_t)this + m_fFlags);    // template will not work with reference
+        return GetValue<EntityFlags>(m_fFlags);
     }
     MoveType_t GetMoveType()
     {
@@ -59,10 +59,10 @@ public:
         static int m_bGunGameImmunity = g_pNetvars->GetOffset("DT_CSPlayer", "m_bGunGameImmunity");
         return GetValue<bool>(m_bGunGameImmunity);
     }
-    unsigned int GetTickBase()
+    int GetTickBase()
     {
         static int m_nTickBase = g_pNetvars->GetOffset("DT_BasePlayer", "localdata", "m_nTickBase");
-        return GetValue<unsigned int>(m_nTickBase);
+        return GetValue<int>(m_nTickBase);
     }
 };
 

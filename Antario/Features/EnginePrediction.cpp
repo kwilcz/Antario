@@ -5,17 +5,14 @@
 float flOldCurtime;
 float flOldFrametime;
 
-int EnginePrediction::m_iRandomSeed = 0;
+int* EnginePrediction::m_nRandomSeed = nullptr;
 
 void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
 {
-    if (!pLocal || !pCmd)
-        return;
-
     static CUserCmd* pLastCmd;
-    static unsigned int flTickBase;
+    static int flTickBase;
 
-    // fix tickbase if game didnt render prevoious tick
+    // fix tickbase if game didnt render previous tick
     if (pLastCmd)   
         if (pLastCmd->hasbeenpredicted)
             flTickBase = pLocal->GetTickBase();
@@ -23,9 +20,9 @@ void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
             ++flTickBase;
 
     // get random_seed as its 0 in clientmode->createmove
-    typedef UINT(__cdecl* MD5_PseudoRandom_t)(UINT);
+    typedef unsigned int(__cdecl* MD5_PseudoRandom_t)(unsigned int);
     static auto MD5_PseudoRandom = (MD5_PseudoRandom_t)g_Utils.FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
-    m_iRandomSeed = MD5_PseudoRandom(pCmd->command_number) & 0x7fffffff;
+    *m_nRandomSeed = MD5_PseudoRandom(pCmd->command_number) & 0x7FFFFFFF;
 
 
     pLastCmd        = pCmd;
