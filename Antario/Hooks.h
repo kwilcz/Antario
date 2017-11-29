@@ -16,7 +16,7 @@ public:
     /*-------------Hooked functions----------------*/
     /*---------------------------------------------*/
 
-    static bool     __fastcall CreateMove(IClientMode*, void*, float, CUserCmd*);
+    extern bool     __fastcall CreateMove(IClientMode*, void*, float, CUserCmd*);
     //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
     //static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     //static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
