@@ -47,7 +47,7 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 {
     // Call original createmove before we start screwing with it
     static auto oCreateMove = g_Hooks.pClientModeHook->GetOriginal<CreateMove_t>(24);
-    oCreateMove(thisptr, sampleInputFrametime, pCmd);
+    oCreateMove(thisptr, edx, sample_frametime, pCmd);
 
     if (!pCmd->command_number)
         return oCreateMove;
