@@ -69,5 +69,8 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     EnginePrediction::RunEnginePred(pLocalEntity, pCmd);
     // run shit in enginepred
     EnginePrediction::EndEnginePred(pLocalEntity);
-    return false;
+    
+    // todo clamp movement here with std::clamp and add a vector clamp fn and call it here
+    
+    return false; // return false here so that the engine doesn't update our view_angles without any modified angles
 }
