@@ -33,6 +33,9 @@
     <ClCompile Include="Antario\Features\EnginePrediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Antario\Utils\D3DFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Antario\Hooks.h">
@@ -120,6 +123,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\Features\EnginePrediction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\Utils\D3DFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

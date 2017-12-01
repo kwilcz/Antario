@@ -1,4 +1,7 @@
 #include "DrawManager.h"
+#include <assert.h>
+
+DrawManager g_Render;
 
 struct Vertex
 {
@@ -18,25 +21,30 @@ void DrawManager::Init(LPDIRECT3DDEVICE9 pDevice)
     // Save the device internally
     this->pDevice = pDevice;
 
-    ///TODO: Create a proper font atlas using bitmap & sprites to save fps. ID3D9Font interface sucks with performance
-    // Create a new font
-    D3DXCreateFontA(this->pDevice, 12, 0, FW_NORMAL, 1, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH, "Tahoma", &this->pFont);
+    pFont = std::make_unique<CD3DFont>(L"Tahoma", 12, FW_BOLD);
+
+    // Init font device object
+    pFont->InitDeviceObjects(pDevice);
+    pFont->RestoreDeviceObjects();
 }
 
 
 void DrawManager::Invalidate()
 {
-    if (this->pDevice)
-        this->pDevice->Release();
-    
-    this->pFont->Release();
+    // No need for checks as SAFE_RELEASE does that for us
+    SAFE_RELEASE(this->pDevice);
+
+    this->pFont->InvalidateDeviceObjects();
 }
 
 
 void DrawManager::Reset(LPDIRECT3DDEVICE9 pDevice)
 {
-    this->Invalidate();
-    this->Init(pDevice);
+    this->pDevice = pDevice;
+
+    pFont->InvalidateDeviceObjects();
+    pFont->InitDeviceObjects(pDevice);
+    pFont->RestoreDeviceObjects();
 }
 
 
@@ -58,4 +66,9 @@ void DrawManager::DrawRect(int x, int y, int width, int height, DWORD color)
     this->DrawLine(x, y, x, y + height, color); // draw left vertical
     this->DrawLine(x, y + height - 1, x + width, y + height - 1, color);    // draw top horizontal
     this->DrawLine(x + width - 1, y, x + width - 1, y + height, color);     // draw right vertical
+}
+
+void DrawManager::DrawString(float x, float y, DWORD dwColor, const char * szText, DWORD dwFlags)
+{
+    pFont->DrawString(x, y, dwColor, szText, dwFlags);    // To make life easier
 }

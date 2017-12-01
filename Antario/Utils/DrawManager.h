@@ -1,6 +1,7 @@
 #pragma once
-#include <d3dx9.h>
-#pragma comment (lib, "d3dx9")  // link D3DX DLL
+#include <memory>
+#include "D3DFont.h"
+
 
 class DrawManager
 {
@@ -14,10 +15,13 @@ public: // Function members
 
     // Drawing functions
 
-    void DrawLine   (int x, int y, int x2, int y2, DWORD color);
-    void DrawRect   (int x, int y, int width, int height, DWORD color);
+    void DrawLine   (int x, int y, int x2, int y2, DWORD dwColor);
+    void DrawRect   (int x, int y, int width, int height, DWORD dwColor);
+
+    void DrawString (float x, float y, DWORD dwColor, const char* szText, DWORD dwFlags = 0L);
 
 private: // Variable members
     LPDIRECT3DDEVICE9 pDevice;
-    LPD3DXFONT pFont;
+    std::unique_ptr<CD3DFont> pFont;
 };
+extern DrawManager g_Render;

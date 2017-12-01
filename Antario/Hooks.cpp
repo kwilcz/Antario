@@ -4,6 +4,7 @@
 #include "Features\EnginePrediction.h"
 #include "SDK\IClientMode.h"
 
+
 Misc    g_Misc;
 Hooks   g_Hooks;
 
@@ -16,13 +17,18 @@ void Hooks::Init()
     uintptr_t d3dDevice = **(uintptr_t**)(g_Utils.FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
 
     // VMTHooks
-    //g_pHooks->pD3DDevice9Hook = std::make_unique<VMTHook>(reinterpret_cast<void*>(d3dDevice));
+    g_Hooks.pD3DDevice9Hook = std::make_unique<VMTHook>(reinterpret_cast<void*>(d3dDevice));
     g_Hooks.pClientModeHook = std::make_unique<VMTHook>(g_pClientMode);
-    g_Hooks.pClientModeHook->Hook(24, (void*)Hooks::CreateMove); 
+
+    // Hook the table functions
+    g_Hooks.pD3DDevice9Hook->Hook(16, Hooks::Reset);
+    g_Hooks.pD3DDevice9Hook->Hook(17, Hooks::Present);
+    g_Hooks.pD3DDevice9Hook->Hook(42, Hooks::EndScene);
+    g_Hooks.pClientModeHook->Hook(24, Hooks::CreateMove); 
 
 
    
-#ifdef _DEBUG       // Example on how to use external WIN console.
+#ifdef _DEBUG       // Create console only in debug mode
     AllocConsole();                                             // Alloc memory and create console    
     g_Utils.SetConsoleHandle(GetStdHandle(STD_OUTPUT_HANDLE));  // Get and save console handle to future use with WriteToConsole etc.    
     g_Utils.LogToConsole(L"Initialization Succeded \n");        // Log info to console
@@ -34,6 +40,9 @@ void Hooks::Init()
 void Hooks::Restore()
 {
     // Unhook every function we hooked and restore original one
+    g_Hooks.pD3DDevice9Hook->Unhook(16);
+    g_Hooks.pD3DDevice9Hook->Unhook(17);
+    g_Hooks.pD3DDevice9Hook->Unhook(42);
     g_Hooks.pClientModeHook->Unhook(24);
 
 #ifdef _DEBUG
@@ -52,15 +61,9 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     if (!pCmd->command_number)
         return oCreateMove;
     
-    // todo update the engine with our current angles ; generate pCmd->random_seed ; get send_packet off the stack
+/// TODO: update the engine with our current angles ; done ; get send_packet off the stack
 
-    // Some quick debug log, uncomment to check if everything works
-//#ifdef _DEBUG
-//    std::wstring str = std::to_wstring(g_pEngine->GetLocalPlayer());
-//    g_Utils.LogToConsole(str);
-//#endif // _DEBUG
-
-    // Local player, get only once -> OPTIMALIZATION :)
+    // Local player, get only once, for now in cm only. Will make global later on
     auto pLocalEntity = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer());
 
     g_Misc.OnCreateMove(pCmd);
@@ -68,9 +71,58 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     
     EnginePrediction::RunEnginePred(pLocalEntity, pCmd);
     // run shit in enginepred
-    EnginePrediction::EndEnginePred(pLocalEntity);
+    EnginePrediction::EndEnginePred(pLocalEntity);    
+/// TODO: clamp movement here with std::clamp and add a vector clamp fn and call it here
     
-    // todo clamp movement here with std::clamp and add a vector clamp fn and call it here
-    
-    return false; // return false here so that the engine doesn't update our view_angles without any modified angles
+    return false; // return false here so that the engine doesn't update our view_angles without any modification
+}
+
+
+
+
+HRESULT __stdcall Hooks::EndScene(IDirect3DDevice9* pDevice)
+{
+
+    if (!g_Hooks.bInitializedDrawManager)
+    {
+        g_Render.Init(pDevice);
+        g_Hooks.bInitializedDrawManager = true;
+    }
+
+    // Call original
+    static auto oEndScene = g_Hooks.pD3DDevice9Hook->GetOriginal<EndScene_t>(42);
+    return oEndScene(pDevice);
+}
+
+
+
+
+HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
+{
+    static auto oReset = g_Hooks.pD3DDevice9Hook->GetOriginal<Reset_t>(16);
+
+    if (g_Hooks.bInitializedDrawManager)
+    {
+        g_Render.Reset(pDevice);
+    }
+
+    return oReset(pDevice, pPresentationParameters);
+
+}
+
+
+
+
+HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourceRect, const RECT * pDestRect, HWND hDestWindowOverride, const RGNDATA * pDirtyRegion)
+{
+    if (g_Hooks.bInitializedDrawManager)
+    {
+        int iScreenWidth, iScreenHeight;
+        g_pEngine->GetScreenSize(iScreenWidth, iScreenHeight);
+        Vector2D mid = Vector2D(iScreenWidth * 0.5f, iScreenHeight * 0.5f);
+        DWORD col = D3DCOLOR_ARGB(255, 255, 255, 255);
+        g_Render.DrawString(mid.x, mid.y, col, "TEST");
+    }
+    static auto oPresent = g_Hooks.pD3DDevice9Hook->GetOriginal<Present_t>(17);
+    return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
