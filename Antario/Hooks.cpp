@@ -23,7 +23,6 @@ void Hooks::Init()
     // Hook the table functions
     g_Hooks.pD3DDevice9Hook->Hook(16, Hooks::Reset);
     g_Hooks.pD3DDevice9Hook->Hook(17, Hooks::Present);
-    g_Hooks.pD3DDevice9Hook->Hook(42, Hooks::EndScene);
     g_Hooks.pClientModeHook->Hook(24, Hooks::CreateMove); 
 
 
@@ -80,23 +79,6 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 
 
 
-HRESULT __stdcall Hooks::EndScene(IDirect3DDevice9* pDevice)
-{
-
-    if (!g_Hooks.bInitializedDrawManager)
-    {
-        g_Render.Init(pDevice);
-        g_Hooks.bInitializedDrawManager = true;
-    }
-
-    // Call original
-    static auto oEndScene = g_Hooks.pD3DDevice9Hook->GetOriginal<EndScene_t>(42);
-    return oEndScene(pDevice);
-}
-
-
-
-
 HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
     static auto oReset = g_Hooks.pD3DDevice9Hook->GetOriginal<Reset_t>(16);
@@ -115,7 +97,12 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 
 HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourceRect, const RECT * pDestRect, HWND hDestWindowOverride, const RGNDATA * pDirtyRegion)
 {
-    if (g_Hooks.bInitializedDrawManager)
+    if (!g_Hooks.bInitializedDrawManager)
+    {
+        g_Render.Init(pDevice);
+        g_Hooks.bInitializedDrawManager = true;
+    }
+    else
     {
         int iScreenWidth, iScreenHeight;
         g_pEngine->GetScreenSize(iScreenWidth, iScreenHeight);

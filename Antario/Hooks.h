@@ -17,7 +17,7 @@ public:
     /*---------------------------------------------*/
 
     static bool     __fastcall CreateMove(IClientMode*, void*, float, CUserCmd*);
-    static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
+    //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
     static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
 
@@ -35,7 +35,6 @@ private:
     /*---------------------------------------------*/
 
     typedef bool(__fastcall* CreateMove_t)  (IClientMode*, void*, float, CUserCmd*);
-    typedef long(__stdcall*  EndScene_t)    (IDirect3DDevice9*);
     typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
     typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 
