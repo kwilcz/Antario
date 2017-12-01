@@ -16,7 +16,7 @@ public:
     /*-------------Hooked functions----------------*/
     /*---------------------------------------------*/
 
-    static bool     __fastcall CreateMove(IClientMode* thisptr, void* edx, float sampleInputFrametime, CUserCmd* cmd);
+    extern bool     __fastcall CreateMove(IClientMode*, void*, float, CUserCmd*);
     //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
     //static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     //static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
@@ -26,7 +26,7 @@ private:
     /*-------------VMT Hook pointers---------------*/
     /*---------------------------------------------*/
 
-    std::unique_ptr<VMTHook>    pD3DDevice9Hook;
+//    std::unique_ptr<VMTHook>    pD3DDevice9Hook;
     std::unique_ptr<VMTHook>    pClientModeHook;
 
 private:
@@ -34,10 +34,10 @@ private:
     /*-------------Hook prototypes-----------------*/
     /*---------------------------------------------*/
 
-    typedef bool(__thiscall* CreateMove_t)  (IClientMode*, float, CUserCmd*);
-    typedef long(__stdcall*  EndScene_t)    (IDirect3DDevice9*);
-    typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-    typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
+    typedef bool(__fastcall* CreateMove_t)  (IClientMode*, void*, float, CUserCmd*);
+//    typedef long(__stdcall*  EndScene_t)    (IDirect3DDevice9*);
+//    typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+//    typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 };
 extern Hooks g_Hooks;
 

@@ -66,7 +66,7 @@ public:
     virtual void        StartMessageMode(int iMessageModeType) = 0; //21
     virtual IPanel*     GetMessagePanel() = 0; //22
     virtual void        OverrideMouseInput(float *x, float *y) = 0; //23
-    virtual bool        CreateMove(float flInputSampleTime, void* usercmd) = 0; // 24
+    virtual bool        CreateMove(float sample_frametime, CUserCmd*) = 0; // 24
     virtual void        LevelInit(const char *newmap) = 0;
     virtual void        LevelShutdown(void) = 0;
 };
