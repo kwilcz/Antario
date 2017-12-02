@@ -41,7 +41,6 @@ void Hooks::Restore()
     // Unhook every function we hooked and restore original one
     g_Hooks.pD3DDevice9Hook->Unhook(16);
     g_Hooks.pD3DDevice9Hook->Unhook(17);
-    g_Hooks.pD3DDevice9Hook->Unhook(42);
     g_Hooks.pClientModeHook->Unhook(24);
 
 #ifdef _DEBUG
