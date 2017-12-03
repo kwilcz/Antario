@@ -103,11 +103,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
     }
     else
     {
-        int iScreenWidth, iScreenHeight;
-        g_pEngine->GetScreenSize(iScreenWidth, iScreenHeight);
-        Vector2D mid = Vector2D(iScreenWidth * 0.5f, iScreenHeight * 0.5f);
-        DWORD col = D3DCOLOR_ARGB(255, 255, 255, 255);
-        g_Render.DrawString(mid.x, mid.y, col, "TEST");
+        // draw here
     }
     static auto oPresent = g_Hooks.pD3DDevice9Hook->GetOriginal<Present_t>(17);
     return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);

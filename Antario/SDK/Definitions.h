@@ -279,7 +279,7 @@ enum class MoveType_t
     MOVETYPE_MAX_BITS = 4
 };
 
-enum class EntityFlags
+enum EntityFlags : int
 {
     FL_ONGROUND =   (1 << 0),
     FL_DUCKING =    (1 << 1),

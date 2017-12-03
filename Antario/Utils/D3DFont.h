@@ -17,6 +17,7 @@
 #define D3DFONT_CENTERED_Y  0x0002
 #define D3DFONT_TWOSIDED    0x0004
 #define D3DFONT_FILTERED    0x0008
+#define D3DFONT_SHADOW      0x0010
 
 
 
@@ -30,7 +31,7 @@ class CD3DFont
     TCHAR   m_strFontName[80];            // Font properties
     DWORD   m_dwFontHeight;
     DWORD   m_dwFontFlags;
-    int     m_iFontWeight;
+    DWORD   m_dwFontWeight;
 
     LPDIRECT3DDEVICE9       m_pd3dDevice; // A D3DDevice used for rendering
     LPDIRECT3DTEXTURE9      m_pTexture;   // The d3d texture for this font
@@ -64,6 +65,6 @@ public:
     HRESULT DeleteDeviceObjects();
 
     // Constructor / destructor
-    CD3DFont(const TCHAR* strFontName, DWORD dwHeight, int iWeight, DWORD dwFlags = 0L);
+    CD3DFont(const TCHAR* strFontName, DWORD dwHeight, DWORD dwWeight, DWORD dwFlags = 0L);
     ~CD3DFont();
 };

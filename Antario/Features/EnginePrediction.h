@@ -8,5 +8,5 @@ namespace EnginePrediction
     void EndEnginePred(C_BaseEntity* pLocal);
 
     // random seed we can use on nospread servers
-    extern int* m_nRandomSeed;
+    extern int m_nRandomSeed;
 }
