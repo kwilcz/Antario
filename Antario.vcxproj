@@ -198,11 +198,14 @@
     <ClInclude Include="Antario\SDK\IClientRenderable.h" />
     <ClInclude Include="Antario\SDK\IClientThinkable.h" />
     <ClInclude Include="Antario\SDK\IClientUnknown.h" />
+    <ClInclude Include="Antario\SDK\IGameEvent.h" />
     <ClInclude Include="Antario\SDK\IVEngineClient.h" />
+    <ClInclude Include="Antario\SDK\KeyValues.h" />
     <ClInclude Include="Antario\SDK\PlayerInfo.h" />
     <ClInclude Include="Antario\Settings.h" />
     <ClInclude Include="Antario\Utils\D3DFont.h" />
     <ClInclude Include="Antario\Utils\DrawManager.h" />
+    <ClInclude Include="Antario\EventListener.h" />
     <ClInclude Include="Antario\Utils\Interfaces.h" />
     <ClInclude Include="Antario\SDK\Recv.h" />
     <ClInclude Include="Antario\SDK\Vector.h" />

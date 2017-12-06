@@ -128,5 +128,14 @@
     <ClInclude Include="Antario\Utils\D3DFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Antario\SDK\IGameEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\EventListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\SDK\KeyValues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

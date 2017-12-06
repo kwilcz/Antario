@@ -6,6 +6,7 @@
 #include "..\SDK\IClientEntityList.h"
 #include "..\SDK\IVEngineClient.h"
 #include "..\SDK\CPrediction.h"
+#include "..\SDK\IGameEvent.h"
 
 // Initializing global variables with no cpp file matching the header
 
@@ -20,6 +21,7 @@ IVEngineClient*     g_pEngine       = nullptr;
 CPrediction*        g_pPrediction   = nullptr;
 IGameMovement*      g_pMovement     = nullptr;
 CGlobalVarsBase*    g_pGlobalVars   = nullptr;
+IGameEventManager2* g_pEventManager = nullptr;
 
 
 namespace Interfaces
@@ -40,5 +42,6 @@ namespace Interfaces
         g_pEngine       = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient014");           // Get IVEngineClient
         g_pPrediction   = CaptureInterface<CPrediction>("client.dll", "VClientPrediction001");          // Get CPrediction
         g_pMovement     = CaptureInterface<IGameMovement>("client.dll", "GameMovement001");             // Get IGameMovement
+        g_pEventManager = CaptureInterface<IGameEventManager2>("engine.dll", "GAMEEVENTSMANAGER002");   // Get IGameEventManager2
     }
 }

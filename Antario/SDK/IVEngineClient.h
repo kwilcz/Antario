@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Definitions.h"
-
+#include "KeyValues.h"
 #include "Color.h"
 #include "PlayerInfo.h"
 #include "Vector.h"
@@ -77,7 +77,6 @@ public:
 
 class ISPSharedMemory;
 class CGamestatsData;
-class KeyValues;
 class CSteamAPIContext;
 struct Frustum_t;
 

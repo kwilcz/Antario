@@ -1,6 +1,7 @@
 #include "Utils\DrawManager.h"
 #include "Utils\Interfaces.h"
 #include "SDK\IClientMode.h"
+#include "EventListener.h"
 #include "SDK\CInput.h"
 
 class VMTHook;
@@ -40,6 +41,7 @@ private:
 
 private:
     bool bInitializedDrawManager = false;
+    EventListener* eventListener = nullptr;
 };
 extern Hooks g_Hooks;
 

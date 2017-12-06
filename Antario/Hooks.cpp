@@ -25,7 +25,8 @@ void Hooks::Init()
     g_Hooks.pD3DDevice9Hook->Hook(17, Hooks::Present);
     g_Hooks.pClientModeHook->Hook(24, Hooks::CreateMove); 
 
-
+    // Create event listener, no need for it now so it will remain commented.
+    //g_Hooks.eventListener = new EventListener({ "" });
    
 #ifdef _DEBUG       // Create console only in debug mode
     AllocConsole();                                             // Alloc memory and create console    
