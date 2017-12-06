@@ -58,21 +58,18 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 
     if (!pCmd->command_number)
         return oCreateMove;
-    
-/// TODO: update the engine with our current angles ; done ; get send_packet off the stack
 
-    // Local player, get only once, for now in cm only. Will make global later on
+    // Local player, get only once, for now in cm only. Will make it global later on
     auto pLocalEntity = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer());
 
     g_Misc.OnCreateMove(pCmd);
     // run shit outside enginepred
-    
+
     EnginePrediction::RunEnginePred(pLocalEntity, pCmd);
     // run shit in enginepred
-    EnginePrediction::EndEnginePred(pLocalEntity);    
-/// TODO: clamp movement here with std::clamp and add a vector clamp fn and call it here
-    
-    return false; // return false here so that the engine doesn't update our view_angles without any modification
+    EnginePrediction::EndEnginePred(pLocalEntity);
+
+    return false;
 }
 
 
@@ -84,7 +81,11 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 
     if (g_Hooks.bInitializedDrawManager)
     {
-        g_Render.Reset(pDevice);
+        g_Render.InvalidateDeviceObjects();
+        HRESULT hr = oReset(pDevice, pPresentationParameters);
+        g_Render.RestoreDeviceObjects(pDevice);
+
+        return hr;
     }
 
     return oReset(pDevice, pPresentationParameters);
@@ -98,11 +99,14 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
 {
     if (!g_Hooks.bInitializedDrawManager)
     {
-        g_Render.Init(pDevice);
+        g_Render.InitDeviceObjects(pDevice);
         g_Hooks.bInitializedDrawManager = true;
     }
     else
     {
+        // watermark to distinguish if we injected (for now)
+        std::string szWatermark = "Antario, build 06.12.2017";
+        g_Render.DrawString(8, 8, D3DFONT_SHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
         // draw here
     }
     static auto oPresent = g_Hooks.pD3DDevice9Hook->GetOriginal<Present_t>(17);

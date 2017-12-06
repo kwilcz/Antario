@@ -1,32 +1,62 @@
 #pragma once
 #include <memory>
+#include "..\SDK\Color.h"
 #include "..\SDK\Vector.h"
 #include "D3DFont.h"
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
+/// TODO: Test this makro, if it works - Replace our function with it.
+#define COL_TO_D3DCOLOR(x) (D3DCOLOR_ARGB(x.a, x.r, x.g, x.b))
 
 
 class DrawManager
 {
 public: // Function members
     // Basic non-drawing functions
+
     DrawManager();
 
-    void Init       (LPDIRECT3DDEVICE9 pDevice);
-    void Reset      (LPDIRECT3DDEVICE9 pDevice);
-    void Invalidate ();
+    void InitDeviceObjects      (LPDIRECT3DDEVICE9 pDevice);
+    void RestoreDeviceObjects   (LPDIRECT3DDEVICE9 pDevice);
+    void InvalidateDeviceObjects();
+
 
     // Drawing functions
 
-    void DrawLine   (Vector2D vecPos1, Vector2D vecPos2, DWORD dwColor);
-    void DrawLine   (float x, float y, float x2, float y2, DWORD dwColor);
-    void DrawRect   (Vector2D vecPos1, Vector2D vecPos2, DWORD dwColor);
-    void DrawRect   (float x, float y, float width, float height, DWORD dwColor);
+    void DrawLine   (Vector2D vecPos1, Vector2D vecPos2, Color color);
+    void DrawLine   (float posx1, float posy1, float posx2, float posy2, Color color);
+    void DrawRect   (Vector2D vecPos1, Vector2D vecPos2, Color color);
+    void DrawRect   (float posx, float posy, float width, float height, Color color);
 
-    void DrawString (float x, float y, DWORD dwFlags, DWORD dwColor, const char* szText, ...);
+    void DrawString (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...);
 
 private: // Variable members
     LPDIRECT3DDEVICE9 pDevice;
-    std::unique_ptr<CD3DFont> pFont;
+
+    D3DCOLOR ColorToD3DColor(Color color) { return D3DCOLOR_ARGB(color.a, color.r, color.g, color.b); }
 };
 extern DrawManager g_Render;
+
+struct Fonts
+{
+public:
+    void InvalidateDeviceObjects()
+    {
+        pFontTahoma8->InvalidateDeviceObjects();
+        pFontTahoma12->InvalidateDeviceObjects();
+    };
+    void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
+    {
+
+        pFontTahoma8->InitDeviceObjects(pDevice);
+        pFontTahoma8->RestoreDeviceObjects();
+
+        pFontTahoma12->InitDeviceObjects(pDevice);
+        pFontTahoma12->RestoreDeviceObjects();
+    };
+
+    // Fonts
+    std::unique_ptr<CD3DFont> pFontTahoma8;
+    std::unique_ptr<CD3DFont> pFontTahoma12;
+};
+extern Fonts g_Fonts;
