@@ -37,7 +37,7 @@ void DrawManager::InvalidateDeviceObjects()
 {
     // No need for sanity checks as SAFE_RELEASE does that for us
     SAFE_RELEASE(this->pDevice);
-
+    
     g_Fonts.InvalidateDeviceObjects();
 }
 
@@ -45,18 +45,19 @@ void DrawManager::InvalidateDeviceObjects()
 void DrawManager::RestoreDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
 {
     this->pDevice = pDevice;
+    this->pDevice->GetViewport(&pViewPort); 
 
     g_Fonts.InitDeviceObjects(pDevice);
 }
 
 
-void DrawManager::DrawLine(Vector2D vecPos1, Vector2D vecPos2, Color color)
+void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color)
 {
-    this->DrawLine(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
+    this->Line(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
 
-void DrawManager::DrawLine(float posx1, float posy1, float posx2, float posy2, Color color)
+void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color)
 {
     D3DCOLOR dwColor = this->ColorToD3DColor(color);
     Vertex vert[2] = {  { posx1, posy1, 0.0f, 1.0f, dwColor },
@@ -69,23 +70,28 @@ void DrawManager::DrawLine(float posx1, float posy1, float posx2, float posy2, C
 }
 
 
-void DrawManager::DrawRect(Vector2D vecPos1, Vector2D vecPos2, Color color)
+void DrawManager::Rect(Vector2D vecPos1, Vector2D vecPos2, Color color)
 {
-    this->DrawRect(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
+    this->Rect(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
 
 /// TODO: Test this, wrote that from my mem.
-void DrawManager::DrawRect(float posx, float posy, float width, float height, Color color)
+void DrawManager::Rect(float posx, float posy, float width, float height, Color color)
 {
-    this->DrawLine(posx, posy, posx + width, posy,  color); // draw lower horizontal
-    this->DrawLine(posx, posy, posx, posy + height, color); // draw left vertical
-    this->DrawLine(posx, posy + height - 1, posx + width, posy + height - 1, color);    // draw top horizontal
-    this->DrawLine(posx + width - 1, posy, posx + width - 1, posy + height,  color);    // draw right vertical
+    this->Line(posx, posy, posx + width, posy,  color); // draw lower horizontal
+    this->Line(posx, posy, posx, posy + height, color); // draw left vertical
+    this->Line(posx, posy + height - 1, posx + width, posy + height - 1, color);    // draw top horizontal
+    this->Line(posx + width - 1, posy, posx + width - 1, posy + height,  color);    // draw right vertical
 }
 
-void DrawManager::DrawString(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
+void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
 {
     D3DCOLOR dwColor = this->ColorToD3DColor(color);
     pFont->DrawString(posx, posy, dwColor, szText, dwFlags);    // To make life easier
+}
+
+Vector2D DrawManager::GetScreenCenter()
+{
+    return Vector2D((static_cast<float>(this->pViewPort.Width)*0.5f), (static_cast<float>(this->pViewPort.Height)*0.5f));
 }

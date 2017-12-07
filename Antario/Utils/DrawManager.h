@@ -23,15 +23,20 @@ public: // Function members
 
     // Drawing functions
 
-    void DrawLine   (Vector2D vecPos1, Vector2D vecPos2, Color color);
-    void DrawLine   (float posx1, float posy1, float posx2, float posy2, Color color);
-    void DrawRect   (Vector2D vecPos1, Vector2D vecPos2, Color color);
-    void DrawRect   (float posx, float posy, float width, float height, Color color);
+    void Line   (Vector2D vecPos1, Vector2D vecPos2, Color color);
+    void Line   (float posx1, float posy1, float posx2, float posy2, Color color);
+    void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color);
+    void Rect   (float posx, float posy, float width, float height, Color color);
 
-    void DrawString (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...);
+    void String (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...);
+
+
+    // Helpers
+    Vector2D GetScreenCenter();
 
 private: // Variable members
-    LPDIRECT3DDEVICE9 pDevice;
+    LPDIRECT3DDEVICE9   pDevice;
+    D3DVIEWPORT9        pViewPort;
 
     D3DCOLOR ColorToD3DColor(Color color) { return D3DCOLOR_ARGB(color.a, color.r, color.g, color.b); }
 };

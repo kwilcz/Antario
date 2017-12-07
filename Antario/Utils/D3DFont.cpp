@@ -140,8 +140,7 @@ HRESULT CD3DFont::InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice)
 
     // Create a font.  By specifying ANTIALIASED_QUALITY, we might get an
     // antialiased font, but this is not guaranteed.
-    INT nHeight = -MulDiv(m_dwFontHeight,
-        (INT)(GetDeviceCaps(hDC, LOGPIXELSY) * m_fTextScale), 72);
+    INT nHeight = -MulDiv(m_dwFontHeight, (INT)(GetDeviceCaps(hDC, LOGPIXELSY) * m_fTextScale), 72);
     DWORD dwItalic = (m_dwFontFlags & D3DFONT_ITALIC) ? TRUE : FALSE;
     HFONT hFont = CreateFont(nHeight, 0, 0, 0, m_dwFontWeight, dwItalic,
                             FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
@@ -385,7 +384,7 @@ HRESULT CD3DFont::GetTextExtent(const TCHAR* strText, SIZE* pSize)
 //       1/8th of the screen width.  This allows you to output text at a fixed
 //       fraction of the viewport, even if the screen or window size changes.
 //-----------------------------------------------------------------------------
-HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y, FLOAT z,
+HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
     FLOAT fXScale, FLOAT fYScale, DWORD dwColor,
     const TCHAR* strText, DWORD dwFlags)
 {
@@ -444,8 +443,6 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y, FLOAT z,
 
     FLOAT sx = (x + 1.0f)*vp.Width / 2;
     FLOAT sy = (y + 1.0f)*vp.Height / 2;
-    FLOAT sz = z;
-    FLOAT rhw = 1.0f;
 
     // Adjust for character spacing
     sx -= m_dwSpacing * (fXScale*vp.Height) / fLineHeight;
@@ -482,12 +479,12 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y, FLOAT z,
 
         if (c != _T(' '))
         {
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + h - 0.5f, sz, rhw), dwColor, tx1, ty2);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0 - 0.5f, sz, rhw), dwColor, tx1, ty1);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h - 0.5f, sz, rhw), dwColor, tx2, ty2);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + 0 - 0.5f, sz, rhw), dwColor, tx2, ty1);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h - 0.5f, sz, rhw), dwColor, tx2, ty2);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0 - 0.5f, sz, rhw), dwColor, tx1, ty1);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty2);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0 - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty1);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx2, ty2);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + 0 - 0.5f, 1.0f, 1.0f), dwColor, tx2, ty1);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx2, ty2);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0 - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty1);
             dwNumTriangles += 2;
 
             if (dwNumTriangles * 3 > (MAX_NUM_VERTICES - 6))
@@ -659,7 +656,7 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
 // Name: Render3DText()
 // Desc: Renders 3D text
 //-----------------------------------------------------------------------------
-HRESULT CD3DFont::Render3DText(const TCHAR* strText, DWORD dwFlags)
+HRESULT CD3DFont::Render3DText(FLOAT x, FLOAT y, const TCHAR* strText, DWORD dwFlags)
 {
     if (m_pd3dDevice == NULL)
         return E_FAIL;
@@ -678,11 +675,7 @@ HRESULT CD3DFont::Render3DText(const TCHAR* strText, DWORD dwFlags)
         m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
     }
 
-    // Position for each text element
-    FLOAT x = 0.0f;
-    FLOAT y = 0.0f;
-
-    // Center the text block at the origin (not the viewport)
+    // Center the text block at the origin
     if (dwFlags & D3DFONT_CENTERED_X)
     {
         SIZE sz;

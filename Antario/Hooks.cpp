@@ -104,11 +104,11 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
         g_Hooks.bInitializedDrawManager = true;
     }
     else
-    {
+    {   // draw here
+
         // watermark to distinguish if we injected (for now)
         std::string szWatermark = "Antario, build 06.12.2017";
-        g_Render.DrawString(8, 8, D3DFONT_SHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
-        // draw here
+        g_Render.String(8, 8, D3DFONT_SHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
     }
     static auto oPresent = g_Hooks.pD3DDevice9Hook->GetOriginal<Present_t>(17);
     return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);

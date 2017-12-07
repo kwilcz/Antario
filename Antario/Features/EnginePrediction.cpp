@@ -13,22 +13,31 @@ void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
     static int flTickBase;
 
     // fix tickbase if game didnt render previous tick
-    if (pLastCmd)   
+    if (pLastCmd)
+    {
         if (pLastCmd->hasbeenpredicted)
             flTickBase = pLocal->GetTickBase();
         else
+        {
             ++flTickBase;
+            pLastCmd->hasbeenpredicted = true;
+        }
+    }
 
     // get random_seed as its 0 in clientmode->createmove
-    typedef unsigned int(__cdecl* MD5_PseudoRandom_t)(unsigned int);
-    static auto MD5_PseudoRandom = (MD5_PseudoRandom_t)g_Utils.FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
-    m_nRandomSeed = MD5_PseudoRandom(pCmd->command_number) & 0x7FFFFFFF;
+    auto getRandomSeed = [&pCmd]()
+    {
+        typedef unsigned int(__cdecl* MD5_PseudoRandom_t)(unsigned int);
+        static auto MD5_PseudoRandom = (MD5_PseudoRandom_t)g_Utils.FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
+        return MD5_PseudoRandom(pCmd->command_number) & 0x7FFFFFFF;;
+    };
 
 
     pLastCmd        = pCmd;
     flOldCurtime    = g_pGlobalVars->curtime;
     flOldFrametime  = g_pGlobalVars->frametime;
 
+    m_nRandomSeed               = getRandomSeed();
     g_pGlobalVars->curtime      = pLocal->GetTickBase() * g_pGlobalVars->intervalPerTick;
     g_pGlobalVars->frametime    = g_pGlobalVars->intervalPerTick;
 
