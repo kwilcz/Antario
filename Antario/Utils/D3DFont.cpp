@@ -605,7 +605,7 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
 
         if (c != _T(' '))
         {
-            if (dwFlags & D3DFONT_SHADOW)
+            if (dwFlags & D3DFONT_DROPSHADOW)
             {
                 *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
                 *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);

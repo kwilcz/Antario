@@ -23,13 +23,15 @@ void DrawManager::InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     // Save the device internally
     this->pDevice = pDevice;
 
+    // Get viewport for our center coords
+    this->pDevice->GetViewport(&pViewPort);
+
     // Create new fonts
     g_Fonts.pFontTahoma8  = std::make_unique<CD3DFont>(L"Tahoma", 8,  FW_NORMAL);
     g_Fonts.pFontTahoma12 = std::make_unique<CD3DFont>(L"Tahoma", 12, FW_BOLD);
 
     // Init font device objects
     g_Fonts.InitDeviceObjects(pDevice);
-
 }
 
 
@@ -60,12 +62,15 @@ void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color)
 void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color)
 {
     D3DCOLOR dwColor = this->ColorToD3DColor(color);
-    Vertex vert[2] = {  { posx1, posy1, 0.0f, 1.0f, dwColor },
-                        { posx2, posy2, 0.0f, 1.0f, dwColor } };
+    Vertex vert[2] = 
+    {  
+        { posx1, posy1, 0.0f, 1.0f, dwColor },
+        { posx2, posy2, 0.0f, 1.0f, dwColor } 
+    };
 
+    this->SetupRenderStates();
     this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     this->pDevice->SetTexture(0, nullptr);
-    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
     this->pDevice->DrawPrimitiveUP(D3DPT_LINELIST, 1, &vert, sizeof(Vertex));
 }
 
@@ -85,10 +90,35 @@ void DrawManager::Rect(float posx, float posy, float width, float height, Color 
     this->Line(posx + width - 1, posy, posx + width - 1, posy + height,  color);    // draw right vertical
 }
 
+void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color)
+{
+    D3DCOLOR dwColor = this->ColorToD3DColor(color);
+    Vertex vert[3] = 
+    {  
+        { pos1.x, pos1.y, 1.0f, 1.0f, dwColor },
+        { pos2.x, pos2.y, 1.0f, 1.0f, dwColor },
+        { pos3.x, pos3.y, 1.0f, 1.0f, dwColor } 
+    };
+    this->SetupRenderStates();
+    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    this->pDevice->SetTexture(0, nullptr);
+    this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 1, &vert, sizeof(Vertex));
+}
+
 void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
 {
     D3DCOLOR dwColor = this->ColorToD3DColor(color);
     pFont->DrawString(posx, posy, dwColor, szText, dwFlags);    // To make life easier
+}
+
+void DrawManager::SetupRenderStates()
+{
+    this->pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    this->pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    this->pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    this->pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+    this->pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
 }
 
 Vector2D DrawManager::GetScreenCenter()

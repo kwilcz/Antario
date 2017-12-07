@@ -27,6 +27,7 @@ public: // Function members
     void Line   (float posx1, float posy1, float posx2, float posy2, Color color);
     void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color);
     void Rect   (float posx, float posy, float width, float height, Color color);
+    void TriangleFilled (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color);
 
     void String (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...);
 
@@ -38,6 +39,7 @@ private: // Variable members
     LPDIRECT3DDEVICE9   pDevice;
     D3DVIEWPORT9        pViewPort;
 
+    void SetupRenderStates();
     D3DCOLOR ColorToD3DColor(Color color) { return D3DCOLOR_ARGB(color.a, color.r, color.g, color.b); }
 };
 extern DrawManager g_Render;

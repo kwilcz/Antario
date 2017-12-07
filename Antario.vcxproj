@@ -182,6 +182,7 @@
     <ClInclude Include="Antario\Features\EnginePrediction.h" />
     <ClInclude Include="Antario\Features\Misc.h" />
     <ClInclude Include="Antario\Hooks.h" />
+    <ClInclude Include="Antario\Menu.h" />
     <ClInclude Include="Antario\SDK\CGlobalVarsBase.h" />
     <ClInclude Include="Antario\SDK\CHandle.h" />
     <ClInclude Include="Antario\SDK\CEntity.h" />

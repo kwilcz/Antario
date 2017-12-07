@@ -58,7 +58,7 @@ public:
         }
         return false;
     }
-    void LogToConsole(std::wstring str, ...)
+    void Log(std::wstring str, ...)
     {
         WriteConsole(hConsoleHandle, str.c_str(), str.length(), NULL, NULL);
     }

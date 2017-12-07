@@ -137,5 +137,8 @@
     <ClInclude Include="Antario\SDK\KeyValues.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Antario\Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

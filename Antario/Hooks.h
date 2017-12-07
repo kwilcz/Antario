@@ -18,9 +18,9 @@ public:
     /*---------------------------------------------*/
 
     static bool     __fastcall CreateMove(IClientMode*, void*, float, CUserCmd*);
-    //static HRESULT  __stdcall EndScene  (IDirect3DDevice9* pDevice);
     static HRESULT  __stdcall Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     static HRESULT  __stdcall Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
+    static LRESULT  __stdcall WndProc   (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
     /*---------------------------------------------*/
@@ -39,9 +39,12 @@ private:
     typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
     typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 
+
 private:
-    bool bInitializedDrawManager = false;
-    EventListener* eventListener = nullptr;
+    HWND hCSGOWindow             = nullptr; // CSGO window handle
+    bool bInitializedDrawManager = false;   // Check if we initialized our draw manager
+    WNDPROC pOriginalWNDProc     = nullptr; // Original CSGO window proc
+    EventListener* eventListener = nullptr; // Listens to csgo events, needs to be created
 };
 extern Hooks g_Hooks;
 

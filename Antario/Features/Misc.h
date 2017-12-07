@@ -12,7 +12,7 @@ public:
         this->pLocal = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer()); // To be replaced with a global var
         if (this->pLocal)
         {
-            if (settings.bBhopEnabled)
+            if (g_Settings.bBhopEnabled)
                 this->DoBhop();
             // sum future shit
         }
