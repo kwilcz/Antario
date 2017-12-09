@@ -1,5 +1,6 @@
 #pragma once
 #include <Psapi.h>
+#include <iostream>
 #include "..\SDK\IVEngineClient.h"
 
 #define INRANGE(x,a,b)    (x >= a && x <= b)
@@ -58,10 +59,11 @@ public:
         }
         return false;
     }
-    void Log(std::wstring str, ...)
-    {
-        WriteConsole(hConsoleHandle, str.c_str(), str.length(), NULL, NULL);
-    }
+    void Log(std::string str, ...) 
+    { 
+        std::cout << str;
+    };
+
     template <typename T>
     T CallVFunc(void* ppClass, int iIndex)
     {

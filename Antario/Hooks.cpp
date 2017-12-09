@@ -1,17 +1,15 @@
-﻿#include <Windows.h>
-#include <Psapi.h>
-#include <iostream>
-#include <chrono>
-#include <thread>
+﻿#include <thread>
 #include "Hooks.h"
 #include "Utils\Utils.h"
 #include "Features\Misc.h"
 #include "Features\EnginePrediction.h"
 #include "SDK\IClientMode.h"
-#include "Menu.h"
 
-Misc    g_Misc;
-Hooks   g_Hooks;
+Misc     g_Misc;
+Hooks    g_Hooks;
+Settings g_Settings;
+
+
 void Hooks::Init()
 {
     // Get window handle
@@ -42,12 +40,17 @@ void Hooks::Init()
 
     // Create event listener, no need for it now so it will remain commented.
     //g_Hooks.eventListener = new EventListener({ "" });
+
+    // Initialize and create our menu. If runtime edition is needed, it could be transfered to Present, but I don't recommend it.
+    g_Hooks.nMenu.Initialize();
    
 #ifdef _DEBUG       // Create console only in debug mode
     AllocConsole();                                 // Alloc memory and create console    
-    g_Utils.SetConsoleHandle(GetStdHandle(STD_OUTPUT_HANDLE));  // Get and save console handle to future use with WriteToConsole etc.    
+    freopen_s((FILE**)stdin,  "CONIN$", "r",  stdin);   // ----------------------------------------------
+    freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);  //  Make iostream library use our console handle
+    freopen_s((FILE**)stdout, "CONOUT$", "w", stderr);  // ----------------------------------------------
     SetConsoleTitleA(" Antario - Debug console");   // Set console name to a custom one
-    g_Utils.Log(L"Initialization Succeded \n");     // Log info to console
+    g_Utils.Log("Initialization Succeded \n");     // Log info to console
 #endif
 }
 
@@ -120,16 +123,15 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
         g_Hooks.bInitializedDrawManager = true;
     }
     else
-    {   // draw here
-
+    {   
         // watermark to distinguish if we injected (for now)
-        std::string szWatermark = "Antario, build 07.12.2017";
+        std::string szWatermark = "Antario, build 09.12.2017";
         g_Render.String(8, 8, D3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
 
         if (g_Settings.bMenuOpened)
-        {
-            //drawmenu
-        }
+            g_Hooks.nMenu.Render();    // Render our menu
+
+        // Put your draw calls here
     }
     static auto oPresent = g_Hooks.pD3DDevice9Hook->GetOriginal<Present_t>(17);
     return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
@@ -155,8 +157,9 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     GetButtonHeld(g_Settings.bMenuOpened);
 
     if (g_Hooks.bInitializedDrawManager && g_Settings.bMenuOpened)
-    {
+    {        
         // our wndproc capture fn
+        g_Hooks.nMenu.RunThink(uMsg, lParam);
         return true;
     }
 

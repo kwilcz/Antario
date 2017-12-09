@@ -173,6 +173,7 @@
     <ClCompile Include="Antario\Features\EnginePrediction.cpp" />
     <ClCompile Include="Antario\Hooks.cpp" />
     <ClCompile Include="Antario\DLLMain.cpp" />
+    <ClCompile Include="Antario\Menu.cpp" />
     <ClCompile Include="Antario\Utils\D3DFont.cpp" />
     <ClCompile Include="Antario\Utils\DrawManager.cpp" />
     <ClCompile Include="Antario\Utils\Interfaces.cpp" />

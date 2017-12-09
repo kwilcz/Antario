@@ -9,5 +9,6 @@ struct Settings
     bool bMenuOpened    = false;
     bool bBhopEnabled   = true;
     Color colCursor     = Color(0, 150, 255, 100);
-} g_Settings;
+};
+extern Settings g_Settings;
 

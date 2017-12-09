@@ -3,6 +3,7 @@
 #include "SDK\IClientMode.h"
 #include "EventListener.h"
 #include "SDK\CInput.h"
+#include "Menu.h"
 
 class VMTHook;
 class Hooks
@@ -41,6 +42,7 @@ private:
 
 
 private:
+    Menu nMenu;
     HWND hCSGOWindow             = nullptr; // CSGO window handle
     bool bInitializedDrawManager = false;   // Check if we initialized our draw manager
     WNDPROC pOriginalWNDProc     = nullptr; // Original CSGO window proc
