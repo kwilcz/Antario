@@ -8,6 +8,7 @@
 /// TODO: Test this makro, if it works - Replace our function with it.
 #define COL_TO_D3DCOLOR(x) (D3DCOLOR_ARGB(x.a, x.r, x.g, x.b))
 
+enum GradientType;
 
 class DrawManager
 {
@@ -27,7 +28,8 @@ public: // Function members
     void Line   (float posx1, float posy1, float posx2, float posy2, Color color);
     void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color);
     void Rect   (float posx, float posy, float width, float height, Color color);
-    void TriangleFilled (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color);
+    void TriangleFilled     (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color);
+    void RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType type);
 
     void String (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...);
 
@@ -50,7 +52,7 @@ public:
     void InvalidateDeviceObjects()
     {
         pFontTahoma8->InvalidateDeviceObjects();
-        pFontTahoma12->InvalidateDeviceObjects();
+        pFontTahoma10->InvalidateDeviceObjects();
     };
     void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     {
@@ -58,12 +60,19 @@ public:
         pFontTahoma8->InitDeviceObjects(pDevice);
         pFontTahoma8->RestoreDeviceObjects();
 
-        pFontTahoma12->InitDeviceObjects(pDevice);
-        pFontTahoma12->RestoreDeviceObjects();
+        pFontTahoma10->InitDeviceObjects(pDevice);
+        pFontTahoma10->RestoreDeviceObjects();
     };
 
     // Fonts
     std::unique_ptr<CD3DFont> pFontTahoma8;
-    std::unique_ptr<CD3DFont> pFontTahoma12;
+    std::unique_ptr<CD3DFont> pFontTahoma10;
 };
 extern Fonts g_Fonts;
+
+
+enum GradientType
+{
+    GRADIENT_VERTICAL,
+    GRADIENT_HORIZONTAL
+};

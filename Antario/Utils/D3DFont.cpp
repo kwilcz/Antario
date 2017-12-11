@@ -133,7 +133,7 @@ HRESULT CD3DFont::InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice)
     bmi.bmiHeader.biBitCount = 32;
 
     // Create a DC and a bitmap for the font
-    HDC     hDC = CreateCompatibleDC(NULL);
+    HDC     hDC       = CreateCompatibleDC(NULL);
     HBITMAP hbmBitmap = CreateDIBSection(hDC, &bmi, DIB_RGB_COLORS,
                                         (void**)&pBitmapBits, NULL, 0);
     SetMapMode(hDC, MM_TEXT);
@@ -144,7 +144,7 @@ HRESULT CD3DFont::InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice)
     DWORD dwItalic = (m_dwFontFlags & D3DFONT_ITALIC) ? TRUE : FALSE;
     HFONT hFont = CreateFont(nHeight, 0, 0, 0, m_dwFontWeight, dwItalic,
                             FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                            CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
+                            CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY,
                             VARIABLE_PITCH, m_strFontName);
 
     if (NULL == hFont)
@@ -335,7 +335,7 @@ HRESULT CD3DFont::DeleteDeviceObjects()
 // Name: GetTextExtent()
 // Desc: Get the dimensions of a text string
 //-----------------------------------------------------------------------------
-HRESULT CD3DFont::GetTextExtent(const TCHAR* strText, SIZE* pSize)
+HRESULT CD3DFont::GetTextExtent(const char* strText, SIZE* pSize)
 {
     if (NULL == strText || NULL == pSize)
         return E_FAIL;
@@ -386,7 +386,7 @@ HRESULT CD3DFont::GetTextExtent(const TCHAR* strText, SIZE* pSize)
 //-----------------------------------------------------------------------------
 HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
     FLOAT fXScale, FLOAT fYScale, DWORD dwColor,
-    const TCHAR* strText, DWORD dwFlags)
+    const char* strText, DWORD dwFlags)
 {
     if (m_pd3dDevice == NULL)
         return E_FAIL;
@@ -409,36 +409,19 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
     m_pd3dDevice->GetViewport(&vp);
     FLOAT fLineHeight = (m_fTexCoords[0][3] - m_fTexCoords[0][1]) * m_dwTexHeight;
 
-    // Center the text block in the viewport
+    // Center the text block
     if (dwFlags & D3DFONT_CENTERED_X)
     {
-        const TCHAR* strTextTmp = strText;
-        float xFinal = 0.0f;
-
-        while (*strTextTmp)
-        {
-            TCHAR c = *strTextTmp++;
-
-            if (c == _T('\n'))
-                break;  // Isn't supported.  
-            if ((c - 32) < 0 || (c - 32) >= 128 - 32)
-                continue;
-
-            FLOAT tx1 = m_fTexCoords[c - 32][0];
-            FLOAT tx2 = m_fTexCoords[c - 32][2];
-
-            FLOAT w = (tx2 - tx1)*m_dwTexWidth;
-
-            w *= (fXScale*vp.Height) / fLineHeight;
-
-            xFinal += w - (2 * m_dwSpacing) * (fXScale*vp.Height) / fLineHeight;
-        }
-
-        x = -xFinal / vp.Width;
+        SIZE sz;
+        GetTextExtent(strText, &sz);
+        x = -(((FLOAT)sz.cx)) * 0.5f;
     }
+
     if (dwFlags & D3DFONT_CENTERED_Y)
     {
-        y = -fLineHeight / vp.Height;
+        SIZE sz;
+        GetTextExtent(strText, &sz);
+        y = -(((FLOAT)sz.cy)) * 0.5f;
     }
 
     FLOAT sx = (x + 1.0f)*vp.Width / 2;
@@ -538,39 +521,19 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
         m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
     }
 
-    // Center the text block in the viewport
+    // Center the text block
     if (dwFlags & D3DFONT_CENTERED_X)
     {
-        D3DVIEWPORT9 vp;
-        m_pd3dDevice->GetViewport(&vp);
-        const char* strTextTmp = strText;
-        float xFinal = 0.0f;
-
-        while (*strTextTmp)
-        {
-            TCHAR c = *strTextTmp++;
-
-            if (c == _T('\n'))
-                break;  // Isn't supported.  
-            if ((c - 32) < 0 || (c - 32) >= 128 - 32)
-                continue;
-
-            FLOAT tx1 = m_fTexCoords[c - 32][0];
-            FLOAT tx2 = m_fTexCoords[c - 32][2];
-
-            FLOAT w = (tx2 - tx1) *  m_dwTexWidth / m_fTextScale;
-
-            xFinal += w - (2 * m_dwSpacing);
-        }
-
-        sx = (vp.Width - xFinal) / 2.0f;
+        SIZE sz;
+        GetTextExtent(strText, &sz);
+        sx -= (FLOAT)sz.cx * 0.5f;
     }
+
     if (dwFlags & D3DFONT_CENTERED_Y)
     {
-        D3DVIEWPORT9 vp;
-        m_pd3dDevice->GetViewport(&vp);
-        float fLineHeight = ((m_fTexCoords[0][3] - m_fTexCoords[0][1])*m_dwTexHeight);
-        sy = (vp.Height - fLineHeight) / 2;
+        SIZE sz;
+        GetTextExtent(strText, &sz);
+        sx = -(FLOAT)sz.cy * 0.5f;
     }
 
     // Adjust for character spacing
@@ -656,7 +619,7 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
 // Name: Render3DText()
 // Desc: Renders 3D text
 //-----------------------------------------------------------------------------
-HRESULT CD3DFont::Render3DText(FLOAT x, FLOAT y, const TCHAR* strText, DWORD dwFlags)
+HRESULT CD3DFont::Render3DText(FLOAT x, FLOAT y, const char* strText, DWORD dwFlags)
 {
     if (m_pd3dDevice == NULL)
         return E_FAIL;
@@ -675,7 +638,7 @@ HRESULT CD3DFont::Render3DText(FLOAT x, FLOAT y, const TCHAR* strText, DWORD dwF
         m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
     }
 
-    // Center the text block at the origin
+    // Center the text block
     if (dwFlags & D3DFONT_CENTERED_X)
     {
         SIZE sz;

@@ -40,9 +40,6 @@ void Hooks::Init()
 
     // Create event listener, no need for it now so it will remain commented.
     //g_Hooks.eventListener = new EventListener({ "" });
-
-    // Initialize and create our menu. If runtime edition is needed, it could be transfered to Present, but I don't recommend it.
-    g_Hooks.nMenu.Initialize();
    
 #ifdef _DEBUG       // Create console only in debug mode
     AllocConsole();                                 // Alloc memory and create console    
@@ -120,6 +117,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
     if (!g_Hooks.bInitializedDrawManager)
     {
         g_Render.InitDeviceObjects(pDevice);
+        g_Hooks.nMenu.Initialize();
         g_Hooks.bInitializedDrawManager = true;
     }
     else
@@ -129,7 +127,10 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
         g_Render.String(8, 8, D3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
 
         if (g_Settings.bMenuOpened)
+        {
+            g_Hooks.nMenu.UpdateData();
             g_Hooks.nMenu.Render();    // Render our menu
+        }
 
         // Put your draw calls here
     }
@@ -143,18 +144,19 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
 LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     // for now as a lambda, to be transfered somewhere
-    auto GetButtonHeld = [](bool& bButton)
+    // Thanks uc/WasserEsser for pointing out my mistake!
+    auto GetButtonHeld = [uMsg, wParam](bool& bButton, int vKey)
     {
-        if (!bButton && GetAsyncKeyState(VK_INSERT))
-            bButton = true;
-        else 
-        if (bButton && !GetAsyncKeyState(VK_INSERT))
-            bButton = false;
+        if (uMsg == WM_KEYDOWN && wParam == vKey)
+                bButton = true;
+        else
+        if (uMsg == WM_KEYUP && wParam == vKey)
+                bButton = false;
     };
 
     // Working when you HOLD the insert button, not when you press it.
     // Not a finished concept, maybe ill change it to a switch
-    GetButtonHeld(g_Settings.bMenuOpened);
+    GetButtonHeld(g_Settings.bMenuOpened, VK_INSERT);
 
     if (g_Hooks.bInitializedDrawManager && g_Settings.bMenuOpened)
     {        

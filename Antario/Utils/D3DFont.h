@@ -51,11 +51,11 @@ public:
     HRESULT DrawString(FLOAT x, FLOAT y, DWORD dwColor,
             const char* strText, DWORD dwFlags = 0L);
     HRESULT DrawStringScaled(FLOAT x, FLOAT y, FLOAT fXScale, FLOAT fYScale, 
-            DWORD dwColor, const TCHAR* strText, DWORD dwFlags = 0L);
-    HRESULT Render3DText(FLOAT x, FLOAT y, const TCHAR* strText, DWORD dwFlags = 0L);
+            DWORD dwColor, const char* strText, DWORD dwFlags = 0L);
+    HRESULT Render3DText(FLOAT x, FLOAT y, const char* strText, DWORD dwFlags = 0L);
 
     // Function to get extent of text
-    HRESULT GetTextExtent(const TCHAR* strText, SIZE* pSize);
+    HRESULT GetTextExtent(const char* strText, SIZE* pSize);
 
     // Initializing and destroying device-dependent objects
     HRESULT InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice);

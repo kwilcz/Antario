@@ -42,7 +42,7 @@ private:
 
 
 private:
-    Menu nMenu;
+    MenuMain nMenu;
     HWND hCSGOWindow             = nullptr; // CSGO window handle
     bool bInitializedDrawManager = false;   // Check if we initialized our draw manager
     WNDPROC pOriginalWNDProc     = nullptr; // Original CSGO window proc
@@ -68,8 +68,11 @@ public:
        
         this->pOriginalVMT = *this->ppBaseClass;
         this->pNewVMT = std::make_unique<std::uintptr_t[]>(this->indexCount);
-        std::memcpy(this->pNewVMT.get(), this->pOriginalVMT, kSizeTable); // replace original vtable pointer to pointer to our f-ction
 
+        // copy original vtable to our local copy of it
+        std::memcpy(this->pNewVMT.get(), this->pOriginalVMT, kSizeTable); 
+
+        // replace original class with our local copy
         *this->ppBaseClass = this->pNewVMT.get();   
     };
     ~VMTHook() { *this->ppBaseClass = this->pOriginalVMT; };
@@ -99,8 +102,8 @@ public:
     };
 
 private:
-    std::unique_ptr<std::uintptr_t[]> pNewVMT = nullptr;    // Actual used pointer of VMT hook
-    std::uintptr_t**    ppBaseClass  = nullptr;             // Saved pointer to our VMT hook
+    std::unique_ptr<std::uintptr_t[]> pNewVMT = nullptr;    // Actual used vtable
+    std::uintptr_t**    ppBaseClass  = nullptr;             // Saved pointer to original class
     std::uintptr_t*     pOriginalVMT = nullptr;             // Saved original pointer to the VMT
     std::size_t         indexCount = 0;                     // Count of indexes inside out f-ction
 };

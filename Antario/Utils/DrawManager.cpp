@@ -14,7 +14,7 @@ struct Vertex
 DrawManager::DrawManager()
 {
     this->pDevice         = nullptr;
-    g_Fonts.pFontTahoma12 = nullptr;
+    g_Fonts.pFontTahoma10 = nullptr;
 }
 
 
@@ -28,7 +28,7 @@ void DrawManager::InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
 
     // Create new fonts
     g_Fonts.pFontTahoma8  = std::make_unique<CD3DFont>(L"Tahoma", 8,  FW_NORMAL);
-    g_Fonts.pFontTahoma12 = std::make_unique<CD3DFont>(L"Tahoma", 12, FW_BOLD);
+    g_Fonts.pFontTahoma10 = std::make_unique<CD3DFont>(L"Tahoma", 10, FW_MEDIUM);
 
     // Init font device objects
     g_Fonts.InitDeviceObjects(pDevice);
@@ -103,6 +103,42 @@ void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Co
     this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 1, &vert, sizeof(Vertex));
+}
+
+void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType vertical)
+{
+    D3DCOLOR dwColor  = this->ColorToD3DColor(col1);
+    D3DCOLOR dwColor2 = this->ColorToD3DColor(col2);
+    D3DCOLOR dwcol1, dwcol2, dwcol3, dwcol4;
+
+    switch (vertical)
+    {
+        case GradientType::GRADIENT_VERTICAL:
+            dwcol1 = dwColor;
+            dwcol2 = dwColor;
+            dwcol3 = dwColor2;
+            dwcol4 = dwColor2;
+            break;
+        case GradientType::GRADIENT_HORIZONTAL:
+            dwcol1 = dwColor;
+            dwcol2 = dwColor2;
+            dwcol3 = dwColor;
+            dwcol4 = dwColor2;
+            break;
+    }
+
+    Vertex vert[4] =
+    {
+        { vecPos1.x, vecPos1.y, 0.0f, 1.0f, dwcol1 },
+        { vecPos2.x, vecPos1.y, 0.0f, 1.0f, dwcol2 },
+        { vecPos1.x, vecPos2.y, 0.0f, 1.0f, dwcol3 },
+        { vecPos2.x, vecPos2.y, 0.0f, 1.0f, dwcol4 }
+    };
+
+    this->SetupRenderStates();
+    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    this->pDevice->SetTexture(0, nullptr);
+    this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
 void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
