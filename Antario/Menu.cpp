@@ -7,9 +7,8 @@
 #define GET_X_LPARAM(lp)                        ((float)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((float)(short)HIWORD(lp))
 
-
-std::unique_ptr<MouseCursor> g_MouseCursor;   // Pointer to our mouse cursor
-
+// Init our static pointer
+std::unique_ptr<MouseCursor> MenuMain::mouseCursor;
 
 void MouseCursor::Render()
 {
@@ -64,8 +63,23 @@ BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, 
     this->pFont = pFont;
     this->strLabel = strLabel;
     this->vecWindowSize = vecSize;
-    SetWindowPos(vecPosition);
-    this->iHeaderHeight = this->GetHeaderHeight();
+    this->iHeaderHeight = this->SetHeaderHeight();
+    this->SetWindowPos(vecPosition);
+}
+
+
+void BaseWindow::Render()
+{
+    // Draw main background rectangle
+    g_Render.RectFilledGradient(this->vecWindowPos, this->vecWindowPos + this->vecWindowSize, Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
+    // Draw header rect.
+    g_Render.RectFilledGradient(this->vecWindowPos, Vector2D(this->vecWindowPos.x + this->vecWindowSize.x, this->vecWindowPos.y + this->iHeaderHeight), Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
+
+    // Draw title string, defined as label.
+    g_Render.String(this->vecWindowPos.x +(this->vecWindowSize.x / 2.f), this->vecWindowPos.y, D3DFONT_CENTERED_X, Color(200, 200, 200), this->pFont, this->strLabel.c_str());
+    
+    // Render all childrens
+    MenuMain::Render();
 }
 
 
@@ -82,39 +96,28 @@ void BaseWindow::UpdateData()
 
     // Check if mouse has been pressed in the proper area. If yes, save window state as dragged.
     Vector2D vecHeaderBounds = Vector2D(this->vecWindowPos.x + this->vecWindowSize.x, this->vecWindowPos.y + this->iHeaderHeight);
-    if (g_MouseCursor->bLMBPressed && IsInBounds(g_MouseCursor->vecPointPos, this->vecWindowPos, vecHeaderBounds))
-    {
+    if (this->mouseCursor->bLMBPressed && IsInBounds(this->mouseCursor->vecPointPos, this->vecWindowPos, vecHeaderBounds))
         this->bIsDragged = true;
-    }
     else
-    if (!g_MouseCursor->bLMBPressed)
+    if (!this->mouseCursor->bLMBPressed)
         this->bIsDragged = false;
 
     // Check if the window is dragged. If it is, move window by the cursor difference between ticks.
-    static Vector2D vecOldMousePos = g_MouseCursor->vecPointPos;
+    static Vector2D vecOldMousePos = this->mouseCursor->vecPointPos;
     if (this->bIsDragged)
     {
-        Vector2D vecNewPos = this->vecWindowPos + (g_MouseCursor->vecPointPos - vecOldMousePos);
+        Vector2D vecNewPos = this->vecWindowPos + (this->mouseCursor->vecPointPos - vecOldMousePos);
         this->SetWindowPos(vecNewPos);
-        vecOldMousePos = g_MouseCursor->vecPointPos;
+        vecOldMousePos = this->mouseCursor->vecPointPos;
     }
     else
-        vecOldMousePos = g_MouseCursor->vecPointPos;
+        vecOldMousePos = this->mouseCursor->vecPointPos;
 
+    MenuMain::UpdateData();
 }
 
-void BaseWindow::Render()
-{
-    // Draw main background rectangle
-    g_Render.RectFilledGradient(this->vecWindowPos, this->vecWindowPos + this->vecWindowSize, Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
-    // Draw header rect.
-    g_Render.RectFilledGradient(this->vecWindowPos, Vector2D(this->vecWindowPos.x + this->vecWindowSize.x, this->vecWindowPos.y + this->iHeaderHeight), Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
 
-    // Draw title string, defined as label.
-    g_Render.String(this->vecWindowPos.x +(this->vecWindowSize.x / 2.f), this->vecWindowPos.y, D3DFONT_CENTERED_X, Color(200, 200, 200), g_Fonts.pFontTahoma10.get(), this->strLabel.c_str());
-}
-
-int BaseWindow::GetHeaderHeight()
+int BaseWindow::SetHeaderHeight()
 {
     SIZE size;
     this->pFont->GetTextExtent(this->strLabel.c_str(), &size);
@@ -122,29 +125,53 @@ int BaseWindow::GetHeaderHeight()
 }
 
 
-void MenuMain::Initialize()
+void MenuMain::SetParent(MenuMain* newParent)
 {
-    g_MouseCursor = std::make_unique<MouseCursor>();    // Create our mouse cursor
-    this->mainWindow  = std::make_unique<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
-    {
-        // define future child windows etc.
-    }
+    this->pParent = newParent;
+}
+
+
+void MenuMain::AddChild(std::shared_ptr<MenuMain> child)
+{
+    child->SetParent(this);
+    this->vecChildren.push_back(child);
 }
 
 
 void MenuMain::Render()
-{  
-    this->mainWindow->Render();     // Render main window
-    g_MouseCursor->Render();    // Render mouse cursor in the end  
+{    
+    if (this->vecChildren.size() > 0)
+    {
+        // Render all childrens
+        for (auto it = this->vecChildren.begin(); it != this->vecChildren.end(); it++)
+            (*it)->Render();
+    }
 }
+
 
 void MenuMain::RunThink(UINT uMsg, LPARAM lParam)
 {
-    g_MouseCursor->RunThink(uMsg, lParam);
+    this->mouseCursor->RunThink(uMsg, lParam);
 /// TODO: Capture keyboard input
+}
+
+
+void MenuMain::Initialize()
+{
+    std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
+    {
+        // All child menus / buttons etc, will be done in the future.
+    }
+    this->AddChild(mainWindow);
+
+    this->mouseCursor = std::make_unique<MouseCursor>();    // Create our mouse cursor (one instance only)
 }
 
 void MenuMain::UpdateData()
 {
-    this->mainWindow->UpdateData();
+    if (this->vecChildren.size() > 0)
+    {
+        for (auto it = this->vecChildren.begin(); it != this->vecChildren.end(); it++)
+            (*it)->UpdateData();
+    }
 }

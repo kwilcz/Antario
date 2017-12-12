@@ -6,7 +6,7 @@
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
 /// TODO: Test this makro, if it works - Replace our function with it.
-#define COL_TO_D3DCOLOR(x) (D3DCOLOR_ARGB(x.a, x.r, x.g, x.b))
+#define COL2DWORD(x) (D3DCOLOR_ARGB(x.a, x.r, x.g, x.b))
 
 enum GradientType;
 
@@ -29,7 +29,7 @@ public: // Function members
     void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color);
     void Rect   (float posx, float posy, float width, float height, Color color);
     void TriangleFilled     (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color);
-    void RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType type);
+    void RectFilledGradient (Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType type);
 
     void String (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...);
 
@@ -42,7 +42,6 @@ private: // Variable members
     D3DVIEWPORT9        pViewPort;
 
     void SetupRenderStates();
-    D3DCOLOR ColorToD3DColor(Color color) { return D3DCOLOR_ARGB(color.a, color.r, color.g, color.b); }
 };
 extern DrawManager g_Render;
 

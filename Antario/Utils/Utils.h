@@ -61,7 +61,10 @@ public:
     }
     void Log(std::string str, ...) 
     { 
+#ifdef _DEBUG
+/// TODO: Time/date logging. Possibly even creating a new build option or file setting that would turn console+file logging.
         std::cout << str;
+#endif // _DEBUG
     };
 
     template <typename T>

@@ -83,22 +83,22 @@ public:
         return reinterpret_cast<Type>(this->pOriginalVMT[index]);
     };
 
-    bool Hook(std::size_t index, void* fnNew)
+    HRESULT Hook(std::size_t index, void* fnNew)
     {
         if (index > this->indexCount)   // check if given index is valid
-            return false;
+            return E_INVALIDARG;
 
         this->pNewVMT[index] = reinterpret_cast<std::uintptr_t>(fnNew);
-        return true;
+        return S_OK;
     };
 
-    bool Unhook(std::size_t index)
+    HRESULT Unhook(std::size_t index)
     {
         if (index > this->indexCount)
-            return false;
+            return E_INVALIDARG;
 
         this->pNewVMT[index] = this->pOriginalVMT[index];
-        return true;
+        return S_OK;
     };
 
 private:

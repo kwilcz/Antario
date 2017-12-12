@@ -22,6 +22,7 @@ void Hooks::Init()
     Interfaces::Init();                         // Get interfaces
     g_pNetvars = std::make_unique<NetvarTree>();// Get netvars after getting interfaces as we use them
 
+    g_Utils.Log("Hooking in progress...\n");
     // D3D Device pointer
     uintptr_t d3dDevice = **(uintptr_t**)(g_Utils.FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
 
@@ -40,29 +41,20 @@ void Hooks::Init()
 
     // Create event listener, no need for it now so it will remain commented.
     //g_Hooks.eventListener = new EventListener({ "" });
-   
-#ifdef _DEBUG       // Create console only in debug mode
-    AllocConsole();                                 // Alloc memory and create console    
-    freopen_s((FILE**)stdin,  "CONIN$", "r",  stdin);   // ----------------------------------------------
-    freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);  //  Make iostream library use our console handle
-    freopen_s((FILE**)stdout, "CONOUT$", "w", stderr);  // ----------------------------------------------
-    SetConsoleTitleA(" Antario - Debug console");   // Set console name to a custom one
-    g_Utils.Log("Initialization Succeded \n");     // Log info to console
-#endif
+
+    g_Utils.Log("Hooking completed.\n");
 }
 
 
 
 void Hooks::Restore()
 {
+    g_Utils.Log("Unhooking in progress.\n");
     // Unhook every function we hooked and restore original one
     g_Hooks.pD3DDevice9Hook->Unhook(16);
     g_Hooks.pD3DDevice9Hook->Unhook(17);
     g_Hooks.pClientModeHook->Unhook(24);
-
-#ifdef _DEBUG
-    FreeConsole();  // Free allocated memory and remove console
-#endif
+    g_Utils.Log("Unhooking succeded!\n");
 }
 
 
@@ -98,10 +90,11 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 
     if (g_Hooks.bInitializedDrawManager)
     {
+        g_Utils.Log("Reseting draw manager.\n");
         g_Render.InvalidateDeviceObjects();
         HRESULT hr = oReset(pDevice, pPresentationParameters);
         g_Render.RestoreDeviceObjects(pDevice);
-
+        g_Utils.Log("DrawManager reset succeded.\n");
         return hr;
     }
 
@@ -116,9 +109,11 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
 {
     if (!g_Hooks.bInitializedDrawManager)
     {
+        g_Utils.Log("Initializing Draw manager\n");
         g_Render.InitDeviceObjects(pDevice);
         g_Hooks.nMenu.Initialize();
         g_Hooks.bInitializedDrawManager = true;
+        g_Utils.Log("Draw manager initialized\n");
     }
     else
     {   
@@ -129,7 +124,8 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
         if (g_Settings.bMenuOpened)
         {
             g_Hooks.nMenu.UpdateData();
-            g_Hooks.nMenu.Render();    // Render our menu
+            g_Hooks.nMenu.Render();     // Render our menu                                        
+            g_Hooks.nMenu.mouseCursor->Render();// Render mouse cursor in the end so its not overlapped
         }
 
         // Put your draw calls here
@@ -158,11 +154,14 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     // Not a finished concept, maybe ill change it to a switch
     GetButtonHeld(g_Settings.bMenuOpened, VK_INSERT);
 
-    if (g_Hooks.bInitializedDrawManager && g_Settings.bMenuOpened)
+
+    if (g_Hooks.bInitializedDrawManager)
     {        
         // our wndproc capture fn
         g_Hooks.nMenu.RunThink(uMsg, lParam);
-        return true;
+
+        if (g_Settings.bMenuOpened)
+            return true;    // Disable game wndproc usage when we use the menu
     }
 
     // Call original wndproc to make game use input again

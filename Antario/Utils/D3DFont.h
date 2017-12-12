@@ -47,12 +47,11 @@ class CD3DFont
     LPDIRECT3DSTATEBLOCK9 m_pStateBlockDrawString;
 
 public:
-    // 2D and 3D text drawing functions
+    // 2D text drawing functions
     HRESULT DrawString(FLOAT x, FLOAT y, DWORD dwColor,
             const char* strText, DWORD dwFlags = 0L);
     HRESULT DrawStringScaled(FLOAT x, FLOAT y, FLOAT fXScale, FLOAT fYScale, 
             DWORD dwColor, const char* strText, DWORD dwFlags = 0L);
-    HRESULT Render3DText(FLOAT x, FLOAT y, const char* strText, DWORD dwFlags = 0L);
 
     // Function to get extent of text
     HRESULT GetTextExtent(const char* strText, SIZE* pSize);

@@ -37,8 +37,8 @@ void DrawManager::InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
 
 void DrawManager::InvalidateDeviceObjects()
 {
-    // No need for sanity checks as SAFE_RELEASE does that for us
-    SAFE_RELEASE(this->pDevice);
+    // Remove a pointer to game device
+    this->pDevice = nullptr;
     
     g_Fonts.InvalidateDeviceObjects();
 }
@@ -61,7 +61,7 @@ void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color)
 
 void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color)
 {
-    D3DCOLOR dwColor = this->ColorToD3DColor(color);
+    D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[2] = 
     {  
         { posx1, posy1, 0.0f, 1.0f, dwColor },
@@ -92,7 +92,7 @@ void DrawManager::Rect(float posx, float posy, float width, float height, Color 
 
 void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color)
 {
-    D3DCOLOR dwColor = this->ColorToD3DColor(color);
+    D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[3] = 
     {  
         { pos1.x, pos1.y, 1.0f, 1.0f, dwColor },
@@ -107,8 +107,8 @@ void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Co
 
 void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType vertical)
 {
-    D3DCOLOR dwColor  = this->ColorToD3DColor(col1);
-    D3DCOLOR dwColor2 = this->ColorToD3DColor(col2);
+    D3DCOLOR dwColor  = COL2DWORD(col1);
+    D3DCOLOR dwColor2 = COL2DWORD(col2);
     D3DCOLOR dwcol1, dwcol2, dwcol3, dwcol4;
 
     switch (vertical)
@@ -143,7 +143,7 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
 
 void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
 {
-    D3DCOLOR dwColor = this->ColorToD3DColor(color);
+    D3DCOLOR dwColor = COL2DWORD(color);
     pFont->DrawString(posx, posy, dwColor, szText, dwFlags);    // To make life easier
 }
 

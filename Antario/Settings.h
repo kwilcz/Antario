@@ -6,6 +6,7 @@
 
 struct Settings
 {
+    bool bCheatActive   = true;
     bool bMenuOpened    = false;
     bool bBhopEnabled   = true;
     Color colCursor     = Color(0, 150, 255, 100);
