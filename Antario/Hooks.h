@@ -5,12 +5,19 @@
 #include "SDK\CInput.h"
 #include "Menu.h"
 
+namespace VTableIndexes
+{
+	constexpr auto Reset = 16;
+	constexpr auto Present = 17;
+	constexpr auto CreateMove = 24;
+}
+
 class VMTHook;
 class Hooks
 {
-public:   
+public:
     // Initialization setup, called on injection
-    static void Init(); 
+    static void Init();
     static void Restore();
 
 public:
@@ -65,15 +72,15 @@ public:
 
         const std::size_t kSizeTable = this->indexCount * sizeof(std::uintptr_t);
 
-       
+
         this->pOriginalVMT = *this->ppBaseClass;
         this->pNewVMT = std::make_unique<std::uintptr_t[]>(this->indexCount);
 
         // copy original vtable to our local copy of it
-        std::memcpy(this->pNewVMT.get(), this->pOriginalVMT, kSizeTable); 
+        std::memcpy(this->pNewVMT.get(), this->pOriginalVMT, kSizeTable);
 
         // replace original class with our local copy
-        *this->ppBaseClass = this->pNewVMT.get();   
+        *this->ppBaseClass = this->pNewVMT.get();
     };
     ~VMTHook() { *this->ppBaseClass = this->pOriginalVMT; };
 

@@ -18,7 +18,7 @@ void Hooks::Init()
         using namespace std::literals::chrono_literals;
         std::this_thread::sleep_for(50ms);
     }
-    
+
     Interfaces::Init();                         // Get interfaces
     g_pNetvars = std::make_unique<NetvarTree>();// Get netvars after getting interfaces as we use them
 
@@ -34,9 +34,9 @@ void Hooks::Init()
     g_Hooks.pClientModeHook = std::make_unique<VMTHook>(g_pClientMode);
 
     // Hook the table functions
-    g_Hooks.pD3DDevice9Hook->Hook(16, Hooks::Reset);
-    g_Hooks.pD3DDevice9Hook->Hook(17, Hooks::Present);
-    g_Hooks.pClientModeHook->Hook(24, Hooks::CreateMove); 
+    g_Hooks.pD3DDevice9Hook->Hook(VTableIndexes::Reset, Hooks::Reset);
+    g_Hooks.pD3DDevice9Hook->Hook(VTableIndexes::Present, Hooks::Present);
+    g_Hooks.pClientModeHook->Hook(VTableIndexes::CreateMove, Hooks::CreateMove);
 
 
     // Create event listener, no need for it now so it will remain commented.
@@ -51,9 +51,9 @@ void Hooks::Restore()
 {
     Utils::Log("Unhooking in progress.\n");
     // Unhook every function we hooked and restore original one
-    g_Hooks.pD3DDevice9Hook->Unhook(16);
-    g_Hooks.pD3DDevice9Hook->Unhook(17);
-    g_Hooks.pClientModeHook->Unhook(24);
+    g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Reset);
+    g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Present);
+    g_Hooks.pClientModeHook->Unhook(VTableIndexes::CreateMove);
     SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.pOriginalWNDProc);
     Utils::Log("Unhooking succeded!\n");
 
@@ -121,7 +121,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
         Utils::Log("Draw manager initialized\n");
     }
     else
-    {   
+    {
         static bool bIsHeld = false;
         if (g_Settings.bMenuOpened && !bIsHeld)
         {
@@ -136,13 +136,13 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
         }
 
         // watermark to distinguish if we injected (for now)
-        std::string szWatermark = "Antario, build 09.12.2017";
+        std::string szWatermark = "Antario";
         g_Render.String(8, 8, D3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
 
         if (g_Settings.bMenuOpened)
         {
             g_Hooks.nMenu.UpdateData();
-            g_Hooks.nMenu.Render();     // Render our menu                                        
+            g_Hooks.nMenu.Render();     // Render our menu
             g_Hooks.nMenu.mouseCursor->Render();// Render mouse cursor in the end so its not overlapped
         }
 
@@ -172,7 +172,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
      GetButtonHeld(g_Settings.bMenuOpened, VK_INSERT);
 
     if (g_Hooks.bInitializedDrawManager)
-    {        
+    {
         // our wndproc capture fn
         g_Hooks.nMenu.RunThink(uMsg, lParam);
 
