@@ -143,8 +143,8 @@ HRESULT CD3DFont::InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice)
     INT nHeight = -MulDiv(m_dwFontHeight, (INT)(GetDeviceCaps(hDC, LOGPIXELSY) * m_fTextScale), 72);
     DWORD dwItalic = (m_dwFontFlags & D3DFONT_ITALIC) ? TRUE : FALSE;
     HFONT hFont = CreateFont(nHeight, 0, 0, 0, m_dwFontWeight, dwItalic,
-                            FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                            CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY,
+                            FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+                            m_dwFontHeight > 8 ? CLEARTYPE_NATURAL_QUALITY : ANTIALIASED_QUALITY,
                             VARIABLE_PITCH, m_strFontName);
 
     if (NULL == hFont)

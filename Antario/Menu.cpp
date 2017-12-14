@@ -7,8 +7,9 @@
 #define GET_X_LPARAM(lp)                        ((float)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((float)(short)HIWORD(lp))
 
-// Init our static pointer
+// Init our static pointers
 std::unique_ptr<MouseCursor> MenuMain::mouseCursor;
+CD3DFont* MenuMain::pFont = nullptr;
 
 void MouseCursor::Render()
 {
@@ -57,26 +58,35 @@ void MouseCursor::RunThink(UINT uMsg, LPARAM lParam)
     }
 }
 
+bool MouseCursor::IsInBounds(Vector2D vecDst1, Vector2D vecDst2)
+{
+        if (vecPointPos.x > vecDst1.x && vecPointPos.x < vecDst2.x && vecPointPos.y > vecDst1.y && vecPointPos.y < vecDst2.y)
+            return true;
+        else
+            return false;
+}
 
-BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, std::string strLabel)
+
+BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, CD3DFont* pHeaderFont, std::string strLabel)
 {
     this->pFont = pFont;
+    this->pHeaderFont = pHeaderFont;
     this->strLabel = strLabel;
-    this->vecWindowSize = vecSize;
+    this->vecSize = vecSize;
     this->iHeaderHeight = this->SetHeaderHeight();
-    this->SetWindowPos(vecPosition);
+    this->SetPos(vecPosition);
 }
 
 
 void BaseWindow::Render()
 {
     // Draw main background rectangle
-    g_Render.RectFilledGradient(this->vecWindowPos, this->vecWindowPos + this->vecWindowSize, Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
+    g_Render.RectFilledGradient(this->vecPosition, this->vecPosition + this->vecSize, Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
     // Draw header rect.
-    g_Render.RectFilledGradient(this->vecWindowPos, Vector2D(this->vecWindowPos.x + this->vecWindowSize.x, this->vecWindowPos.y + this->iHeaderHeight), Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
+    g_Render.RectFilledGradient(this->vecPosition, Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight), Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
 
-    // Draw title string, defined as label.
-    g_Render.String(this->vecWindowPos.x +(this->vecWindowSize.x / 2.f), this->vecWindowPos.y, D3DFONT_CENTERED_X, Color(200, 200, 200), this->pFont, this->strLabel.c_str());
+    // Draw header string, defined as label.
+    g_Render.String(this->vecPosition.x +(this->vecSize.x / 2.f), this->vecPosition.y, D3DFONT_CENTERED_X, Color(200, 200, 200), this->pHeaderFont, this->strLabel.c_str());
     
     // Render all childrens
     MenuMain::Render();
@@ -85,18 +95,9 @@ void BaseWindow::Render()
 
 void BaseWindow::UpdateData()
 {
-    // Lambda checking if our mouse cursor is in bounds of the selectable. Will be moved later on
-    auto IsInBounds = [this](Vector2D vecSrc, Vector2D vecDst1, Vector2D vecDst2) -> bool
-    {
-        if (vecSrc.x > vecDst1.x && vecSrc.x < vecDst2.x && vecSrc.y > vecDst1.y && vecSrc.y < vecDst2.y)
-            return true;
-        else
-            return false;
-    };
-
     // Check if mouse has been pressed in the proper area. If yes, save window state as dragged.
-    Vector2D vecHeaderBounds = Vector2D(this->vecWindowPos.x + this->vecWindowSize.x, this->vecWindowPos.y + this->iHeaderHeight);
-    if (this->mouseCursor->bLMBPressed && IsInBounds(this->mouseCursor->vecPointPos, this->vecWindowPos, vecHeaderBounds))
+    Vector2D vecHeaderBounds = Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight);
+    if (this->mouseCursor->bLMBPressed && MenuMain::mouseCursor->IsInBounds(this->vecPosition, vecHeaderBounds))
         this->bIsDragged = true;
     else
     if (!this->mouseCursor->bLMBPressed)
@@ -106,12 +107,20 @@ void BaseWindow::UpdateData()
     static Vector2D vecOldMousePos = this->mouseCursor->vecPointPos;
     if (this->bIsDragged)
     {
-        Vector2D vecNewPos = this->vecWindowPos + (this->mouseCursor->vecPointPos - vecOldMousePos);
-        this->SetWindowPos(vecNewPos);
+        Vector2D vecNewPos = this->vecPosition + (this->mouseCursor->vecPointPos - vecOldMousePos);
+        this->SetPos(vecNewPos);
         vecOldMousePos = this->mouseCursor->vecPointPos;
     }
     else
         vecOldMousePos = this->mouseCursor->vecPointPos;
+    
+
+    // Set the position of all child buttons / checkboxes etc.
+    for (std::size_t it = 0; it < this->vecChildren.size(); it++)
+    {
+        this->vecChildren.at(it)->SetPos(Vector2D(this->vecPosition.x + 10,
+            this->vecPosition.y + (it * this->vecChildren.at(it)->GetSize().y) + this->iHeaderHeight + 10));
+    }
 
     MenuMain::UpdateData();
 }
@@ -120,7 +129,7 @@ void BaseWindow::UpdateData()
 int BaseWindow::SetHeaderHeight()
 {
     SIZE size;
-    this->pFont->GetTextExtent(this->strLabel.c_str(), &size);
+    this->pHeaderFont->GetTextExtent(this->strLabel.c_str(), &size);
     return size.cy + 1;
 }
 
@@ -139,13 +148,10 @@ void MenuMain::AddChild(std::shared_ptr<MenuMain> child)
 
 
 void MenuMain::Render()
-{    
-    if (this->vecChildren.size() > 0)
-    {
-        // Render all childrens
-        for (auto it = this->vecChildren.begin(); it != this->vecChildren.end(); it++)
-            (*it)->Render();
-    }
+{  
+    // Render all childrens
+    for (std::size_t it = 0; it < this->vecChildren.size(); it++)
+        this->vecChildren.at(it)->Render();
 }
 
 
@@ -158,8 +164,9 @@ void MenuMain::RunThink(UINT uMsg, LPARAM lParam)
 
 void MenuMain::Initialize()
 {
-    std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
+    std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
     {
+        mainWindow->AddChild(std::make_unique<Checkbox>("Bunnyhop", &g_Settings.bBhopEnabled));
         // All child menus / buttons etc, will be done in the future.
     }
     this->AddChild(mainWindow);
@@ -174,4 +181,38 @@ void MenuMain::UpdateData()
         for (auto it = this->vecChildren.begin(); it != this->vecChildren.end(); it++)
             (*it)->UpdateData();
     }
+}
+
+Checkbox::Checkbox(std::string strLabel, bool *bValue)
+{
+    this->strLabel = strLabel;
+    this->bCheckboxValue = bValue;
+
+    SIZE size;
+    this->pFont->GetTextExtent(this->strLabel.c_str(), &size);
+    this->vecSize = Vector2D(200, static_cast<float>(size.cy) + 10.f);
+    this->vecSelectableSize = Vector2D(static_cast<float>(size.cy), static_cast<float>(size.cy));
+}
+
+void Checkbox::Render()
+{
+   if (*this->bCheckboxValue)
+        g_Render.RectFilledGradient(this->vecPosition + 1, this->vecPosition + this->vecSelectableSize, Color(50, 50, 50, 255), Color(20, 20, 20, 255), GradientType::GRADIENT_VERTICAL);
+
+    g_Render.Rect(this->vecPosition, this->vecPosition + this->vecSelectableSize, Color(15, 15, 15, 220));
+
+    g_Render.String((this->vecPosition.x + this->vecSelectableSize.x + 5), this->vecPosition.y, D3DFONT_DROPSHADOW, Color(160, 160, 160, 255), this->pFont, this->strLabel.c_str());
+}
+
+void Checkbox::UpdateData()
+{
+    static bool bIsChanged = false;
+    if (this->mouseCursor->bLMBPressed && MenuMain::mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSelectableSize)) && !bIsChanged)
+    {
+        *this->bCheckboxValue = !*this->bCheckboxValue;
+        bIsChanged = true;
+    }
+    else
+    if (!this->mouseCursor->bLMBPressed)
+        bIsChanged = false;
 }

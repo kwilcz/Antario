@@ -117,6 +117,19 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
     }
     else
     {   
+        static bool bIsHeld = false;
+        if (g_Settings.bMenuOpened && !bIsHeld)
+        {
+            g_pEngine->ExecuteClientCmd("cl_mouseenable 0");
+            bIsHeld = true;
+        }
+        else
+        if (!g_Settings.bMenuOpened && bIsHeld)
+        {
+            g_pEngine->ExecuteClientCmd("cl_mouseenable 1");
+            bIsHeld = false;
+        }
+
         // watermark to distinguish if we injected (for now)
         std::string szWatermark = "Antario, build 09.12.2017";
         g_Render.String(8, 8, D3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
@@ -144,16 +157,14 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     auto GetButtonHeld = [uMsg, wParam](bool& bButton, int vKey)
     {
         if (uMsg == WM_KEYDOWN && wParam == vKey)
-                bButton = true;
+            bButton = true;
         else
-        if (uMsg == WM_KEYUP && wParam == vKey)
+            if (uMsg == WM_KEYUP && wParam == vKey)
                 bButton = false;
     };
 
     // Working when you HOLD the insert button, not when you press it.
-    // Not a finished concept, maybe ill change it to a switch
-    GetButtonHeld(g_Settings.bMenuOpened, VK_INSERT);
-
+     GetButtonHeld(g_Settings.bMenuOpened, VK_INSERT);
 
     if (g_Hooks.bInitializedDrawManager)
     {        

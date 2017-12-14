@@ -636,6 +636,7 @@ public:
     Vector2D	operator-(const Vector2D& v) const;
     Vector2D	operator*(const Vector2D& v) const;
     Vector2D	operator/(const Vector2D& v) const;
+    Vector2D    operator+(int   i1) const;
     Vector2D	operator*(float fl) const;
     Vector2D	operator/(float fl) const;
 
@@ -912,6 +913,13 @@ inline void Vector2DAdd(const Vector2D& a, const Vector2D& b, Vector2D& c)
     c.y = a.y + b.y;
 }
 
+inline void Vector2DAdd(const Vector2D& a, const int b, Vector2D& c)
+{
+    Assert(a.IsValid());
+    c.x = a.x + b;
+    c.y = a.y + b;
+}
+
 inline void Vector2DSubtract(const Vector2D& a, const Vector2D& b, Vector2D& c)
 {
     Assert(a.IsValid() && b.IsValid());
@@ -1141,6 +1149,13 @@ inline Vector2D Vector2D::operator-(const Vector2D& v) const
 {
     Vector2D res;
     Vector2DSubtract(*this, v, res);
+    return res;
+}
+
+inline Vector2D Vector2D::operator+(int v) const
+{
+    Vector2D res;
+    Vector2DAdd(*this, v, res);
     return res;
 }
 

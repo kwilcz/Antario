@@ -11,6 +11,7 @@ struct Vertex
     DWORD color;
 };
 
+
 DrawManager::DrawManager()
 {
     this->pDevice         = nullptr;
@@ -59,7 +60,7 @@ void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color)
 }
 
 
-void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color)
+void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color, bool antialiased)
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[2] = 
@@ -68,7 +69,7 @@ void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color
         { posx2, posy2, 0.0f, 1.0f, dwColor } 
     };
 
-    this->SetupRenderStates();
+    this->SetupRenderStates(antialiased);
     this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_LINELIST, 1, &vert, sizeof(Vertex));
@@ -81,14 +82,14 @@ void DrawManager::Rect(Vector2D vecPos1, Vector2D vecPos2, Color color)
 }
 
 
-/// TODO: Test this, wrote that from my mem.
-void DrawManager::Rect(float posx, float posy, float width, float height, Color color)
+void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color color)
 {
-    this->Line(posx, posy, posx + width, posy,  color); // draw lower horizontal
-    this->Line(posx, posy, posx, posy + height, color); // draw left vertical
-    this->Line(posx, posy + height - 1, posx + width, posy + height - 1, color);    // draw top horizontal
-    this->Line(posx + width - 1, posy, posx + width - 1, posy + height,  color);    // draw right vertical
+    this->Line(posx1, posy2, posx2, posy2, color, false); // draw top horizontal
+    this->Line(posx1, posy1, posx2, posy1, color, false); // draw lower horizontal
+    this->Line(posx1, posy1 + 1, posx1, posy2, color, false); // draw left vertical
+    this->Line(posx2, posy1, posx2, posy2 + 1, color, false); // draw right vertical
 }
+
 
 void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color)
 {
@@ -104,6 +105,7 @@ void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Co
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 1, &vert, sizeof(Vertex));
 }
+
 
 void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType vertical)
 {
@@ -141,21 +143,24 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
+
 void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     pFont->DrawString(posx, posy, dwColor, szText, dwFlags);    // To make life easier
 }
 
-void DrawManager::SetupRenderStates()
+
+void DrawManager::SetupRenderStates(bool antialiased)
 {
     this->pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
     this->pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
     this->pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
     this->pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
     this->pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
+    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, antialiased);
 }
+
 
 Vector2D DrawManager::GetScreenCenter()
 {

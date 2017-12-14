@@ -5,7 +5,6 @@
 #include "D3DFont.h"
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
-/// TODO: Test this makro, if it works - Replace our function with it.
 #define COL2DWORD(x) (D3DCOLOR_ARGB(x.a, x.r, x.g, x.b))
 
 enum GradientType;
@@ -25,7 +24,7 @@ public: // Function members
     // Drawing functions
 
     void Line   (Vector2D vecPos1, Vector2D vecPos2, Color color);
-    void Line   (float posx1, float posy1, float posx2, float posy2, Color color);
+    void Line   (float posx1, float posy1, float posx2, float posy2, Color color, bool antialiased = true);
     void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color);
     void Rect   (float posx, float posy, float width, float height, Color color);
     void TriangleFilled     (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color);
@@ -41,7 +40,7 @@ private: // Variable members
     LPDIRECT3DDEVICE9   pDevice;
     D3DVIEWPORT9        pViewPort;
 
-    void SetupRenderStates();
+    void SetupRenderStates(bool antialiased = true);
 };
 extern DrawManager g_Render;
 
