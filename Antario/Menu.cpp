@@ -167,6 +167,7 @@ void MenuMain::Initialize()
     std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
     {
         mainWindow->AddChild(std::make_unique<Checkbox>("Bunnyhop", &g_Settings.bBhopEnabled));
+        mainWindow->AddChild(std::make_unique<Checkbox>("Shutdown", &g_Settings.bCheatActive));
         // All child menus / buttons etc, will be done in the future.
     }
     this->AddChild(mainWindow);

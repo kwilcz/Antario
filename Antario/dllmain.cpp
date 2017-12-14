@@ -9,7 +9,7 @@ DWORD WINAPI OnDllAttach(PVOID base)
     AllocConsole();                                 // Alloc memory and create console    
     freopen_s((FILE**)stdin,  "CONIN$", "r",  stdin);   // ----------------------------------------------
     freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);  //  Make iostream library use our console handle
-    freopen_s((FILE**)stdout, "CONOUT$", "w", stderr);  // ----------------------------------------------
+                                                        // ----------------------------------------------
     SetConsoleTitleA(" Antario - Debug console");   // Set console name to a custom one
 #endif
     g_Utils.Log("Console Allocated\n");
@@ -26,6 +26,8 @@ DWORD WINAPI OnDllAttach(PVOID base)
 VOID WINAPI OnDllDetach()
 {
 #ifdef _DEBUG
+    fclose((FILE*)stdin);
+    fclose((FILE*)stdout);
     FreeConsole();  // Free allocated memory and remove console
 #endif
 }
@@ -40,7 +42,11 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
     else if (dwReason == DLL_PROCESS_DETACH) 
     {
         if (!lpReserved)
+        {
             Hooks::Restore();
+            using namespace std::literals::chrono_literals;
+            std::this_thread::sleep_for(1s);
+        }
 
         OnDllDetach();
     }

@@ -54,7 +54,12 @@ void Hooks::Restore()
     g_Hooks.pD3DDevice9Hook->Unhook(16);
     g_Hooks.pD3DDevice9Hook->Unhook(17);
     g_Hooks.pClientModeHook->Unhook(24);
+    SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.pOriginalWNDProc);
     g_Utils.Log("Unhooking succeded!\n");
+
+    // Destroy fonts and all textures we created
+    g_Render.InvalidateDeviceObjects();
+    g_Fonts.DeleteDeviceObjects();
 }
 
 

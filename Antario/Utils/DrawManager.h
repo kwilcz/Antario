@@ -47,6 +47,11 @@ extern DrawManager g_Render;
 struct Fonts
 {
 public:
+    void DeleteDeviceObjects()
+    {
+        pFontTahoma8->DeleteDeviceObjects();
+        pFontTahoma10->DeleteDeviceObjects();
+    };
     void InvalidateDeviceObjects()
     {
         pFontTahoma8->InvalidateDeviceObjects();
