@@ -8,10 +8,6 @@
 #include "..\SDK\CPrediction.h"
 #include "..\SDK\IGameEvent.h"
 
-// Initializing global variables with no cpp file matching the header
-
-Utils g_Utils;
-
 // Initializing global interfaces
 
 IBaseClientDLL*     g_pClientDll    = nullptr;

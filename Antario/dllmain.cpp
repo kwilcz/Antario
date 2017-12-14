@@ -12,7 +12,7 @@ DWORD WINAPI OnDllAttach(PVOID base)
                                                         // ----------------------------------------------
     SetConsoleTitleA(" Antario - Debug console");   // Set console name to a custom one
 #endif
-    g_Utils.Log("Console Allocated\n");
+    Utils::Log("Console Allocated\n");
     Hooks::Init();
 
     while (g_Settings.bCheatActive)

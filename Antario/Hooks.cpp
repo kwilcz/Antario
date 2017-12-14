@@ -22,9 +22,9 @@ void Hooks::Init()
     Interfaces::Init();                         // Get interfaces
     g_pNetvars = std::make_unique<NetvarTree>();// Get netvars after getting interfaces as we use them
 
-    g_Utils.Log("Hooking in progress...\n");
+    Utils::Log("Hooking in progress...\n");
     // D3D Device pointer
-    uintptr_t d3dDevice = **(uintptr_t**)(g_Utils.FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
+    uintptr_t d3dDevice = **(uintptr_t**)(Utils::FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
 
     if (g_Hooks.hCSGOWindow)        // Hook WNDProc to capture mouse / keyboard input
         g_Hooks.pOriginalWNDProc = (WNDPROC)SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.WndProc);
@@ -40,22 +40,22 @@ void Hooks::Init()
 
 
     // Create event listener, no need for it now so it will remain commented.
-    //g_Hooks.eventListener = new EventListener({ "" });
+    //g_Hooks.pEventListener = new EventListener({ "" });
 
-    g_Utils.Log("Hooking completed.\n");
+    Utils::Log("Hooking completed.\n");
 }
 
 
 
 void Hooks::Restore()
 {
-    g_Utils.Log("Unhooking in progress.\n");
+    Utils::Log("Unhooking in progress.\n");
     // Unhook every function we hooked and restore original one
     g_Hooks.pD3DDevice9Hook->Unhook(16);
     g_Hooks.pD3DDevice9Hook->Unhook(17);
     g_Hooks.pClientModeHook->Unhook(24);
     SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.pOriginalWNDProc);
-    g_Utils.Log("Unhooking succeded!\n");
+    Utils::Log("Unhooking succeded!\n");
 
     // Destroy fonts and all textures we created
     g_Render.InvalidateDeviceObjects();
@@ -95,11 +95,11 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 
     if (g_Hooks.bInitializedDrawManager)
     {
-        g_Utils.Log("Reseting draw manager.\n");
+        Utils::Log("Reseting draw manager.\n");
         g_Render.InvalidateDeviceObjects();
         HRESULT hr = oReset(pDevice, pPresentationParameters);
         g_Render.RestoreDeviceObjects(pDevice);
-        g_Utils.Log("DrawManager reset succeded.\n");
+        Utils::Log("DrawManager reset succeded.\n");
         return hr;
     }
 
@@ -114,11 +114,11 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
 {
     if (!g_Hooks.bInitializedDrawManager)
     {
-        g_Utils.Log("Initializing Draw manager\n");
+        Utils::Log("Initializing Draw manager\n");
         g_Render.InitDeviceObjects(pDevice);
         g_Hooks.nMenu.Initialize();
         g_Hooks.bInitializedDrawManager = true;
-        g_Utils.Log("Draw manager initialized\n");
+        Utils::Log("Draw manager initialized\n");
     }
     else
     {   

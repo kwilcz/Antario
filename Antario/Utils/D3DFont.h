@@ -28,23 +28,23 @@
 //-----------------------------------------------------------------------------
 class CD3DFont
 {
-    TCHAR   m_strFontName[80];            // Font properties
-    DWORD   m_dwFontHeight;
-    DWORD   m_dwFontFlags;
-    DWORD   m_dwFontWeight;
+    TCHAR   strFontName[80];            // Font properties
+    DWORD   dwFontHeight;
+    DWORD   dwFontFlags;
+    DWORD   dwFontWeight;
 
-    LPDIRECT3DDEVICE9       m_pd3dDevice; // A D3DDevice used for rendering
-    LPDIRECT3DTEXTURE9      m_pTexture;   // The d3d texture for this font
-    LPDIRECT3DVERTEXBUFFER9 m_pVB;        // VertexBuffer for rendering text
-    DWORD   m_dwTexWidth;                 // Texture dimensions
-    DWORD   m_dwTexHeight;
-    FLOAT   m_fTextScale;
-    FLOAT   m_fTexCoords[128 - 32][4];
-    DWORD   m_dwSpacing;                  // Character pixel spacing per side
+    LPDIRECT3DDEVICE9       pd3dDevice; // A D3DDevice used for rendering
+    LPDIRECT3DTEXTURE9      pTexture;   // The d3d texture for this font
+    LPDIRECT3DVERTEXBUFFER9 pVB;        // VertexBuffer for rendering text
+    DWORD   dwTexWidth;                 // Texture dimensions
+    DWORD   dwTexHeight;
+    FLOAT   fTextScale;
+    FLOAT   fTexCoords[128 - 32][4];
+    DWORD   dwSpacing;                  // Character pixel spacing per side
 
-                                          // Stateblocks for setting and restoring render states
-    LPDIRECT3DSTATEBLOCK9 m_pStateBlockSaved;
-    LPDIRECT3DSTATEBLOCK9 m_pStateBlockDrawString;
+                                        // Stateblocks for setting and restoring render states
+    LPDIRECT3DSTATEBLOCK9 pStateBlockSaved;
+    LPDIRECT3DSTATEBLOCK9 pStateBlockDrawString;
 
 public:
     // 2D text drawing functions

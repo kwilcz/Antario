@@ -28,7 +28,7 @@ void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
     auto getRandomSeed = [&pCmd]()
     {
         typedef unsigned int(__cdecl* MD5_PseudoRandom_t)(unsigned int);
-        static auto MD5_PseudoRandom = (MD5_PseudoRandom_t)g_Utils.FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
+        static auto MD5_PseudoRandom = (MD5_PseudoRandom_t)Utils::FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
         return MD5_PseudoRandom(pCmd->command_number) & 0x7FFFFFFF;;
     };
 

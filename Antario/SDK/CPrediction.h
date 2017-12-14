@@ -14,7 +14,7 @@ public:
     void SetHost(C_BaseEntity* host)
     {
         typedef void(__thiscall* OriginalFn)(void*, C_BaseEntity*);
-        return g_Utils.CallVFunc<OriginalFn>(this, 1)(this, host);
+        return Utils::CallVFunc<OriginalFn>(this, 1)(this, host);
     }
 };
 
