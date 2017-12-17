@@ -20,6 +20,7 @@ DWORD WINAPI OnDllAttach(PVOID base)
         using namespace std::literals::chrono_literals;
         std::this_thread::sleep_for(1s);
     }
+	g_pEngine->ExecuteClientCmd("cl_mouseenable 1"); //Renable the mouse after exit
     FreeLibraryAndExitThread(static_cast<HMODULE>(base), 1);
 }
 
