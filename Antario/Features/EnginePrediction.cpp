@@ -38,7 +38,7 @@ void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
     flOldFrametime  = g_pGlobalVars->frametime;
 
     m_nRandomSeed               = getRandomSeed();
-    g_pGlobalVars->curtime      = pLocal->GetTickBase() * g_pGlobalVars->intervalPerTick;
+    g_pGlobalVars->curtime      = flTickBase * g_pGlobalVars->intervalPerTick;
     g_pGlobalVars->frametime    = g_pGlobalVars->intervalPerTick;
 
     g_pMovement->StartTrackPredictionErrors(pLocal);
