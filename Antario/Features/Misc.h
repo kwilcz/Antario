@@ -10,13 +10,15 @@ public:
     {
         this->pCmd = pCmd;
         this->pLocal = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer()); // To be replaced with a global var
-        if (this->pLocal)
-        {
-            if (g_Settings.bBhopEnabled)
-                this->DoBhop();
-            // sum future shit
-        }
-    }
+
+        if (g_Settings.bBhopEnabled)
+            this->DoBhop();
+        // sum future shit
+    };
+    void Render()
+    {
+        this->DrawRecoilCrosshair();
+    };
 private:
     CUserCmd* pCmd;
     C_BaseEntity* pLocal;
@@ -26,6 +28,10 @@ private:
         if (!(this->pLocal->GetFlags() & EntityFlags::FL_ONGROUND) && this->pLocal->GetMoveType() != MoveType_t::MOVETYPE_LADDER)
             if (this->pCmd->buttons & IN_JUMP)
                 this->pCmd->buttons &= ~IN_JUMP;
+    }
+    void DrawRecoilCrosshair()
+    {
+
     }
 };
 extern Misc g_Misc;

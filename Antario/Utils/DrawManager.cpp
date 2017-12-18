@@ -90,6 +90,28 @@ void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color
     this->Line(posx2, posy1, posx2, posy2 + 1, color, false); // draw right vertical
 }
 
+void DrawManager::RectFilled(Vector2D vecPos1, Vector2D vecPos2, Color color)
+{
+    this->RectFilled(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
+}
+
+void DrawManager::RectFilled(float posx1, float posy1, float posx2, float posy2, Color color)
+{
+    D3DCOLOR dwColor = COL2DWORD(color);
+    Vertex vert[4] =
+    {
+        { posx1, posy1, 0.0f, 1.0f, dwColor },
+        { posx2, posy1, 0.0f, 1.0f, dwColor },
+        { posx1, posy2, 0.0f, 1.0f, dwColor },
+        { posx2, posy2, 0.0f, 1.0f, dwColor }
+    };
+
+    this->SetupRenderStates();
+    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    this->pDevice->SetTexture(0, nullptr);
+    this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
+}
+
 
 void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color)
 {

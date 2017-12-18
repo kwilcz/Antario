@@ -53,7 +53,7 @@ private:
     HWND hCSGOWindow              = nullptr; // CSGO window handle
     bool bInitializedDrawManager  = false;   // Check if we initialized our draw manager
     WNDPROC pOriginalWNDProc      = nullptr; // Original CSGO window proc
-    EventListener* pEventListener = nullptr; // Listens to csgo events, needs to be created
+    std::unique_ptr<EventListener> pEventListener = nullptr; // Listens to csgo events, needs to be created
 };
 extern Hooks g_Hooks;
 

@@ -40,16 +40,19 @@ void Hooks::Init()
 
 
     // Create event listener, no need for it now so it will remain commented.
-    //g_Hooks.pEventListener = new EventListener({ "" });
+    //const std::vector<const char*> vecEventNames = { "" };
+    //g_Hooks.pEventListener = std::make_unique<EventListener>(vecEventNames);
 
-    Utils::Log("Hooking completed.\n");
+    Utils::Log("Hooking completed!\n");
 }
 
 
 
 void Hooks::Restore()
 {
-    Utils::Log("Unhooking in progress.\n");
+    Utils::Log("Enabling mouse pointer.\n");
+    g_pEngine->ExecuteClientCmd("cl_mouseenable 1"); //Renable the mouse after exit
+    Utils::Log("Unhooking in progress...\n");
     // Unhook every function we hooked and restore original one
     g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Reset);
     g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Present);
@@ -75,6 +78,8 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 
     // Local player, get only once, for now in cm only. Will make it global later on
     auto pLocalEntity = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer());
+    if (!pLocalEntity)
+        return false;
 
     g_Misc.OnCreateMove(pCmd);
     // run shit outside enginepred

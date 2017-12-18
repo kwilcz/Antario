@@ -67,7 +67,7 @@ public:
     virtual void Render();
     virtual void UpdateData();
 
-    virtual int  SetHeaderHeight();
+    virtual int  GetHeaderHeight();
 private:
     CD3DFont* pHeaderFont;      // Header only font
     int       iHeaderHeight;    // Header height in pixels

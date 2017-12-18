@@ -1,6 +1,9 @@
 #pragma once
 #include <Psapi.h>
 #include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <chrono>
 #include "..\SDK\IVEngineClient.h"
 
 #define INRANGE(x,a,b)    (x >= a && x <= b)
@@ -50,19 +53,18 @@ public:
     static void Log(std::string str, ...)
     { 
 #ifdef _DEBUG
-/// TODO: Time/date logging. Possibly even creating a new build option or file setting that would turn console+file logging.
-        std::cout << str;
+        std::chrono::system_clock::time_point systemNow = std::chrono::system_clock::now();
+        std::time_t now_c = std::chrono::system_clock::to_time_t(systemNow);
+        struct tm timeInfo;
+        localtime_s(&timeInfo, &now_c); // using localtime_s as std::localtime is not thread-safe.
+        std::cout << "[" << std::put_time(&timeInfo, "%T") << "] " << str;
 #endif // _DEBUG
     };
 
-    template <typename T>
-    static T CallVFunc(void* ppClass, int iIndex)
-    {
-        return (*(T**)ppClass)[iIndex];
-    }
+
     static bool WorldToScreen(const Vector &origin, Vector &screen)
     {
-        auto ScreenTransform = [](const Vector& point, Vector& screen) -> bool
+        auto ScreenTransform = [&origin, &screen]() -> bool
         {
             static ptrdiff_t pViewMatrix;
             if (!pViewMatrix)
@@ -74,11 +76,11 @@ public:
             }
 
             const VMatrix& w2sMatrix = *(VMatrix*)pViewMatrix;
-            screen.x = w2sMatrix.m[0][0] * point.x + w2sMatrix.m[0][1] * point.y + w2sMatrix.m[0][2] * point.z + w2sMatrix.m[0][3];
-            screen.y = w2sMatrix.m[1][0] * point.x + w2sMatrix.m[1][1] * point.y + w2sMatrix.m[1][2] * point.z + w2sMatrix.m[1][3];
+            screen.x = w2sMatrix.m[0][0] * origin.x + w2sMatrix.m[0][1] * origin.y + w2sMatrix.m[0][2] * origin.z + w2sMatrix.m[0][3];
+            screen.y = w2sMatrix.m[1][0] * origin.x + w2sMatrix.m[1][1] * origin.y + w2sMatrix.m[1][2] * origin.z + w2sMatrix.m[1][3];
             screen.z = 0.0f;
 
-            float w = w2sMatrix.m[3][0] * point.x + w2sMatrix.m[3][1] * point.y + w2sMatrix.m[3][2] * point.z + w2sMatrix.m[3][3];
+            float w = w2sMatrix.m[3][0] * origin.x + w2sMatrix.m[3][1] * origin.y + w2sMatrix.m[3][2] * origin.z + w2sMatrix.m[3][3];
 
             if (w < 0.001f) {
                 screen.x *= 100000;
@@ -93,7 +95,7 @@ public:
             return false;
         };
 
-        if (!ScreenTransform(origin, screen))
+        if (!ScreenTransform())
         {
             int iScreenWidth, iScreenHeight;
             g_pEngine->GetScreenSize(iScreenWidth, iScreenHeight);
@@ -104,5 +106,12 @@ public:
             return true;
         }
         return false;
+    }
+
+
+    template <typename T>
+    static T CallVFunc(void* ppClass, int iIndex)
+    {
+        return (*(T**)ppClass)[iIndex];
     }
 };

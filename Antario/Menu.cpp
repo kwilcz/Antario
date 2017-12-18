@@ -73,7 +73,7 @@ BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, 
     this->pHeaderFont = pHeaderFont;
     this->strLabel = strLabel;
     this->vecSize = vecSize;
-    this->iHeaderHeight = this->SetHeaderHeight();
+    this->iHeaderHeight = this->GetHeaderHeight();
     this->SetPos(vecPosition);
 }
 
@@ -126,7 +126,7 @@ void BaseWindow::UpdateData()
 }
 
 
-int BaseWindow::SetHeaderHeight()
+int BaseWindow::GetHeaderHeight()
 {
     SIZE size;
     this->pHeaderFont->GetTextExtent(this->strLabel.c_str(), &size);
