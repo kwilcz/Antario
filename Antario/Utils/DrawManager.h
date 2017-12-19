@@ -1,8 +1,9 @@
 #pragma once
 #include <memory>
+#include "D3DFont.h"
 #include "..\SDK\Color.h"
 #include "..\SDK\Vector.h"
-#include "D3DFont.h"
+#include "..\Utils\Utils.h"
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
 #define COL2DWORD(x) (D3DCOLOR_ARGB(x.a, x.r, x.g, x.b))
@@ -51,22 +52,34 @@ struct Fonts
 public:
     void DeleteDeviceObjects()
     {
-        pFontTahoma8->DeleteDeviceObjects();
-        pFontTahoma10->DeleteDeviceObjects();
+        Utils::Log("Deleting device objects...");
+        HRESULT hr;
+        hr = pFontTahoma8->DeleteDeviceObjects();
+        if (FAILED(hr)) { Utils::Log(hr); }
+        hr = pFontTahoma10->DeleteDeviceObjects();
+        if (FAILED(hr)) { Utils::Log(hr); }
     };
     void InvalidateDeviceObjects()
     {
-        pFontTahoma8->InvalidateDeviceObjects();
-        pFontTahoma10->InvalidateDeviceObjects();
+        HRESULT hr;
+        hr = pFontTahoma8->InvalidateDeviceObjects();
+        if (FAILED(hr)) { Utils::Log(hr); }
+        hr = pFontTahoma10->InvalidateDeviceObjects();
+        if (FAILED(hr)) { Utils::Log(hr); }
     };
     void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     {
 
-        pFontTahoma8->InitDeviceObjects(pDevice);
-        pFontTahoma8->RestoreDeviceObjects();
+        HRESULT hr;
+        hr = pFontTahoma8->InitDeviceObjects(pDevice);
+        if (FAILED(hr)) { Utils::Log(hr); }
+        hr = pFontTahoma8->RestoreDeviceObjects();
+        if (FAILED(hr)) { Utils::Log(hr); }
 
-        pFontTahoma10->InitDeviceObjects(pDevice);
-        pFontTahoma10->RestoreDeviceObjects();
+        hr = pFontTahoma10->InitDeviceObjects(pDevice);
+        if (FAILED(hr)) { Utils::Log(hr); }
+        hr = pFontTahoma10->RestoreDeviceObjects();
+        if (FAILED(hr)) { Utils::Log(hr); }
     };
 
     // Fonts

@@ -7,7 +7,7 @@
 std::unique_ptr<NetvarTree> g_pNetvars;
 
 /**
-* netvar_tree - Constructor
+* NetvarTree - Constructor
 NetvarTree
 * Call populate_nodes on every RecvTable under client->GetAllClasses()
 */

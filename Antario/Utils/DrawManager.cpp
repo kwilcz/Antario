@@ -133,7 +133,7 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
 {
     D3DCOLOR dwColor  = COL2DWORD(col1);
     D3DCOLOR dwColor2 = COL2DWORD(col2);
-    D3DCOLOR dwcol1, dwcol2, dwcol3, dwcol4;
+    D3DCOLOR dwcol1, dwcol2, dwcol3, dwcol4 = NULL;
 
     switch (vertical)
     {
@@ -149,6 +149,9 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
             dwcol3 = dwColor;
             dwcol4 = dwColor2;
             break;
+        default:
+            dwcol1 = D3DCOLOR_RGBA(255, 255, 255, 255);
+            dwcol4 = dwcol3 = dwcol2 = dwcol1;
     }
 
     Vertex vert[4] =

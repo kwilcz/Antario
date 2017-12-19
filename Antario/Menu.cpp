@@ -86,7 +86,7 @@ void BaseWindow::Render()
     g_Render.RectFilledGradient(this->vecPosition, Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight), Color(50, 50, 50, 200), Color(20, 20, 20, 200), GradientType::GRADIENT_VERTICAL);
 
     // Draw header string, defined as label.
-    g_Render.String(this->vecPosition.x +(this->vecSize.x / 2.f), this->vecPosition.y, D3DFONT_CENTERED_X, Color(200, 200, 200), this->pHeaderFont, this->strLabel.c_str());
+    g_Render.String(this->vecPosition.x +(this->vecSize.x / 2.f), this->vecPosition.y, CD3DFONT_CENTERED_X, Color(200, 200, 200), this->pHeaderFont, this->strLabel.c_str());
     
     // Render all childrens
     MenuMain::Render();
@@ -202,7 +202,7 @@ void Checkbox::Render()
 
     g_Render.Rect(this->vecPosition, this->vecPosition + this->vecSelectableSize, Color(15, 15, 15, 220));
 
-    g_Render.String((this->vecPosition.x + this->vecSelectableSize.x + 5), this->vecPosition.y, D3DFONT_DROPSHADOW, Color(160, 160, 160, 255), this->pFont, this->strLabel.c_str());
+    g_Render.String((this->vecPosition.x + this->vecSelectableSize.x + 5), this->vecPosition.y, CD3DFONT_DROPSHADOW, Color(160, 160, 160, 255), this->pFont, this->strLabel.c_str());
 }
 
 void Checkbox::UpdateData()

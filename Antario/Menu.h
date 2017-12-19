@@ -5,7 +5,6 @@
 
 /// TODO LIST:
 /// - Child tabs / menus
-/// - Checkboxes
 /// - Sliders
 /// - Combo boxes
 

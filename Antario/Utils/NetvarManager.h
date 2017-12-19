@@ -27,7 +27,7 @@ private:
     void PopulateNodes(class RecvTable *recv_table, MapType *map);
 
     /**
-    * get_offset_recursive - Return the offset of the final node
+    * GetOffsetRecursive - Return the offset of the final node
     * @map:	Node map to scan
     * @acc:	Offset accumulator
     * @name:	Netvar name to search for
@@ -40,7 +40,7 @@ private:
     }
 
     /**
-    * get_offset_recursive - Recursively grab an offset from the tree
+    * GetOffsetRecursive - Recursively grab an offset from the tree
     * @map:	Node map to scan
     * @acc:	Offset accumulator
     * @name:	Netvar name to search for
@@ -58,7 +58,7 @@ private:
 
 public:
     /**
-    * get_offset - Get the offset of a netvar given a list of branch names
+    * GetOffset - Get the offset of a netvar given a list of branch names
     * @name:	Top level datatable name
     * @args:	Remaining netvar names
     *

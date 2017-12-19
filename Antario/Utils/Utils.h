@@ -13,6 +13,14 @@
 class Utils
 {
 public:
+    template <typename T>
+    static T CallVFunc(void* ppClass, int iIndex)
+    {
+        return (*(T**)ppClass)[iIndex];
+    }
+
+
+
     static uintptr_t FindSignature(const char* szModule, const char* szSignature)
     {
         const char* pat = szSignature;
@@ -50,18 +58,58 @@ public:
     }
 
 
+
+    /**
+    *   GetCurrentSystemTime - Gets actual system time
+    *   @timeInfo: Reference to your own tm variable, gets modified.
+    */
+    static void GetCurrentSystemTime(tm& timeInfo)
+    {
+        std::chrono::system_clock::time_point systemNow = std::chrono::system_clock::now();
+        std::time_t now_c = std::chrono::system_clock::to_time_t(systemNow);
+        localtime_s(&timeInfo, &now_c); // using localtime_s as std::localtime is not thread-safe.
+    };
+
+
+    /**
+    *   Log - Logs specified message to debug console if in debug mode.
+    *   Format: [HH:MM:SS] str
+    *   @str: Debug message to be shown.
+    */
     static void Log(std::string str, ...)
     { 
 #ifdef _DEBUG
-        std::chrono::system_clock::time_point systemNow = std::chrono::system_clock::now();
-        std::time_t now_c = std::chrono::system_clock::to_time_t(systemNow);
-        struct tm timeInfo;
-        localtime_s(&timeInfo, &now_c); // using localtime_s as std::localtime is not thread-safe.
-        std::cout << "[" << std::put_time(&timeInfo, "%T") << "] " << str;
+        tm timeInfo;
+        Utils::GetCurrentSystemTime(timeInfo);
+
+        std::stringstream ssTime; // Temp stringstream to keep things clean
+        ssTime << "[" << std::put_time(&timeInfo, "%T") << "] " << str << std::endl;
+
+        std::cout << ssTime.str();
 #endif // _DEBUG
     };
 
 
+    /**
+    *   Log(HRESULT) - Sets up an error message when you pass HRESULT
+    *   Message contains error code only, no specific information
+    */
+    static void Log(HRESULT hr)
+    {
+#ifdef _DEBUG
+        std::stringstream strFormatted;
+        strFormatted << "Operation failed, error code = 0x" << std::hex << hr;
+                
+        Utils::Log(strFormatted.str());
+#endif // _DEBUG
+    };
+
+
+    /**
+    *   WorldToScreen - Converts game coordinates to screen
+    *   @origin: 3D coordinates to be converted
+    *   @screen: Viewport coordinates to which we will convert
+    */
     static bool WorldToScreen(const Vector &origin, Vector &screen)
     {
         auto ScreenTransform = [&origin, &screen]() -> bool
@@ -106,12 +154,5 @@ public:
             return true;
         }
         return false;
-    }
-
-
-    template <typename T>
-    static T CallVFunc(void* ppClass, int iIndex)
-    {
-        return (*(T**)ppClass)[iIndex];
     }
 };

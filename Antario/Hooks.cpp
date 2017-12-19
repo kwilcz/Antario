@@ -22,7 +22,7 @@ void Hooks::Init()
     Interfaces::Init();                         // Get interfaces
     g_pNetvars = std::make_unique<NetvarTree>();// Get netvars after getting interfaces as we use them
 
-    Utils::Log("Hooking in progress...\n");
+    Utils::Log("Hooking in progress...");
     // D3D Device pointer
     uintptr_t d3dDevice = **(uintptr_t**)(Utils::FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
 
@@ -43,22 +43,22 @@ void Hooks::Init()
     //const std::vector<const char*> vecEventNames = { "" };
     //g_Hooks.pEventListener = std::make_unique<EventListener>(vecEventNames);
 
-    Utils::Log("Hooking completed!\n");
+    Utils::Log("Hooking completed!");
 }
 
 
 
 void Hooks::Restore()
 {
-    Utils::Log("Enabling mouse pointer.\n");
+    Utils::Log("Enabling mouse pointer.");
     g_pEngine->ExecuteClientCmd("cl_mouseenable 1"); //Renable the mouse after exit
-    Utils::Log("Unhooking in progress...\n");
+    Utils::Log("Unhooking in progress...");
     // Unhook every function we hooked and restore original one
     g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Reset);
     g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Present);
     g_Hooks.pClientModeHook->Unhook(VTableIndexes::CreateMove);
     SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.pOriginalWNDProc);
-    Utils::Log("Unhooking succeded!\n");
+    Utils::Log("Unhooking succeded!");
 
     // Destroy fonts and all textures we created
     g_Render.InvalidateDeviceObjects();
@@ -100,11 +100,11 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 
     if (g_Hooks.bInitializedDrawManager)
     {
-        Utils::Log("Reseting draw manager.\n");
+        Utils::Log("Reseting draw manager.");
         g_Render.InvalidateDeviceObjects();
         HRESULT hr = oReset(pDevice, pPresentationParameters);
         g_Render.RestoreDeviceObjects(pDevice);
-        Utils::Log("DrawManager reset succeded.\n");
+        Utils::Log("DrawManager reset succeded.");
         return hr;
     }
 
@@ -119,11 +119,11 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
 {
     if (!g_Hooks.bInitializedDrawManager)
     {
-        Utils::Log("Initializing Draw manager\n");
+        Utils::Log("Initializing Draw manager");
         g_Render.InitDeviceObjects(pDevice);
         g_Hooks.nMenu.Initialize();
         g_Hooks.bInitializedDrawManager = true;
-        Utils::Log("Draw manager initialized\n");
+        Utils::Log("Draw manager initialized");
     }
     else
     {
@@ -142,7 +142,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourc
 
         // watermark to distinguish if we injected (for now)
         std::string szWatermark = "Antario";
-        g_Render.String(8, 8, D3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
+        g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
 
         if (g_Settings.bMenuOpened)
         {

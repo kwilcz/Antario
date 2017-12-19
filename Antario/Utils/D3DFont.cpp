@@ -135,7 +135,14 @@ HRESULT CD3DFont::InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice)
     // Create a DC and a bitmap for the font
     HDC     hDC       = CreateCompatibleDC(NULL);
     HBITMAP hbmBitmap = CreateDIBSection(hDC, &bmi, DIB_RGB_COLORS,
-                                        (void**)&pBitmapBits, NULL, 0);
+        (void**)&pBitmapBits, NULL, 0);
+
+    // Sanity checks
+    if (hDC == NULL)
+        return E_FAIL;
+    if (hbmBitmap == NULL)
+        return E_FAIL;
+
     SetMapMode(hDC, MM_TEXT);
 
     // Create a font.  By specifying ANTIALIASED_QUALITY, we might get an
@@ -399,7 +406,7 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
     this->pd3dDevice->SetStreamSource(0, this->pVB, 0, sizeof(FONT2DVERTEX));
 
     // Set filter states
-    if (dwFlags & D3DFONT_FILTERED)
+    if (dwFlags & CD3DFONT_FILTERED)
     {
         this->pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
         this->pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -410,14 +417,14 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
     FLOAT fLineHeight = (this->fTexCoords[0][3] - this->fTexCoords[0][1]) * this->dwTexHeight;
 
     // Center the text block
-    if (dwFlags & D3DFONT_CENTERED_X)
+    if (dwFlags & CD3DFONT_CENTERED_X)
     {
         SIZE sz;
         GetTextExtent(strText, &sz);
         x = -(((FLOAT)sz.cx)) * 0.5f;
     }
 
-    if (dwFlags & D3DFONT_CENTERED_Y)
+    if (dwFlags & CD3DFONT_CENTERED_Y)
     {
         SIZE sz;
         GetTextExtent(strText, &sz);
@@ -462,6 +469,18 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
 
         if (c != _T(' '))
         {
+
+            if (dwFlags & CD3DFONT_DROPSHADOW)
+            {
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
+                dwNumTriangles += 2;
+            }
+
             *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty2);
             *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0 - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty1);
             *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx2, ty2);
@@ -515,21 +534,21 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
     this->pd3dDevice->SetStreamSource(0, this->pVB, 0, sizeof(FONT2DVERTEX));
 
     // Set filter states
-    if (dwFlags & D3DFONT_FILTERED)
+    if (dwFlags & CD3DFONT_FILTERED)
     {
         this->pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
         this->pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
     }
 
     // Center the text block
-    if (dwFlags & D3DFONT_CENTERED_X)
+    if (dwFlags & CD3DFONT_CENTERED_X)
     {
         SIZE sz;
         GetTextExtent(strText, &sz);
         sx -= (FLOAT)sz.cx * 0.5f;
     }
 
-    if (dwFlags & D3DFONT_CENTERED_Y)
+    if (dwFlags & CD3DFONT_CENTERED_Y)
     {
         SIZE sz;
         GetTextExtent(strText, &sz);
@@ -568,7 +587,7 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
 
         if (c != _T(' '))
         {
-            if (dwFlags & D3DFONT_DROPSHADOW)
+            if (dwFlags & CD3DFONT_DROPSHADOW)
             {
                 *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
                 *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
