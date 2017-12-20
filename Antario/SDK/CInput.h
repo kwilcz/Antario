@@ -29,7 +29,7 @@
 #define IN_RELOAD        (1 << 13)
 #define IN_ALT1          (1 << 14)
 #define IN_ALT2          (1 << 15)
-#define IN_SCORE         (1 << 16)// Used by client.dll for when scoreboard is held down
+#define IN_SCORE         (1 << 16) // Used by client.dll for when scoreboard is held down
 #define IN_SPEED         (1 << 17) // Player is holding the speed key
 #define IN_WALK          (1 << 18) // Player holding walk key
 #define IN_ZOOM          (1 << 19) // Zoom key for HUD zoom
@@ -45,51 +45,10 @@ class bf_write;
 
 typedef unsigned long CRC32_t;
 
-void      CRC32_Init(CRC32_t *pulCRC);
-void      CRC32_ProcessBuffer(CRC32_t *pulCRC, const void *p, int len);
-void      CRC32_Final(CRC32_t *pulCRC);
-CRC32_t	  CRC32_GetTableEntry(unsigned int slot);
-
-inline CRC32_t CRC32_ProcessSingleBuffer(const void *p, int len)
-{
-    CRC32_t crc;
-
-    CRC32_Init(&crc);
-    CRC32_ProcessBuffer(&crc, p, len);
-    CRC32_Final(&crc);
-
-    return crc;
-}
-
 class CUserCmd
 {
 public:
     virtual ~CUserCmd() {};
-
-    CRC32_t GetChecksum(void) const
-    {
-        CRC32_t crc;
-        CRC32_Init(&crc);
-
-        CRC32_ProcessBuffer(&crc, &command_number, sizeof(command_number));
-        CRC32_ProcessBuffer(&crc, &tick_count, sizeof(tick_count));
-        CRC32_ProcessBuffer(&crc, &viewangles, sizeof(viewangles));
-        CRC32_ProcessBuffer(&crc, &aimdirection, sizeof(aimdirection));
-        CRC32_ProcessBuffer(&crc, &forwardmove, sizeof(forwardmove));
-        CRC32_ProcessBuffer(&crc, &sidemove, sizeof(sidemove));
-        CRC32_ProcessBuffer(&crc, &upmove, sizeof(upmove));
-        CRC32_ProcessBuffer(&crc, &buttons, sizeof(buttons));
-        CRC32_ProcessBuffer(&crc, &impulse, sizeof(impulse));
-        CRC32_ProcessBuffer(&crc, &weaponselect, sizeof(weaponselect));
-        CRC32_ProcessBuffer(&crc, &weaponsubtype, sizeof(weaponsubtype));
-        CRC32_ProcessBuffer(&crc, &random_seed, sizeof(random_seed));
-        CRC32_ProcessBuffer(&crc, &mousedx, sizeof(mousedx));
-        CRC32_ProcessBuffer(&crc, &mousedy, sizeof(mousedy));
-
-        CRC32_Final(&crc);
-        return crc;
-    }
-
     int       command_number;     // For matching server and client commands for debugging
     int       tick_count;         // The tick the client created this command
     QAngle    viewangles;         // Player instantaneous view angles.

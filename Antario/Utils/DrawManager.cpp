@@ -176,14 +176,19 @@ void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3
 }
 
 
+/// TODO: Does it have to be called before each drawing, or just once in my state block? Check it
 void DrawManager::SetupRenderStates(bool antialiased)
 {
-    this->pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-    this->pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    this->pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
     this->pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
     this->pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+    this->pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    this->pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    this->pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    this->pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
     this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, antialiased);
+    this->pDevice->SetRenderState(D3DRS_COLORWRITEENABLE,
+        D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
+        D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
 }
 
 

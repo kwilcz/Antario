@@ -55,17 +55,17 @@ public:
         Utils::Log("Deleting device objects...");
         HRESULT hr;
         hr = pFontTahoma8->DeleteDeviceObjects();
-        if (FAILED(hr)) { Utils::Log(hr); }
+        if (FAILED(hr)) { Utils::Log("Deleting proceture failed for font Tahoma 8"); }
         hr = pFontTahoma10->DeleteDeviceObjects();
-        if (FAILED(hr)) { Utils::Log(hr); }
+        if (FAILED(hr)) { Utils::Log("Deleting proceture failed for font Tahoma 10"); }
     };
     void InvalidateDeviceObjects()
     {
         HRESULT hr;
         hr = pFontTahoma8->InvalidateDeviceObjects();
-        if (FAILED(hr)) { Utils::Log(hr); }
+        if (FAILED(hr)) { Utils::Log("Invalidating failed for font Tahoma 8"); }
         hr = pFontTahoma10->InvalidateDeviceObjects();
-        if (FAILED(hr)) { Utils::Log(hr); }
+        if (FAILED(hr)) { Utils::Log("Invalidating failed for font Tahoma 10"); }
     };
     void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     {

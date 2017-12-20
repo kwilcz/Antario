@@ -23,11 +23,14 @@ void Hooks::Init()
     g_pNetvars = std::make_unique<NetvarTree>();// Get netvars after getting interfaces as we use them
 
     Utils::Log("Hooking in progress...");
+
+
     // D3D Device pointer
     uintptr_t d3dDevice = **(uintptr_t**)(Utils::FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
 
     if (g_Hooks.hCSGOWindow)        // Hook WNDProc to capture mouse / keyboard input
         g_Hooks.pOriginalWNDProc = (WNDPROC)SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.WndProc);
+
 
     // VMTHooks
     g_Hooks.pD3DDevice9Hook = std::make_unique<VMTHook>(reinterpret_cast<void*>(d3dDevice));
@@ -52,12 +55,14 @@ void Hooks::Restore()
 {
     Utils::Log("Enabling mouse pointer.");
     g_pEngine->ExecuteClientCmd("cl_mouseenable 1"); //Renable the mouse after exit
+
     Utils::Log("Unhooking in progress...");
-    // Unhook every function we hooked and restore original one
-    g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Reset);
-    g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Present);
-    g_Hooks.pClientModeHook->Unhook(VTableIndexes::CreateMove);
-    SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.pOriginalWNDProc);
+    {   // Unhook every function we hooked and restore original one
+        g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Reset);
+        g_Hooks.pD3DDevice9Hook->Unhook(VTableIndexes::Present);
+        g_Hooks.pClientModeHook->Unhook(VTableIndexes::CreateMove);
+        SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, (LONG_PTR)g_Hooks.pOriginalWNDProc);
+    }
     Utils::Log("Unhooking succeded!");
 
     // Destroy fonts and all textures we created
@@ -115,44 +120,45 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 
 
 
-HRESULT __stdcall Hooks::Present(IDirect3DDevice9 * pDevice, const RECT * pSourceRect, const RECT * pDestRect, HWND hDestWindowOverride, const RGNDATA * pDirtyRegion)
+HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
 {
-    if (!g_Hooks.bInitializedDrawManager)
+    IDirect3DStateBlock9* stateBlock = nullptr;
+    pDevice->CreateStateBlock(D3DSBT_ALL, &stateBlock);
+
+///TODO: Is it really needed? The renderstate-setup already has that. Check it.
+    pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFFFFFFFF);
+    
+    [pDevice]()
     {
-        Utils::Log("Initializing Draw manager");
-        g_Render.InitDeviceObjects(pDevice);
-        g_Hooks.nMenu.Initialize();
-        g_Hooks.bInitializedDrawManager = true;
-        Utils::Log("Draw manager initialized");
-    }
-    else
-    {
-        static bool bIsHeld = false;
-        if (g_Settings.bMenuOpened && !bIsHeld)
+        if (!g_Hooks.bInitializedDrawManager)
         {
-            g_pEngine->ExecuteClientCmd("cl_mouseenable 0");
-            bIsHeld = true;
+            Utils::Log("Initializing Draw manager");
+            g_Render.InitDeviceObjects(pDevice);
+            g_Hooks.nMenu.Initialize();
+            g_Hooks.bInitializedDrawManager = true;
+            Utils::Log("Draw manager initialized");
         }
         else
-        if (!g_Settings.bMenuOpened && bIsHeld)
         {
-            g_pEngine->ExecuteClientCmd("cl_mouseenable 1");
-            bIsHeld = false;
+            g_Hooks.MouseEnableExecute();
+            
+            std::string szWatermark = "Antario"; // watermark to distinguish if we injected (for now)
+            g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
+
+            if (g_Settings.bMenuOpened)
+            {
+                g_Hooks.nMenu.UpdateData();
+                g_Hooks.nMenu.Render();             // Render our menu
+                g_Hooks.nMenu.mouseCursor->Render();// Render mouse cursor in the end so its not overlapped
+            }
+
+            // Put your draw calls here
         }
+    }();
 
-        // watermark to distinguish if we injected (for now)
-        std::string szWatermark = "Antario";
-        g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
+    stateBlock->Apply();
+    stateBlock->Release();
 
-        if (g_Settings.bMenuOpened)
-        {
-            g_Hooks.nMenu.UpdateData();
-            g_Hooks.nMenu.Render();     // Render our menu
-            g_Hooks.nMenu.mouseCursor->Render();// Render mouse cursor in the end so its not overlapped
-        }
-
-        // Put your draw calls here
-    }
     static auto oPresent = g_Hooks.pD3DDevice9Hook->GetOriginal<Present_t>(17);
     return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
@@ -169,8 +175,8 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (uMsg == WM_KEYDOWN && wParam == vKey)
             bButton = true;
         else
-            if (uMsg == WM_KEYUP && wParam == vKey)
-                bButton = false;
+        if (uMsg == WM_KEYUP && wParam == vKey)
+            bButton = false;
     };
 
     // Working when you HOLD the insert button, not when you press it.
@@ -187,4 +193,21 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     // Call original wndproc to make game use input again
     return CallWindowProcA(g_Hooks.pOriginalWNDProc, hWnd, uMsg, wParam, lParam);
+}
+
+
+void Hooks::MouseEnableExecute()
+{
+    static bool bIsHeld = false;
+    if (g_Settings.bMenuOpened && !bIsHeld)
+    {
+        g_pEngine->ExecuteClientCmd("cl_mouseenable 0");
+        bIsHeld = true;
+    }
+    else
+    if (!g_Settings.bMenuOpened && bIsHeld)
+    {
+        g_pEngine->ExecuteClientCmd("cl_mouseenable 1");
+        bIsHeld = false;
+    }
 }

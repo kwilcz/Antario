@@ -7,9 +7,9 @@
 
 namespace VTableIndexes
 {
-	constexpr auto Reset = 16;
-	constexpr auto Present = 17;
-	constexpr auto CreateMove = 24;
+	constexpr auto Reset        = 16;
+	constexpr auto Present      = 17;
+	constexpr auto CreateMove   = 24;
 }
 
 class VMTHook;
@@ -20,7 +20,6 @@ public:
     static void Init();
     static void Restore();
 
-public:
     /*---------------------------------------------*/
     /*-------------Hooked functions----------------*/
     /*---------------------------------------------*/
@@ -38,7 +37,6 @@ private:
     std::unique_ptr<VMTHook>    pD3DDevice9Hook;
     std::unique_ptr<VMTHook>    pClientModeHook;
 
-private:
     /*---------------------------------------------*/
     /*-------------Hook prototypes-----------------*/
     /*---------------------------------------------*/
@@ -47,7 +45,7 @@ private:
     typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
     typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 
-
+    void MouseEnableExecute();
 private:
     MenuMain nMenu;
     HWND hCSGOWindow              = nullptr; // CSGO window handle

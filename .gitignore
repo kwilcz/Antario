@@ -7,7 +7,7 @@
 *.o
 *.obj
 
-# Retarded vs created files
+# MSVC binary files
 *.db
 *.ipch
 *.suo
@@ -21,6 +21,8 @@
 *.opendb
 *.iobj
 *.ipdb
+*.xml
+*.lastcodeanalysissucceeded
 
 # Precompiled Headers
 *.gch
