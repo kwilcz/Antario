@@ -60,7 +60,7 @@ void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color)
 }
 
 
-void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color, bool antialiased)
+void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color)
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[2] = 
@@ -68,9 +68,7 @@ void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color
         { posx1, posy1, 0.0f, 1.0f, dwColor },
         { posx2, posy2, 0.0f, 1.0f, dwColor } 
     };
-
-    this->SetupRenderStates(antialiased);
-    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_LINELIST, 1, &vert, sizeof(Vertex));
 }
@@ -84,10 +82,18 @@ void DrawManager::Rect(Vector2D vecPos1, Vector2D vecPos2, Color color)
 
 void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color color)
 {
-    this->Line(posx1, posy2, posx2, posy2, color, false); // draw top horizontal
-    this->Line(posx1, posy1, posx2, posy1, color, false); // draw lower horizontal
-    this->Line(posx1, posy1 + 1, posx1, posy2, color, false); // draw left vertical
-    this->Line(posx2, posy1, posx2, posy2 + 1, color, false); // draw right vertical
+    D3DCOLOR dwColor = COL2DWORD(color);
+    Vertex vert[5] =
+    {   // Draw lines between declared points, needs primitive count as number of lines (4 here)
+        { posx1, posy1, 0.0f, 1.0f, dwColor },  // Top left corner
+        { posx2, posy1, 0.0f, 1.0f, dwColor },  // Top right corner
+        { posx2, posy2, 0.0f, 1.0f, dwColor },  // Bottom right corner
+        { posx1, posy2, 0.0f, 1.0f, dwColor },  // Bottom left corner
+        { posx1, posy1, 0.0f, 1.0f, dwColor }   // Back to top left to finish drawing
+    };
+
+    this->pDevice->SetTexture(0, nullptr);
+    this->pDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, &vert, sizeof(Vertex));
 }
 
 void DrawManager::RectFilled(Vector2D vecPos1, Vector2D vecPos2, Color color)
@@ -105,11 +111,24 @@ void DrawManager::RectFilled(float posx1, float posy1, float posx2, float posy2,
         { posx1, posy2, 0.0f, 1.0f, dwColor },
         { posx2, posy2, 0.0f, 1.0f, dwColor }
     };
-
-    this->SetupRenderStates();
-    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
+}
+
+void DrawManager::Triangle(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color)
+{
+    D3DCOLOR dwColor = COL2DWORD(color);
+    Vertex vert[4] =
+    {
+        { pos1.x, pos1.y, 0.0f, 1.0f, dwColor },
+        { pos2.x, pos2.y, 0.0f, 1.0f, dwColor },
+        { pos3.x, pos3.y, 0.0f, 1.0f, dwColor },
+        { pos1.x, pos1.y, 0.0f, 1.0f, dwColor }
+    };
+
+    this->pDevice->SetTexture(0, nullptr);
+    this->pDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, 3, &vert, sizeof(Vertex));
 }
 
 
@@ -118,12 +137,11 @@ void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Co
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[3] = 
     {  
-        { pos1.x, pos1.y, 1.0f, 1.0f, dwColor },
-        { pos2.x, pos2.y, 1.0f, 1.0f, dwColor },
-        { pos3.x, pos3.y, 1.0f, 1.0f, dwColor } 
+        { pos1.x, pos1.y, 0.0f, 1.0f, dwColor },
+        { pos2.x, pos2.y, 0.0f, 1.0f, dwColor },
+        { pos3.x, pos3.y, 0.0f, 1.0f, dwColor }
     };
-    this->SetupRenderStates();
-    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 1, &vert, sizeof(Vertex));
 }
@@ -133,7 +151,7 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
 {
     D3DCOLOR dwColor  = COL2DWORD(col1);
     D3DCOLOR dwColor2 = COL2DWORD(col2);
-    D3DCOLOR dwcol1, dwcol2, dwcol3, dwcol4 = NULL;
+    D3DCOLOR dwcol1, dwcol2, dwcol3, dwcol4;
 
     switch (vertical)
     {
@@ -161,9 +179,7 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
         { vecPos1.x, vecPos2.y, 0.0f, 1.0f, dwcol3 },
         { vecPos2.x, vecPos2.y, 0.0f, 1.0f, dwcol4 }
     };
-
-    this->SetupRenderStates();
-    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+  
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
@@ -176,16 +192,33 @@ void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3
 }
 
 
-/// TODO: Does it have to be called before each drawing, or just once in my state block? Check it
-void DrawManager::SetupRenderStates(bool antialiased)
+void DrawManager::SetupRenderStates()
 {
+    this->pDevice->SetVertexShader(nullptr);
+    this->pDevice->SetPixelShader(nullptr);
+    this->pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     this->pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-    this->pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-    this->pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    this->pDevice->SetRenderState(D3DRS_FOGENABLE, FALSE);
     this->pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    this->pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+
+    this->pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+    this->pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+    this->pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+    this->pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+    this->pDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
+    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
+
+    this->pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    this->pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+    this->pDevice->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, TRUE);
     this->pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    this->pDevice->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_INVDESTALPHA);
     this->pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, antialiased);
+    this->pDevice->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
+
+    this->pDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
     this->pDevice->SetRenderState(D3DRS_COLORWRITEENABLE,
         D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
         D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);

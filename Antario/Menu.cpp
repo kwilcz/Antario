@@ -29,9 +29,10 @@ void MouseCursor::Render()
     g_Render.TriangleFilled(vecPos1, vecPos2, vecPos3, g_Settings.colCursor);
 
     // Draw border
-    g_Render.Line(x, y, x + 25, y + 12, Color(0, 0, 0, 200));
-    g_Render.Line(x, y, x + 12, y + 25, Color(0, 0, 0, 200));
-    g_Render.Line(x + 25, y + 12, x + 12, y + 25, Color(0, 0, 0, 200));
+    g_Render.Triangle(Vector2D(x, y), Vector2D(x + 25, y + 12), Vector2D(x + 12, y + 25), Color(0, 0, 0, 200));
+    //g_Render.Line(x, y, x + 25, y + 12, Color(0, 0, 0, 200));
+    //g_Render.Line(x, y, x + 12, y + 25, Color(0, 0, 0, 200));
+    //g_Render.Line(x + 25, y + 12, x + 12, y + 25, Color(0, 0, 0, 200));
 }
 
 

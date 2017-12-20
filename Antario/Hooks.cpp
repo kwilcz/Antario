@@ -124,10 +124,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
 {
     IDirect3DStateBlock9* stateBlock = nullptr;
     pDevice->CreateStateBlock(D3DSBT_ALL, &stateBlock);
-
-///TODO: Is it really needed? The renderstate-setup already has that. Check it.
-    pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFFFFFFFF);
-    
+        
     [pDevice]()
     {
         if (!g_Hooks.bInitializedDrawManager)
@@ -139,10 +136,11 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
             Utils::Log("Draw manager initialized");
         }
         else
-        {
-            g_Hooks.MouseEnableExecute();
+        {            
+            g_Render.SetupRenderStates(); // Sets up proper render states for our state block
+            g_Hooks.MouseEnableExecute(); // Handles in-game cursor
             
-            std::string szWatermark = "Antario"; // watermark to distinguish if we injected (for now)
+            std::string szWatermark = "Antario";
             g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
 
             if (g_Settings.bMenuOpened)
