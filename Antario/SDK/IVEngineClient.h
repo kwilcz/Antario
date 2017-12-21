@@ -91,7 +91,7 @@ public:
     virtual void                  GetScreenSize(int& width, int& height) = 0;
     virtual void                  ServerCmd(const char *szCmdString, bool bReliable = true) = 0;
     virtual void                  ClientCmd(const char *szCmdString) = 0;
-    virtual bool                  GetPlayerInfo(int ent_num, player_info_t *pinfo) = 0;
+    virtual bool                  GetPlayerInfo(int ent_num, PlayerInfo_t *pinfo) = 0;
     virtual int                   GetPlayerForUserID(int userID) = 0;
     virtual client_textmessage_t* TextMessageGet(const char *pName) = 0; // 10
     virtual bool                  Con_IsVisible(void) = 0;

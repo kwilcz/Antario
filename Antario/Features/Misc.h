@@ -1,15 +1,14 @@
 #pragma once
-#include "..\SDK\CInput.h"
-#include "..\SDK\IVEngineClient.h"
+#include "..\Utils\GlobalVars.h"
 #include "..\Settings.h"
 
 class Misc
 {
 public:
-    void OnCreateMove(CUserCmd* pCmd)
+    void OnCreateMove()
     {
-        this->pCmd = pCmd;
-        this->pLocal = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer()); // To be replaced with a global var
+        this->pCmd   = g::pCmd;
+        this->pLocal = g::pLocalEntity;
 
         if (g_Settings.bBhopEnabled)
             this->DoBhop();

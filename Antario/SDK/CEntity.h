@@ -54,6 +54,10 @@ public:
         static int m_iHealth = g_pNetvars->GetOffset("DT_BasePlayer", "m_iHealth");
         return GetValue<int>(m_iHealth);
     }
+    bool IsAlive()
+    {
+        return this->GetHealth() > 0 && this->GetLifeState() == 0;
+    }
     bool IsImmune()
     {
         static int m_bGunGameImmunity = g_pNetvars->GetOffset("DT_CSPlayer", "m_bGunGameImmunity");
@@ -63,6 +67,20 @@ public:
     {
         static int m_nTickBase = g_pNetvars->GetOffset("DT_BasePlayer", "localdata", "m_nTickBase");
         return GetValue<int>(m_nTickBase);
+    }
+    Vector GetOrigin()
+    {
+        static int m_vecOrigin = g_pNetvars->GetOffset("DT_BaseEntity", "m_vecOrigin");
+        return GetValue<Vector>(m_vecOrigin);
+    }	
+    Vector GetViewOffset()
+    {
+        static int m_vecViewOffset = g_pNetvars->GetOffset("DT_BasePlayer", "localdata", "m_vecViewOffset[0]");
+        return GetValue<Vector>(m_vecViewOffset);
+    }
+    Vector GetEyePosition()
+    {
+        return this->GetOrigin() + this->GetViewOffset();
     }
 };
 

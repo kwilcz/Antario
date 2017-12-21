@@ -176,11 +176,14 @@
     <ClCompile Include="Antario\Menu.cpp" />
     <ClCompile Include="Antario\Utils\D3DFont.cpp" />
     <ClCompile Include="Antario\Utils\DrawManager.cpp" />
+    <ClCompile Include="Antario\Utils\GlobalVars.cpp" />
     <ClCompile Include="Antario\Utils\Interfaces.cpp" />
     <ClCompile Include="Antario\Utils\NetvarManager.cpp" />
+    <ClCompile Include="Antario\Features\ESP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Antario\Features\EnginePrediction.h" />
+    <ClInclude Include="Antario\Features\Features.h" />
     <ClInclude Include="Antario\Features\Misc.h" />
     <ClInclude Include="Antario\Hooks.h" />
     <ClInclude Include="Antario\Menu.h" />
@@ -208,12 +211,14 @@
     <ClInclude Include="Antario\Utils\D3DFont.h" />
     <ClInclude Include="Antario\Utils\DrawManager.h" />
     <ClInclude Include="Antario\EventListener.h" />
+    <ClInclude Include="Antario\Utils\GlobalVars.h" />
     <ClInclude Include="Antario\Utils\Interfaces.h" />
     <ClInclude Include="Antario\SDK\Recv.h" />
     <ClInclude Include="Antario\SDK\Vector.h" />
     <ClInclude Include="Antario\SDK\VMatrix.h" />
     <ClInclude Include="Antario\Utils\NetvarManager.h" />
     <ClInclude Include="Antario\Utils\Utils.h" />
+    <ClInclude Include="Antario\Features\ESP.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

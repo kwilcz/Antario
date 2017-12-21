@@ -1,16 +1,20 @@
 #include "EnginePrediction.h"
+#include "..\Utils\GlobalVars.h"
 #include "..\SDK\CPrediction.h"
 #include "..\SDK\CGlobalVarsBase.h"
 
 float flOldCurtime;
 float flOldFrametime;
 
-int EnginePrediction::m_nRandomSeed = 0;
 
-void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
+void EnginePrediction::RunEnginePred()
 {
-    static CUserCmd* pLastCmd;
     static int flTickBase;
+    static CUserCmd* pLastCmd;
+
+    // Don't work on global variables.
+    auto pLocal = g::pLocalEntity;
+    auto pCmd   = g::pCmd;
 
     // fix tickbase if game didnt render previous tick
     if (pLastCmd)
@@ -27,9 +31,9 @@ void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
     // get random_seed as its 0 in clientmode->createmove
     auto getRandomSeed = [&pCmd]()
     {
-        typedef unsigned int(__cdecl* MD5_PseudoRandom_t)(unsigned int);
+        typedef std::uintptr_t(__cdecl* MD5_PseudoRandom_t)(std::uintptr_t);
         static auto MD5_PseudoRandom = (MD5_PseudoRandom_t)Utils::FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
-        return MD5_PseudoRandom(pCmd->command_number) & 0x7FFFFFFF;;
+        return MD5_PseudoRandom(pCmd->command_number) & 0x7FFFFFFF;
     };
 
 
@@ -37,7 +41,7 @@ void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
     flOldCurtime    = g_pGlobalVars->curtime;
     flOldFrametime  = g_pGlobalVars->frametime;
 
-    m_nRandomSeed               = getRandomSeed();
+    g::uRandomSeed              = getRandomSeed();
     g_pGlobalVars->curtime      = flTickBase * g_pGlobalVars->intervalPerTick;
     g_pGlobalVars->frametime    = g_pGlobalVars->intervalPerTick;
 
@@ -51,8 +55,9 @@ void EnginePrediction::RunEnginePred(C_BaseEntity* pLocal, CUserCmd* pCmd)
     g_pPrediction->FinishMove(pLocal, pCmd, &data);
 }
 
-void EnginePrediction::EndEnginePred(C_BaseEntity* pLocal)
+void EnginePrediction::EndEnginePred()
 {
+    auto pLocal = g::pLocalEntity;
     g_pMovement->FinishTrackPredictionErrors(pLocal);
 
     g_pGlobalVars->curtime      = flOldCurtime;
