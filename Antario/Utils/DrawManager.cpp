@@ -192,6 +192,10 @@ void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3
 }
 
 
+/*
+*   SetupRenderStates - Sets RenderStates for our custom StateBlock
+*   It's required to draw everything independent on game settings.
+*/
 void DrawManager::SetupRenderStates()
 {
     this->pDevice->SetVertexShader(nullptr);

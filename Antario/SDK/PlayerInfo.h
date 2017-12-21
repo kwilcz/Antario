@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct player_info_s
+typedef struct PlayerInfo_s
 {
     __int64         unknown;            //0x0000 
     union
@@ -8,8 +8,8 @@ typedef struct player_info_s
         __int64       steamID64;          //0x0008 - SteamID64
         struct
         {
-            __int32     xuid_low;
-            __int32     xuid_high;
+            __int32     xuidLow;
+            __int32     xuidHigh;
         };
     };
     char            szName[128];        //0x0010 - Player Name
@@ -22,4 +22,4 @@ typedef struct player_info_s
     bool            ishltv;
     unsigned int    customFiles[4];
     unsigned char   filesDownloaded;
-} player_info_t;
+} PlayerInfo_t;

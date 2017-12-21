@@ -45,8 +45,9 @@ private:
     typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
     typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 
-    void MouseEnableExecute();
 private:
+    void MouseEnableExecute();
+
     MenuMain nMenu;
     HWND hCSGOWindow              = nullptr; // CSGO window handle
     bool bInitializedDrawManager  = false;   // Check if we initialized our draw manager

@@ -1,9 +1,7 @@
 ﻿#include <thread>
 #include "Hooks.h"
 #include "Utils\Utils.h"
-#include "Features\Misc.h"
-#include "Features\EnginePrediction.h"
-#include "SDK\IClientMode.h"
+#include "Features\Features.h"
 
 Misc     g_Misc;
 Hooks    g_Hooks;
@@ -78,20 +76,22 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     static auto oCreateMove = g_Hooks.pClientModeHook->GetOriginal<CreateMove_t>(24);
     oCreateMove(thisptr, edx, sample_frametime, pCmd);
 
-    if (!pCmd->command_number)
+    if (!pCmd || !pCmd->command_number)
         return oCreateMove;
 
-    // Local player, get only once, for now in cm only. Will make it global later on
-    auto pLocalEntity = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer());
-    if (!pLocalEntity)
+    // Get globals
+    g::pCmd = pCmd;
+    g::pLocalEntity = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer());
+    if (!g::pLocalEntity)
         return false;
 
-    g_Misc.OnCreateMove(pCmd);
+
+    g_Misc.OnCreateMove();
     // run shit outside enginepred
 
-    EnginePrediction::RunEnginePred(pLocalEntity, pCmd);
+    EnginePrediction::RunEnginePred();
     // run shit in enginepred
-    EnginePrediction::EndEnginePred(pLocalEntity);
+    EnginePrediction::EndEnginePred();
 
     return false;
 }
@@ -151,6 +151,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
             }
 
             // Put your draw calls here
+            g_ESP.Render();
         }
     }();
 
