@@ -8,6 +8,15 @@
 /// - Sliders
 /// - Combo boxes
 
+struct MenuStyle
+{
+    int iPaddingX = 20;                             /*- Padding between sections -*/
+    int iPaddingY = 10;                             /*- Padding between selectables -*/
+    Color colCheckbox1 = Color(50, 50, 50, 255);    /*- Color of the first gradient color of the checkbox -*/
+    Color colCheckbox2 = Color(20, 20, 20, 255);    /*- Color of the second gradient color of the checkbox -*/
+    Color colText = Color(160, 160, 160, 255);      /*- Color of the text inside the main window -*/
+    Color colHeaderText = Color(200, 200, 255);     /*- Color of the text inside the header strip -*/
+};
 
 class MouseCursor
 {
@@ -47,7 +56,8 @@ public:
     // Parent/child setting functions
     virtual void SetParent(MenuMain* parent);
     virtual void AddChild(std::shared_ptr<MenuMain> child);
-        
+    
+    static MenuStyle style;
     static std::unique_ptr<MouseCursor> mouseCursor;  // Pointer to our mouse cursor
     static CD3DFont*   pFont;                         // Pointer to the font we will be using
 protected:
@@ -82,5 +92,18 @@ public:
     virtual void UpdateData();
 private:
     Vector2D vecSelectableSize;
-    bool*    bCheckboxValue;
+    bool    bIsHovered;
+    bool*   bCheckboxValue;
+};
+
+
+class Button : public MenuMain
+{
+public:
+    Button(std::string strLabel, void (&fnPointer)());
+    virtual void Render();
+    virtual void UpdateData();
+private:
+    void    (*fnActionPlay)();
+    bool    bIsHovered;
 };

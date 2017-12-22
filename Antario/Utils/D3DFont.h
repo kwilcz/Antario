@@ -9,17 +9,17 @@
 
 
 // Font creation flags
-#define D3DFONT_ITALIC      0x0002
-#define D3DFONT_ZENABLE     0x0004
+#define D3DFONT_ITALIC      (1 << 0)
+#define D3DFONT_ZENABLE     (1 << 1)
 
 // Font rendering flags
 enum CD3DFontFlags
 {
-    CD3DFONT_CENTERED_X  = 0x0001,
-    CD3DFONT_CENTERED_Y  = 0x0002,
-    CD3DFONT_TWOSIDED    = 0x0004,
-    CD3DFONT_FILTERED    = 0x0008,
-    CD3DFONT_DROPSHADOW  = 0x0010
+    CD3DFONT_CENTERED_X  = (1 << 0),
+    CD3DFONT_CENTERED_Y  = (1 << 1),
+    CD3DFONT_TWOSIDED    = (1 << 2),
+    CD3DFONT_FILTERED    = (1 << 3),
+    CD3DFONT_DROPSHADOW  = (1 << 4)
 };
 
 

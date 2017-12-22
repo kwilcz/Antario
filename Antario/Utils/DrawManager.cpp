@@ -188,6 +188,7 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
 void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
 {
     D3DCOLOR dwColor = COL2DWORD(color);
+    posx = std::roundf(posx); posy = std::roundf(posy);
     pFont->DrawString(posx, posy, dwColor, szText, dwFlags);    // To make life easier
 }
 
