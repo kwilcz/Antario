@@ -132,9 +132,9 @@ BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, 
 void BaseWindow::Render()
 {
     // Draw main background rectangle
-    g_Render.RectFilledGradient(this->vecPosition, this->vecPosition + this->vecSize, Color(50, 50, 50, 255), Color(20, 20, 20, 255), GradientType::GRADIENT_VERTICAL);
+    g_Render.RectFilledGradient(this->vecPosition, this->vecPosition + this->vecSize, Color(50, 50, 50, 255), Color(20, 20, 20, 235), GradientType::GRADIENT_VERTICAL);
     // Draw header rect.
-    g_Render.RectFilledGradient(this->vecPosition, Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight), Color(50, 50, 50, 250), Color(20, 20, 20, 250), GradientType::GRADIENT_VERTICAL);
+    g_Render.RectFilledGradient(this->vecPosition, Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight), Color(50, 50, 50, 230), Color(35, 35, 35, 230), GradientType::GRADIENT_VERTICAL);
 
     // Draw header string, defined as label.
     g_Render.String(this->vecPosition.x +(this->vecSize.x * 0.5f), this->vecPosition.y, CD3DFONT_CENTERED_X, this->style.colHeaderText, this->pHeaderFont, this->strLabel.c_str());
@@ -282,26 +282,31 @@ Checkbox::Checkbox(std::string strLabel, bool *bValue)
     SIZE size;
     this->pFont->GetTextExtent(this->strLabel.c_str(), &size);
     this->vecSize = Vector2D(100, static_cast<float>(size.cy));
-    this->vecSelectableSize = Vector2D(static_cast<float>(size.cy), static_cast<float>(size.cy));
+    this->vecSelectableSize = Vector2D(std::roundf(static_cast<float>(size.cy) * 0.70f), std::roundf(static_cast<float>(size.cy) * 0.70f));
 }
 
 
 void Checkbox::Render()
 {
     if (*this->bCheckboxValue)
-        g_Render.RectFilledGradient(this->vecPosition + 1, this->vecPosition + this->vecSelectableSize, this->style.colCheckbox1, this->style.colCheckbox2, GradientType::GRADIENT_VERTICAL);
+        g_Render.RectFilledGradient(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, this->style.colCheckbox1, this->style.colCheckbox2, GradientType::GRADIENT_VERTICAL);
 
-    g_Render.Rect(this->vecPosition, this->vecPosition + this->vecSelectableSize, Color(15, 15, 15, 220));    
-    g_Render.String((this->vecPosition.x + this->vecSelectableSize.x + 5), this->vecPosition.y, CD3DFONT_DROPSHADOW, this->style.colText, this->pFont, this->strLabel.c_str());
+    g_Render.Rect(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, Color(15, 15, 15, 220));
+    g_Render.String((this->vecSelectablePosition.x + this->vecSelectableSize.x + this->style.iPaddingX * 0.5f), this->vecPosition.y, CD3DFONT_DROPSHADOW, this->style.colText, this->pFont, this->strLabel.c_str());
 
     if (this->bIsHovered)
-        g_Render.RectFilled(this->vecPosition + 1, this->vecPosition + this->vecSelectableSize, Color(100, 100, 100, 50));
+        g_Render.RectFilled(this->vecSelectablePosition + 1, this->vecSelectablePosition + this->vecSelectableSize, Color(100, 100, 100, 50));
 }
 
 
 void Checkbox::UpdateData()
 {
     static bool bIsChanged = false;
+    SIZE size;
+    this->pFont->GetTextExtent(this->strLabel.c_str(), &size);
+    const float flVectorpos = (size.cy - this->vecSelectableSize.y) * 0.5f;
+
+    this->vecSelectablePosition = this->vecPosition + Vector2D(flVectorpos, flVectorpos);
 
     if (MenuMain::mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
     {

@@ -93,7 +93,9 @@ void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color
     };
 
     this->pDevice->SetTexture(0, nullptr);
+    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, FALSE);  /* Disabled, cause corners of the rectangle get antialiased */
     this->pDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, &vert, sizeof(Vertex));
+    this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);   /* And enable again for the rest of the drawing */
 }
 
 void DrawManager::RectFilled(Vector2D vecPos1, Vector2D vecPos2, Color color)

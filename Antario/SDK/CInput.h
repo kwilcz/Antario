@@ -85,7 +85,7 @@ public:
     bool                m_fJoystickAdvancedInit;      //0x07
     char                pad_0x08[0x2C];               //0x08
     void*               m_pKeys;                      //0x34
-    char                pad_0x38[0x64];               //0x38
+    char                pad_0x38[0x6C];               //0x38
     int					pad_0x41;
     int					pad_0x42;
     bool                m_fCameraInterceptingMouse;   //0x9C

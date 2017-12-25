@@ -24,7 +24,7 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
     if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
         return;
 
-    g_Render.String(vecScreenPos.x, vecScreenPos.y, CD3DFONT_CENTERED_X, textColor, g_Fonts.pFontTahoma10.get(), strPlayerName.c_str());
+    g_Render.String(vecScreenPos.x, vecScreenPos.y, CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW, textColor, g_Fonts.pFontTahoma10.get(), strPlayerName.c_str());
 }
 
 
@@ -41,6 +41,7 @@ void ESP::Render()
             || pPlayerEntity == g::pLocalEntity)
             continue;
 
-        this->RenderName(pPlayerEntity, it);
+        if (g_Settings.bShowNames)
+            this->RenderName(pPlayerEntity, it);
     }
 }

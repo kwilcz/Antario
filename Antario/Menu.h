@@ -4,9 +4,9 @@
 #include "SDK\Vector.h"
 
 /// TODO LIST:
-/// - Child tabs / menus
 /// - Sliders
 /// - Combo boxes
+
 
 struct MenuStyle
 {
@@ -14,9 +14,9 @@ struct MenuStyle
     int iPaddingY = 10;                                 /*- Padding between selectables -*/
     Color colSectionOutl = Color(0, 0, 0, 100);         /*- Color of the section outline -*/
     Color colCheckbox1 = Color(50, 50, 50, 255);        /*- Color of the first gradient color of the checkbox -*/
-    Color colCheckbox2 = Color(20, 20, 20, 255);        /*- Color of the second gradient color of the checkbox -*/
+    Color colCheckbox2 = Color(35, 35, 35, 255);        /*- Color of the second gradient color of the checkbox -*/
     Color colText = Color(160, 160, 160, 255);          /*- Color of the text inside the main window -*/
-    Color colHeaderText = Color(200, 200, 255);         /*- Color of the text inside the header strip -*/
+    Color colHeaderText = Color(200, 200, 215);         /*- Color of the text inside the header strip -*/
 };
 
 
@@ -98,6 +98,7 @@ public:
     BaseSection(Vector2D vecSize, int iNumRows);
     virtual void Render();
     virtual void UpdateData();
+
 private:
     virtual void SetupPositions();
     bool bIsInitialized = false;
@@ -115,6 +116,7 @@ public:
     virtual void UpdateData();
 private:
     Vector2D vecSelectableSize;
+    Vector2D vecSelectablePosition;
     bool    bIsHovered;
     bool*   bCheckboxValue;
 };
