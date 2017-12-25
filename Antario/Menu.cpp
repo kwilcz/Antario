@@ -11,6 +11,9 @@
 std::unique_ptr<MouseCursor> MenuMain::mouseCursor;
 MenuStyle MenuMain::style;
 CD3DFont* MenuMain::pFont = nullptr;
+bool      BaseWindow::bIsDragged = false;
+
+
 
 void Detach() { g_Settings.bCheatActive = false; }
 
@@ -76,6 +79,45 @@ bool MouseCursor::IsInBounds(Vector2D vecDst1, Vector2D vecDst2)
 
 
 
+void MenuMain::SetParent(MenuMain* newParent)
+{
+    this->pParent = newParent;
+}
+
+
+void MenuMain::AddChild(std::shared_ptr<MenuMain> child)
+{
+    child->SetParent(this);
+    this->vecChildren.push_back(child);
+}
+
+
+void MenuMain::Render()
+{
+    // Render all childrens
+    for (std::size_t it = 0; it < this->vecChildren.size(); it++)
+        this->vecChildren.at(it)->Render();
+}
+
+
+void MenuMain::RunThink(UINT uMsg, LPARAM lParam)
+{
+    this->mouseCursor->RunThink(uMsg, lParam);
+    /// TODO: Capture keyboard input
+}
+
+
+void MenuMain::UpdateData()
+{
+    if (this->vecChildren.size() > 0)
+    {
+        for (auto it = this->vecChildren.begin(); it != this->vecChildren.end(); it++)
+            (*it)->UpdateData();
+    }
+}
+
+
+
 BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, CD3DFont* pHeaderFont, std::string strLabel)
 {
     this->pFont = pFont;
@@ -85,7 +127,6 @@ BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, 
     this->iHeaderHeight = this->GetHeaderHeight();
     this->SetPos(vecPosition);
 }
-
 
 
 void BaseWindow::Render()
@@ -103,24 +144,40 @@ void BaseWindow::Render()
 }
 
 
-
 void BaseWindow::UpdateData()
 {
     static bool bIsInitialized = false;
-    Vector2D vecHeaderBounds = Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight);
 
-
-    auto SetChildPos = [&]()    // Set the position of all child buttons / checkboxes etc.
+    auto SetChildPos = [&]()    // Set the position of all child sections
     {
+        float flBiggestWidth = 0.f;
+        float flUsedArea = static_cast<float>(this->iHeaderHeight);
+        float flPosX = this->GetPos().x + this->style.iPaddingX;
+        float flPosY = 0.f;
+
         for (std::size_t it = 0; it < this->vecChildren.size(); it++)
         {
-            this->vecChildren.at(it)->SetPos(Vector2D(this->vecPosition.x + 10,
-                this->vecPosition.y + (it * this->vecChildren.at(it)->GetSize().y) + this->iHeaderHeight + 10));
+            flPosY = this->GetPos().y + flUsedArea + this->style.iPaddingY;
+
+            if (flPosY + this->vecChildren.at(it)->GetSize().y > this->GetPos().y + this->GetSize().y)
+            {
+                flPosY -= flUsedArea;
+                flUsedArea = 0.f;
+                flPosX += flBiggestWidth + this->style.iPaddingX;
+            }
+
+            this->vecChildren.at(it)->SetPos(Vector2D(flPosX, flPosY));
+            flUsedArea += this->vecChildren.at(it)->GetSize().y + this->style.iPaddingY;
+
+            if (this->vecChildren.at(it)->GetSize().x > flBiggestWidth)
+                flBiggestWidth = this->vecChildren.at(it)->GetSize().x;
         }
     };
     if (!bIsInitialized)
         SetChildPos();
 
+
+    Vector2D vecHeaderBounds = Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight);
 
     // Check if mouse has been pressed in the proper area. If yes, save window state as dragged.
     if (this->mouseCursor->bLMBPressed && MenuMain::mouseCursor->IsInBounds(this->vecPosition, vecHeaderBounds))
@@ -136,8 +193,8 @@ void BaseWindow::UpdateData()
     {
         Vector2D vecNewPos = this->vecPosition + (this->mouseCursor->vecPointPos - vecOldMousePos);
         this->SetPos(vecNewPos);
-        SetChildPos();
         vecOldMousePos = this->mouseCursor->vecPointPos;
+        SetChildPos();
     }
     else
         vecOldMousePos = this->mouseCursor->vecPointPos;
@@ -145,7 +202,6 @@ void BaseWindow::UpdateData()
     // Call the inherited "UpdateData" function from the MenuMain class to loop through childs
     MenuMain::UpdateData();
 }
-
 
 
 int BaseWindow::GetHeaderHeight()
@@ -157,60 +213,63 @@ int BaseWindow::GetHeaderHeight()
 
 
 
-void MenuMain::SetParent(MenuMain* newParent)
+BaseSection::BaseSection(Vector2D vecSize, int iNumRows)
 {
-    this->pParent = newParent;
+    this->vecSize = vecSize;
+    this->iNumRows = iNumRows;
 }
 
 
-
-void MenuMain::AddChild(std::shared_ptr<MenuMain> child)
+void BaseSection::Render()
 {
-    child->SetParent(this);
-    this->vecChildren.push_back(child);
+    g_Render.Rect(this->vecPosition, this->vecPosition + this->vecSize, this->style.colSectionOutl);
+
+    MenuMain::Render();
 }
 
 
+void BaseSection::UpdateData()
+{
+    this->SetupPositions();
+    MenuMain::UpdateData();
+}
 
-void MenuMain::Render()
-{  
-    // Render all childrens
+
+void BaseSection::SetupPositions()
+{
+    if (!this->bIsDragged && this->bIsInitialized)
+        return;
+    
+    float flUsedArea = 0.f;             /* Specifies used rows in our menu window */
+    float flColumnShift = 0.f;          /* Specifies which column we draw in by shifting drawing "cursor" */
+    int iLeftRows = this->iNumRows - 1; /* Rows we have left to draw in */
+
     for (std::size_t it = 0; it < this->vecChildren.size(); it++)
-        this->vecChildren.at(it)->Render();
-}
-
-
-
-void MenuMain::RunThink(UINT uMsg, LPARAM lParam)
-{
-    this->mouseCursor->RunThink(uMsg, lParam);
-/// TODO: Capture keyboard input
-}
-
-
-
-void MenuMain::Initialize()
-{
-    std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
     {
-        mainWindow->AddChild(std::make_unique<Checkbox> ("Bunnyhop", &g_Settings.bBhopEnabled));
-        mainWindow->AddChild(std::make_unique<Button>   ("Shutdown", Detach));
-        // All child menus / buttons etc, will be done in the future.
+        float flPosX = this->vecPosition.x + this->style.iPaddingX + flColumnShift;
+        float flPosY = this->vecPosition.y + flUsedArea + this->style.iPaddingY;
+
+        /* Check if we will exceed bounds of the section */
+        if ((flPosY + this->vecChildren.at(it)->GetSize().y) > (this->GetPos().y + this->GetSize().y))
+        {   /* Check if we have any left rows to draw in */
+            if (iLeftRows > 0)
+            {   /* Shift our X position and run this loop instance once again */
+                flColumnShift += this->GetSize().x / this->iNumRows;
+                flUsedArea = 0.f;
+                --iLeftRows;
+                --it;
+                continue;
+            }
+            else
+                break;  /* Don't set up positions if there are too many selectables so its easy to spot an error */
+        }
+
+        this->vecChildren.at(it)->SetPos(Vector2D(flPosX, flPosY));
+
+        flUsedArea += this->vecChildren.at(it)->GetSize().y + this->style.iPaddingY;
     }
-    this->AddChild(mainWindow);
 
-    this->mouseCursor = std::make_unique<MouseCursor>();    // Create our mouse cursor (one instance only)
-}
-
-
-
-void MenuMain::UpdateData()
-{
-    if (this->vecChildren.size() > 0)
-    {
-        for (auto it = this->vecChildren.begin(); it != this->vecChildren.end(); it++)
-            (*it)->UpdateData();
-    }
+    this->bIsInitialized = true;    
 }
 
 
@@ -222,10 +281,9 @@ Checkbox::Checkbox(std::string strLabel, bool *bValue)
 
     SIZE size;
     this->pFont->GetTextExtent(this->strLabel.c_str(), &size);
-    this->vecSize = Vector2D(100, static_cast<float>(size.cy) + this->style.iPaddingY);
+    this->vecSize = Vector2D(100, static_cast<float>(size.cy));
     this->vecSelectableSize = Vector2D(static_cast<float>(size.cy), static_cast<float>(size.cy));
 }
-
 
 
 void Checkbox::Render()
@@ -239,7 +297,6 @@ void Checkbox::Render()
     if (this->bIsHovered)
         g_Render.RectFilled(this->vecPosition + 1, this->vecPosition + this->vecSelectableSize, Color(100, 100, 100, 50));
 }
-
 
 
 void Checkbox::UpdateData()
@@ -276,7 +333,6 @@ Button::Button(std::string strLabel, void (&fnPointer)())
 }
 
 
-
 void Button::Render()
 {
     g_Render.RectFilledGradient(this->vecPosition, this->vecPosition + this->vecSize, this->style.colCheckbox1, this->style.colCheckbox2, GradientType::GRADIENT_VERTICAL);
@@ -286,7 +342,6 @@ void Button::Render()
     if (this->bIsHovered)
         g_Render.RectFilled(this->vecPosition + 1, this->vecPosition + this->vecSize, Color(100, 100, 100, 50));
 }
-
 
 
 void Button::UpdateData()
@@ -308,4 +363,36 @@ void Button::UpdateData()
     }
     else
         this->bIsHovered = false;
+}
+
+
+
+void MenuMain::Initialize()
+{
+    std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
+    {
+        std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 1);
+        {
+            sectMain->AddChild(std::make_unique<Checkbox>("Bunnyhop Enabled", &g_Settings.bBhopEnabled));
+            sectMain->AddChild(std::make_unique<Checkbox>("Show Player Names", &g_Settings.bShowNames));
+            sectMain->AddChild(std::make_unique<Button>("Shutdown", Detach));
+            // All child menus / buttons etc, will be done in the future.
+        }
+        mainWindow->AddChild(sectMain);
+        std::shared_ptr<BaseSection> sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2);
+        {
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad1", &g_Settings.bBhopEnabled));
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad2", &g_Settings.bBhopEnabled));
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad3", &g_Settings.bBhopEnabled));
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad4", &g_Settings.bBhopEnabled));
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad5", &g_Settings.bBhopEnabled));
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad6", &g_Settings.bBhopEnabled));
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad7", &g_Settings.bBhopEnabled));
+            sectMain2->AddChild(std::make_unique<Checkbox>("Test Pad8", &g_Settings.bBhopEnabled));
+        }
+        mainWindow->AddChild(sectMain2);
+    }
+    this->AddChild(mainWindow);
+
+    this->mouseCursor = std::make_unique<MouseCursor>();    // Create our mouse cursor (one instance only)
 }

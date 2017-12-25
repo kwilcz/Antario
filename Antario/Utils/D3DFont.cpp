@@ -6,6 +6,7 @@
 
 #pragma once
 #include <stdio.h>
+#include <cmath>
 #include <tchar.h>
 
 #include "D3DFont.h"
@@ -422,6 +423,7 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
         SIZE sz;
         GetTextExtent(strText, &sz);
         x = -(((FLOAT)sz.cx)) * 0.5f;
+        x = std::roundf(x);
     }
 
     if (dwFlags & CD3DFONT_CENTERED_Y)
@@ -429,6 +431,7 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
         SIZE sz;
         GetTextExtent(strText, &sz);
         y = -(((FLOAT)sz.cy)) * 0.5f;
+        y = std::roundf(y);
     }
 
     FLOAT sx = (x + 1.0f)*vp.Width / 2;
@@ -472,12 +475,12 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y,
 
             if (dwFlags & CD3DFONT_DROPSHADOW)
             {
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty1);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 1.0f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 1.0f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
                 dwNumTriangles += 2;
             }
 
@@ -546,6 +549,7 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
         SIZE sz;
         GetTextExtent(strText, &sz);
         sx -= (FLOAT)sz.cx * 0.5f;
+        sx = std::roundf(sx);
     }
 
     if (dwFlags & CD3DFONT_CENTERED_Y)
@@ -553,6 +557,7 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
         SIZE sz;
         GetTextExtent(strText, &sz);
         sy -= (FLOAT)sz.cy * 0.5f;
+        sy = std::roundf(sy);
     }
 
     // Adjust for character spacing
@@ -589,21 +594,21 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor,
         {
             if (dwFlags & CD3DFONT_DROPSHADOW)
             {
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty1);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 1.f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 1.f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
                 dwNumTriangles += 2;
             }
 
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + h, 1.0f, 1.0f), dwColor, tx1, ty2);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0, 1.0f, 1.0f), dwColor, tx1, ty1);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h, 1.0f, 1.0f), dwColor, tx2, ty2);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + 0, 1.0f, 1.0f), dwColor, tx2, ty1);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h, 1.0f, 1.0f), dwColor, tx2, ty2);
-            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0, 1.0f, 1.0f), dwColor, tx1, ty1);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty2);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0 - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty1);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx2, ty2);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + 0 - 0.5f, 1.0f, 1.0f), dwColor, tx2, ty1);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w - 0.5f, sy + h - 0.5f, 1.0f, 1.0f), dwColor, tx2, ty2);
+            *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 - 0.5f, sy + 0 - 0.5f, 1.0f, 1.0f), dwColor, tx1, ty1);
             dwNumTriangles += 2;
 
             if (dwNumTriangles * 3 > (MAX_NUM_VERTICES - 6))

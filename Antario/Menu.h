@@ -10,13 +10,16 @@
 
 struct MenuStyle
 {
-    int iPaddingX = 20;                             /*- Padding between sections -*/
-    int iPaddingY = 10;                             /*- Padding between selectables -*/
-    Color colCheckbox1 = Color(50, 50, 50, 255);    /*- Color of the first gradient color of the checkbox -*/
-    Color colCheckbox2 = Color(20, 20, 20, 255);    /*- Color of the second gradient color of the checkbox -*/
-    Color colText = Color(160, 160, 160, 255);      /*- Color of the text inside the main window -*/
-    Color colHeaderText = Color(200, 200, 255);     /*- Color of the text inside the header strip -*/
+    int iPaddingX = 20;                                 /*- Padding between sections -*/
+    int iPaddingY = 10;                                 /*- Padding between selectables -*/
+    Color colSectionOutl = Color(0, 0, 0, 100);         /*- Color of the section outline -*/
+    Color colCheckbox1 = Color(50, 50, 50, 255);        /*- Color of the first gradient color of the checkbox -*/
+    Color colCheckbox2 = Color(20, 20, 20, 255);        /*- Color of the second gradient color of the checkbox -*/
+    Color colText = Color(160, 160, 160, 255);          /*- Color of the text inside the main window -*/
+    Color colHeaderText = Color(200, 200, 255);         /*- Color of the text inside the header strip -*/
 };
+
+
 
 class MouseCursor
 {
@@ -36,6 +39,7 @@ public:
     bool     bRMBPressed = false;
     Vector2D vecPointPos;
 };
+
 
 
 class MenuMain
@@ -69,19 +73,38 @@ protected:
 };
 
 
+
 class BaseWindow : public MenuMain
 {
 public:
+    BaseWindow() {};
     BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* font, CD3DFont* headerFont, std::string strLabel = "");
     virtual void Render();
     virtual void UpdateData();
 
-    virtual int  GetHeaderHeight();
+    static bool      bIsDragged;// Defines if the window is currently dragged
 private:
+    virtual int  GetHeaderHeight();
+
     CD3DFont* pHeaderFont;      // Header only font
     int       iHeaderHeight;    // Header height in pixels
-    bool      bIsDragged;       // Defines if the window is currently dragged
 };
+
+
+
+class BaseSection : public BaseWindow
+{
+public: 
+    BaseSection(Vector2D vecSize, int iNumRows);
+    virtual void Render();
+    virtual void UpdateData();
+private:
+    virtual void SetupPositions();
+    bool bIsInitialized = false;
+    int iNumRows;
+
+};
+
 
 
 class Checkbox : public MenuMain
@@ -95,6 +118,7 @@ private:
     bool    bIsHovered;
     bool*   bCheckboxValue;
 };
+
 
 
 class Button : public MenuMain

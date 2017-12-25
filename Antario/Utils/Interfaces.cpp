@@ -25,10 +25,17 @@ namespace Interfaces
     template<typename T>
     T* CaptureInterface(const char* szModuleName, const char* szInterfaceVersion)
     {
-        CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA(szModuleName), "CreateInterface");        
-        return (T*)pfnFactory(szInterfaceVersion, NULL);
+        HMODULE moduleHandle = GetModuleHandleA(szModuleName);
+        if (moduleHandle)   /* In case of not finding module handle, throw an error. */
+        {
+            CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(moduleHandle, "CreateInterface");
+            return (T*)pfnFactory(szInterfaceVersion, NULL);
+        }
+        Utils::Log(std::string("Error getting interface ") + std::string(szInterfaceVersion));
+        return nullptr;
     }
     
+
     void Init()
     {
         g_pClientDll    = CaptureInterface<IBaseClientDLL>("client.dll", "VClient018");                 // Get IBaseClientDLL
