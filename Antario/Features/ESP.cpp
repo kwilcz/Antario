@@ -7,8 +7,9 @@ ESP g_ESP;
 
 void ESP::RenderBox(C_BaseEntity* pEnt)
 {
-    Vector vecOrigin = pEnt->GetOrigin();
-    Vector vecBottom = vecOrigin;
+	Vector vecOrigin, vecBottom;
+	vecOrigin = vecBottom = pEnt->GetOrigin();
+
     vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
 
     Vector vecScreenBottom;
@@ -29,8 +30,8 @@ void ESP::RenderBox(C_BaseEntity* pEnt)
     g_Render.Rect(sx - w, sy, sx + w, sy + h, (pEnt->GetTeam() == localTeam) ? teamColor : enemyColor);
 
     /* Draw rect outline */
-    g_Render.Rect(sx - w - 1, sy - 1, sx + w + 1, sy + h + 1, Color(0, 0, 0, 255));
-    g_Render.Rect(sx - w + 1, sy + 1, sx + w - 1, sy + h - 1, Color(0, 0, 0, 255));
+    g_Render.Rect(sx - w - 1, sy - 1, sx + w + 1, sy + h + 1, Color::Black());
+    g_Render.Rect(sx - w + 1, sy + 1, sx + w - 1, sy + h - 1, Color::Black());
 }
 
 void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
@@ -53,7 +54,7 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 
 void ESP::Render()
 {
-    if (!g::pLocalEntity)
+    if (!g::pLocalEntity || !g_pEngine->IsInGame())
         return;
 
     localTeam = g::pLocalEntity->GetTeam();

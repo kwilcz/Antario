@@ -114,12 +114,12 @@ public:
     {
         auto ScreenTransform = [&origin, &screen]() -> bool
         {
-            static ptrdiff_t pViewMatrix;
+            static std::uintptr_t pViewMatrix;
             if (!pViewMatrix)
             {
-                pViewMatrix = static_cast<ptrdiff_t>(Utils::FindSignature("client.dll", "0F 10 05 ? ? ? ? 8D 85 ? ? ? ? B9"));
-                pViewMatrix += 0x3;
-                pViewMatrix = *reinterpret_cast<uintptr_t*>(pViewMatrix);
+                pViewMatrix = static_cast<std::uintptr_t>(Utils::FindSignature("client.dll", "0F 10 05 ? ? ? ? 8D 85 ? ? ? ? B9"));
+                pViewMatrix += 3;
+                pViewMatrix = *reinterpret_cast<std::uintptr_t*>(pViewMatrix);
                 pViewMatrix += 176;
             }
 
@@ -136,7 +136,7 @@ public:
                 return true;
             }
 
-            float invw = 1.0f / w;
+            float invw = 1.f / w;
             screen.x *= invw;
             screen.y *= invw;
 
