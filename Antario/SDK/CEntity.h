@@ -100,10 +100,10 @@ private:
     }
 
 public:
-	int GetItemDefinitionIndex()
+	ItemDefinitionIndex GetItemDefinitionIndex()
 	{
 		static int m_iItemDefinitionIndex = g_pNetvars->GetOffset("DT_BaseAttributableItem", "m_iItemDefinitionIndex");
-		return GetValue<int>(m_iItemDefinitionIndex);
+		return GetValue<ItemDefinitionIndex>(m_iItemDefinitionIndex);
 	}
 	float GetNextPrimaryAttack()
 	{
@@ -117,9 +117,7 @@ public:
 	}
 	std::string GetName()
 	{
-		auto id = this->GetItemDefinitionIndex();
-
-		switch (static_cast<ItemDefinitionIndex>(id))
+		switch (this->GetItemDefinitionIndex())
 		{ //xD
 		case ItemDefinitionIndex::WEAPON_AK47: return			"ak47";
 		case ItemDefinitionIndex::WEAPON_AUG: return			"aug";
