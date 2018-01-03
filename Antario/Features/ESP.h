@@ -9,6 +9,7 @@ class ESP
 public:
 	void Render();
 private:
+	void RenderBox(C_BaseEntity* pEnt);
 	void RenderName(C_BaseEntity* pEnt, int iterator);
 
 	int localTeam;

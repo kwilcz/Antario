@@ -376,9 +376,10 @@ void MenuMain::Initialize()
 {
     std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); // Create our main window (Could have multiple if you'd create vec. for it)
     {
-        std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 1);
+        std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2);
         {
             sectMain->AddChild(std::make_unique<Checkbox>("Bunnyhop Enabled", &g_Settings.bBhopEnabled));
+			sectMain->AddChild(std::make_unique<Checkbox>("Show Player Boxes", &g_Settings.bShowBoxes));
             sectMain->AddChild(std::make_unique<Checkbox>("Show Player Names", &g_Settings.bShowNames));
             sectMain->AddChild(std::make_unique<Button>("Shutdown", Detach));
             // All child menus / buttons etc, will be done in the future.

@@ -49,3 +49,5 @@
 *.out
 *.app
 *.enc
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json

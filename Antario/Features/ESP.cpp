@@ -5,6 +5,33 @@
 
 ESP g_ESP;
 
+void ESP::RenderBox(C_BaseEntity* pEnt)
+{
+	auto origin = pEnt->GetOrigin();
+	auto top = origin;
+	origin.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
+
+	Vector screenOrigin;
+	if (!Utils::WorldToScreen(origin, screenOrigin))
+		return;
+
+	Vector screenTop;
+	if (!Utils::WorldToScreen(top, screenTop))
+		return;
+
+
+	auto x = screenTop.x;
+	auto y = screenTop.y;
+	auto h = screenOrigin.y - screenTop.y;
+	auto w = h / 4;
+
+	g_Render.Rect(x - w, y, x + w, y + h, (pEnt->GetTeam() == localTeam) ? teamColor : enemyColor);
+
+	//outline
+	g_Render.Rect(x - w - 1, y - 1, x + w + 1, y + h + 1, Color(0, 0, 0, 255));
+	g_Render.Rect(x - w + 1, y + 1, x + w - 1, y + h - 1, Color(0, 0, 0, 255));
+}
+
 void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 {
 	PlayerInfo_t pInfo;
@@ -37,6 +64,9 @@ void ESP::Render()
 			|| pPlayerEntity->IsDormant()
 			|| pPlayerEntity == g::pLocalEntity)
 			continue;
+
+		if (g_Settings.bShowNames)
+			this->RenderName(pPlayerEntity, it);
 
 		if (g_Settings.bShowNames)
 			this->RenderName(pPlayerEntity, it);
