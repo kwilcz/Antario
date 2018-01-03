@@ -54,7 +54,7 @@ void ESP::Render()
 {
 	localTeam = g::pLocalEntity->GetTeam();
 
-	for (int it = 0; it < g_pEngine->GetMaxClients(); ++it)
+	for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
 	{
 		C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
 
