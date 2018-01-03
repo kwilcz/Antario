@@ -19,6 +19,17 @@ public:
     void FireGameEvent(IGameEvent* event)
     {
         // call functions here
+        if(strstr(event->GetName(), "player_hurt")){
+        	int hurt_player_id = event->GetInt("userid");
+	        int attacker_id = event->GetInt("attacker");
+            //big copypaste!!!!
+            //i wrote this on browser, dont really know if syntaxes beyond this point are even correct
+            if(attacker_id == g::pLocalEntity->EntIndex()){
+            //do hitmarkers / player->shotshit++ / etc.
+            //you can also use this to switch head side like aIMwARE.cc does
+            }
+            
+        }
     }
 
     int GetEventDebugID() override
