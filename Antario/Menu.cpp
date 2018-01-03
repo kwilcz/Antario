@@ -71,10 +71,10 @@ void MouseCursor::RunThink(UINT uMsg, LPARAM lParam)
 
 bool MouseCursor::IsInBounds(Vector2D vecDst1, Vector2D vecDst2)
 {
-        if (vecPointPos.x > vecDst1.x && vecPointPos.x < vecDst2.x && vecPointPos.y > vecDst1.y && vecPointPos.y < vecDst2.y)
-            return true;
-        else
-            return false;
+    if (vecPointPos.x > vecDst1.x && vecPointPos.x < vecDst2.x && vecPointPos.y > vecDst1.y && vecPointPos.y < vecDst2.y)
+        return true;
+    else
+        return false;
 }
 
 
@@ -137,8 +137,8 @@ void BaseWindow::Render()
     g_Render.RectFilledGradient(this->vecPosition, Vector2D(this->vecPosition.x + this->vecSize.x, this->vecPosition.y + this->iHeaderHeight), Color(50, 50, 50, 230), Color(35, 35, 35, 230), GradientType::GRADIENT_VERTICAL);
 
     // Draw header string, defined as label.
-    g_Render.String(this->vecPosition.x +(this->vecSize.x * 0.5f), this->vecPosition.y, CD3DFONT_CENTERED_X, this->style.colHeaderText, this->pHeaderFont, this->strLabel.c_str());
-    
+    g_Render.String(this->vecPosition.x + (this->vecSize.x * 0.5f), this->vecPosition.y, CD3DFONT_CENTERED_X, this->style.colHeaderText, this->pHeaderFont, this->strLabel.c_str());
+
     // Render all childrens
     MenuMain::Render();
 }
@@ -183,8 +183,8 @@ void BaseWindow::UpdateData()
     if (this->mouseCursor->bLMBPressed && MenuMain::mouseCursor->IsInBounds(this->vecPosition, vecHeaderBounds))
         this->bIsDragged = true;
     else
-    if (!this->mouseCursor->bLMBPressed)
-        this->bIsDragged = false;
+        if (!this->mouseCursor->bLMBPressed)
+            this->bIsDragged = false;
 
 
     // Check if the window is dragged. If it is, move window by the cursor difference between ticks.
@@ -198,7 +198,7 @@ void BaseWindow::UpdateData()
     }
     else
         vecOldMousePos = this->mouseCursor->vecPointPos;
-    
+
     // Call the inherited "UpdateData" function from the MenuMain class to loop through childs
     MenuMain::UpdateData();
 }
@@ -239,7 +239,7 @@ void BaseSection::SetupPositions()
 {
     if (!this->bIsDragged && this->bIsInitialized)
         return;
-    
+
     float flUsedArea = 0.f;             /* Specifies used rows in our menu window */
     float flColumnShift = 0.f;          /* Specifies which column we draw in by shifting drawing "cursor" */
     int iLeftRows = this->iNumRows - 1; /* Rows we have left to draw in */
@@ -269,7 +269,7 @@ void BaseSection::SetupPositions()
         flUsedArea += this->vecChildren.at(it)->GetSize().y + this->style.iPaddingY;
     }
 
-    this->bIsInitialized = true;    
+    this->bIsInitialized = true;
 }
 
 
@@ -316,8 +316,8 @@ void Checkbox::UpdateData()
             bIsChanged = true;
         }
         else
-        if (!this->mouseCursor->bLMBPressed && bIsChanged)
-            bIsChanged = false;
+            if (!this->mouseCursor->bLMBPressed && bIsChanged)
+                bIsChanged = false;
 
         this->bIsHovered = true;
     }
@@ -327,7 +327,7 @@ void Checkbox::UpdateData()
 
 
 
-Button::Button(std::string strLabel, void (&fnPointer)())
+Button::Button(std::string strLabel, void(&fnPointer)())
 {
     this->strLabel = strLabel;
     this->fnActionPlay = fnPointer;
@@ -361,8 +361,8 @@ void Button::UpdateData()
             bIsActivated = true;
         }
         else
-        if (!this->mouseCursor->bLMBPressed && bIsActivated)
-            bIsActivated = false;
+            if (!this->mouseCursor->bLMBPressed && bIsActivated)
+                bIsActivated = false;
 
         this->bIsHovered = true;
     }
@@ -379,9 +379,9 @@ void MenuMain::Initialize()
         std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2);
         {
             sectMain->AddChild(std::make_unique<Checkbox>("Bunnyhop Enabled", &g_Settings.bBhopEnabled));
-			sectMain->AddChild(std::make_unique<Checkbox>("Show Player Boxes", &g_Settings.bShowBoxes));
             sectMain->AddChild(std::make_unique<Checkbox>("Show Player Names", &g_Settings.bShowNames));
             sectMain->AddChild(std::make_unique<Button>("Shutdown", Detach));
+            sectMain->AddChild(std::make_unique<Checkbox>("Show Player Boxes", &g_Settings.bShowBoxes));
             // All child menus / buttons etc, will be done in the future.
         }
         mainWindow->AddChild(sectMain);

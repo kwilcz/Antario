@@ -7,68 +7,72 @@ ESP g_ESP;
 
 void ESP::RenderBox(C_BaseEntity* pEnt)
 {
-	auto origin = pEnt->GetOrigin();
-	auto top = origin;
-	origin.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
+    Vector vecOrigin = pEnt->GetOrigin();
+    Vector vecBottom = vecOrigin;
+    vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
 
-	Vector screenOrigin;
-	if (!Utils::WorldToScreen(origin, screenOrigin))
-		return;
+    Vector vecScreenBottom;
+    if (!Utils::WorldToScreen(vecBottom, vecScreenBottom))
+        return;
 
-	Vector screenTop;
-	if (!Utils::WorldToScreen(top, screenTop))
-		return;
+    Vector vecScreenOrigin;
+    if (!Utils::WorldToScreen(vecOrigin, vecScreenOrigin))
+        return;
 
 
-	auto x = screenTop.x;
-	auto y = screenTop.y;
-	auto h = screenOrigin.y - screenTop.y;
-	auto w = h / 4;
+    float sx = vecScreenOrigin.x;
+    float sy = vecScreenOrigin.y;
+    float h = vecScreenBottom.y - vecScreenOrigin.y;
+    float w = h * 0.25f;
 
-	g_Render.Rect(x - w, y, x + w, y + h, (pEnt->GetTeam() == localTeam) ? teamColor : enemyColor);
+    /* Draw rect around the entity */
+    g_Render.Rect(sx - w, sy, sx + w, sy + h, (pEnt->GetTeam() == localTeam) ? teamColor : enemyColor);
 
-	//outline
-	g_Render.Rect(x - w - 1, y - 1, x + w + 1, y + h + 1, Color(0, 0, 0, 255));
-	g_Render.Rect(x - w + 1, y + 1, x + w - 1, y + h - 1, Color(0, 0, 0, 255));
+    /* Draw rect outline */
+    g_Render.Rect(sx - w - 1, sy - 1, sx + w + 1, sy + h + 1, Color(0, 0, 0, 255));
+    g_Render.Rect(sx - w + 1, sy + 1, sx + w - 1, sy + h - 1, Color(0, 0, 0, 255));
 }
 
 void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 {
-	PlayerInfo_t pInfo;
-	g_pEngine->GetPlayerInfo(iterator, &pInfo);
+    PlayerInfo_t pInfo;
+    g_pEngine->GetPlayerInfo(iterator, &pInfo);
 
 
-	Vector vecPosition = pEnt->GetEyePosition(); vecPosition.z += 30;
-	Vector vecScreenPos;
-	if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
-		return;
+    Vector vecPosition = pEnt->GetEyePosition(); vecPosition.z += 30;
+    Vector vecScreenPos;
+    if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
+        return;
 
-	g_Render.String(vecScreenPos.x, vecScreenPos.y,
-		CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
-		(localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
-		g_Fonts.pFontTahoma10.get(), pInfo.szName);
+    g_Render.String(vecScreenPos.x, vecScreenPos.y,
+        CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+        (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
+        g_Fonts.pFontTahoma10.get(), pInfo.szName);
 }
 
 
 void ESP::Render()
 {
-	localTeam = g::pLocalEntity->GetTeam();
+    if (!g::pLocalEntity)
+        return;
 
-	for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
-	{
-		C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
+    localTeam = g::pLocalEntity->GetTeam();
 
-		// Sanity checks
-		if (!pPlayerEntity
-			|| !pPlayerEntity->IsAlive()
-			|| pPlayerEntity->IsDormant()
-			|| pPlayerEntity == g::pLocalEntity)
-			continue;
+    for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
+    {
+        C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
 
-		if (g_Settings.bShowBoxes)
-			this->RenderBox(pPlayerEntity);
+        // Sanity checks
+        if (!pPlayerEntity
+            || !pPlayerEntity->IsAlive()
+            || pPlayerEntity->IsDormant()
+            || pPlayerEntity == g::pLocalEntity)
+            continue;
 
-		if (g_Settings.bShowNames)
-			this->RenderName(pPlayerEntity, it);
-	}
+        if (g_Settings.bShowBoxes)
+            this->RenderBox(pPlayerEntity);
+
+        if (g_Settings.bShowNames)
+            this->RenderName(pPlayerEntity, it);
+    }
 }
