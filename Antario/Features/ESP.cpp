@@ -65,8 +65,8 @@ void ESP::Render()
 			|| pPlayerEntity == g::pLocalEntity)
 			continue;
 
-		if (g_Settings.bShowNames)
-			this->RenderName(pPlayerEntity, it);
+		if (g_Settings.bShowBoxes)
+			this->RenderBox(pPlayerEntity);
 
 		if (g_Settings.bShowNames)
 			this->RenderName(pPlayerEntity, it);
