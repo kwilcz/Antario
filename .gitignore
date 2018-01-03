@@ -7,23 +7,6 @@
 *.o
 *.obj
 
-# MSVC binary files
-*.db
-*.ipch
-*.suo
-*.tlog
-*.idb
-*.pdb
-*.ilk
-*.bsc
-*.sbr
-*.log
-*.opendb
-*.iobj
-*.ipdb
-*.xml
-*.lastcodeanalysissucceeded
-
 # Precompiled Headers
 *.gch
 *.pch
@@ -49,5 +32,23 @@
 *.out
 *.app
 *.enc
-/.vs/slnx.sqlite
-/.vs/ProjectSettings.json
+
+# MSVC binary files
+*.db
+*.ipch
+*.suo
+*.tlog
+*.idb
+*.pdb
+*.ilk
+*.bsc
+*.sbr
+*.log
+*.opendb
+*.iobj
+*.ipdb
+*.xml
+*.lastcodeanalysissucceeded
+*.sqlite-journal
+*.sqlite
+*.json
