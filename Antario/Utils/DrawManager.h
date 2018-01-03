@@ -6,7 +6,7 @@
 #include "..\Utils\Utils.h"
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
-#define COL2DWORD(x) (D3DCOLOR_ARGB(x.a, x.r, x.g, x.b))
+#define COL2DWORD(x) (D3DCOLOR_ARGB(x.alpha, x.red, x.green, x.blue))
 
 enum GradientType;
 
