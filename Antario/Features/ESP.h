@@ -11,6 +11,7 @@ public:
 private:
 	void RenderBox(C_BaseEntity* pEnt);
 	void RenderName(C_BaseEntity* pEnt, int iterator);
+	void RenderWeaponName(C_BaseEntity* pEnt);
 
 	int localTeam;
 	Color teamColor{ 195, 240, 100, 255 };

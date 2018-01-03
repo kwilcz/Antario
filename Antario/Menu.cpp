@@ -380,6 +380,7 @@ void MenuMain::Initialize()
         {
             sectMain->AddChild(std::make_unique<Checkbox>("Bunnyhop Enabled", &g_Settings.bBhopEnabled));
             sectMain->AddChild(std::make_unique<Checkbox>("Show Player Names", &g_Settings.bShowNames));
+			sectMain->AddChild(std::make_unique<Checkbox>("Show Player Weapons", &g_Settings.bShowWeapons));
             sectMain->AddChild(std::make_unique<Button>("Shutdown", Detach));
             sectMain->AddChild(std::make_unique<Checkbox>("Show Player Boxes", &g_Settings.bShowBoxes));
             // All child menus / buttons etc, will be done in the future.

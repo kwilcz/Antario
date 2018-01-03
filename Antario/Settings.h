@@ -11,6 +11,7 @@ struct Settings
     bool bBhopEnabled   = true;
 	bool bShowBoxes		= true;
     bool bShowNames     = true;
+	bool bShowWeapons	= true;
     Color colCursor     = Color(0, 150, 255, 100);
 };
 extern Settings g_Settings;

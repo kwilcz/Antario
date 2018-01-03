@@ -51,6 +51,24 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
         g_Fonts.pFontTahoma10.get(), pInfo.szName);
 }
 
+void ESP::RenderWeaponName(C_BaseEntity* pEnt)
+{
+	auto weapon = pEnt->GetActiveWeapon();
+
+	if (!weapon)
+		return;
+
+	Vector vecPosition = pEnt->GetEyePosition(); vecPosition.z += 20;
+	Vector vecScreenPos;
+	if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
+		return;
+
+	g_Render.String(vecScreenPos.x, vecScreenPos.y,
+		CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+		(localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
+		g_Fonts.pFontTahoma10.get(), weapon->GetName().c_str());
+}
+
 
 void ESP::Render()
 {
@@ -75,5 +93,8 @@ void ESP::Render()
 
         if (g_Settings.bShowNames)
             this->RenderName(pPlayerEntity, it);
+
+		if (g_Settings.bShowWeapons)
+			this->RenderWeaponName(pPlayerEntity);
     }
 }
