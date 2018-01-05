@@ -2,6 +2,7 @@
 #include "Definitions.h"
 #include "IClientUnknown.h"
 #include "IClientEntityList.h"
+#include "..\Utils\Utils.h"
 #include "..\Utils\NetvarManager.h"
 
 // class predefinition
@@ -115,52 +116,14 @@ public:
 		static int m_iClip1 = g_pNetvars->GetOffset("DT_BaseCombatWeapon", "m_iClip1");
 		return GetValue<int>(m_iClip1);
 	}
+    WeaponInfo_t* GetCSWpnData()
+    {
+        using GetCSWpnDataFn = WeaponInfo_t * (__thiscall*)(void*);
+        return Utils::CallVFunc<GetCSWpnDataFn>(this, 446)(this);
+    }
 	std::string GetName()
 	{
-		switch (this->GetItemDefinitionIndex())
-		{ //xD
-		case ItemDefinitionIndex::WEAPON_AK47: return			"ak47";
-		case ItemDefinitionIndex::WEAPON_AUG: return			"aug";
-		case ItemDefinitionIndex::WEAPON_AWP: return			"awp";
-		case ItemDefinitionIndex::WEAPON_BIZON: return			"bizon";
-		case ItemDefinitionIndex::WEAPON_CZ75A: return			"cz75";
-		case ItemDefinitionIndex::WEAPON_DEAGLE: return			"deagle";
-		case ItemDefinitionIndex::WEAPON_ELITE: return			"elite";
-		case ItemDefinitionIndex::WEAPON_FIVESEVEN: return		"fiveseven";
-		case ItemDefinitionIndex::WEAPON_GLOCK: return			"glock18";
-		case ItemDefinitionIndex::WEAPON_FAMAS: return			"famas";
-		case ItemDefinitionIndex::WEAPON_G3SG1: return			"g3sg1";
-		case ItemDefinitionIndex::WEAPON_GALILAR: return		"galilar";
-		case ItemDefinitionIndex::WEAPON_HKP2000: return		"hkp2000";
-		case ItemDefinitionIndex::WEAPON_MAG7: return			"mag7";
-		case ItemDefinitionIndex::WEAPON_M249: return			"m249";
-		case ItemDefinitionIndex::WEAPON_M4A1: return			"m4a4";
-		case ItemDefinitionIndex::WEAPON_M4A1_SILENCER: return  "m4a1s";
-		case ItemDefinitionIndex::WEAPON_MAC10: return			"mac10";
-		case ItemDefinitionIndex::WEAPON_MP7: return			"mp7";
-		case ItemDefinitionIndex::WEAPON_MP9: return			"mp9";
-		case ItemDefinitionIndex::WEAPON_NOVA: return			"nova";
-		case ItemDefinitionIndex::WEAPON_NEGEV: return			"negev";
-		case ItemDefinitionIndex::WEAPON_P90: return			"p90";
-		case ItemDefinitionIndex::WEAPON_P250: return			"p250";
-		case ItemDefinitionIndex::WEAPON_REVOLVER: return		"revolver";
-		case ItemDefinitionIndex::WEAPON_SAWEDOFF: return		"sawedoff";
-		case ItemDefinitionIndex::WEAPON_SCAR20: return			"scar20";
-		case ItemDefinitionIndex::WEAPON_SG556: return			"sg553";
-		case ItemDefinitionIndex::WEAPON_SSG08: return			"ssg08";
-		case ItemDefinitionIndex::WEAPON_TEC9: return			"tec9";
-		case ItemDefinitionIndex::WEAPON_UMP45: return			"ump45";
-		case ItemDefinitionIndex::WEAPON_USP_SILENCER: return	"usp";
-		case ItemDefinitionIndex::WEAPON_XM1014: return			"xm1014";
-		case ItemDefinitionIndex::WEAPON_TASER: return			"zeus";
-		case ItemDefinitionIndex::WEAPON_KNIFE: return			"knife";
-		case ItemDefinitionIndex::WEAPON_FLASHBANG: return		"flashbang";
-		case ItemDefinitionIndex::WEAPON_HEGRENADE: return		"hegrenade";
-		case ItemDefinitionIndex::WEAPON_SMOKEGRENADE: return	"smokegrenade";
-		case ItemDefinitionIndex::WEAPON_MOLOTOV: return		"molotov";
-		case ItemDefinitionIndex::WEAPON_DECOY: return			"decoy";
-		case ItemDefinitionIndex::WEAPON_INCGRENADE: return		"incendiary";
-		case ItemDefinitionIndex::WEAPON_C4: return				"c4";
-		}
+///TODO: Test if szWeaponName returns proper value for m4a4 / m4a1-s or it doesnt recognize them.
+        return std::string(this->GetCSWpnData()->szWeaponName);
 	}
 };

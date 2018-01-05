@@ -7,8 +7,8 @@ ESP g_ESP;
 
 void ESP::RenderBox(C_BaseEntity* pEnt)
 {
-	Vector vecOrigin, vecBottom;
-	vecOrigin = vecBottom = pEnt->GetOrigin();
+    Vector vecOrigin, vecBottom;
+    vecOrigin = vecBottom = pEnt->GetOrigin();
 
     vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
 
@@ -53,20 +53,32 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 
 void ESP::RenderWeaponName(C_BaseEntity* pEnt)
 {
-	auto weapon = pEnt->GetActiveWeapon();
+    auto weapon = pEnt->GetActiveWeapon();
 
-	if (!weapon)
-		return;
+    if (!weapon)
+        return;
 
-	Vector vecPosition = pEnt->GetEyePosition(); vecPosition.z += 20;
-	Vector vecScreenPos;
-	if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
-		return;
+    Vector vecPosition = pEnt->GetEyePosition(); vecPosition.z += 20;
+    Vector vecScreenPos;
+    if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
+        return;
 
-	g_Render.String(vecScreenPos.x, vecScreenPos.y,
-		CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
-		(localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
-		g_Fonts.pFontTahoma10.get(), weapon->GetName().c_str());
+    /*auto StringToUpper = [](std::string strToConv) -> std::string
+    {
+        std::string tmp;
+        for (std::string::iterator p = strToConv.begin(); strToConv.end() != p; ++p)
+        {
+            *p = toupper(*p);
+            tmp.push_back(*p);
+        }
+
+        return tmp;
+    };*/
+
+    g_Render.String(vecScreenPos.x, vecScreenPos.y,
+        CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+        (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
+        g_Fonts.pFontTahoma10.get(), weapon->GetName().c_str());
 }
 
 
@@ -81,12 +93,13 @@ void ESP::Render()
     {
         C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
 
-        // Sanity checks
+
         if (!pPlayerEntity
             || !pPlayerEntity->IsAlive()
             || pPlayerEntity->IsDormant()
             || pPlayerEntity == g::pLocalEntity)
             continue;
+
 
         if (g_Settings.bShowBoxes)
             this->RenderBox(pPlayerEntity);
@@ -94,7 +107,7 @@ void ESP::Render()
         if (g_Settings.bShowNames)
             this->RenderName(pPlayerEntity, it);
 
-		if (g_Settings.bShowWeapons)
-			this->RenderWeaponName(pPlayerEntity);
+        if (g_Settings.bShowWeapons)
+            this->RenderWeaponName(pPlayerEntity);
     }
 }

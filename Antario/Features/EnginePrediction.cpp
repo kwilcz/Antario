@@ -24,10 +24,10 @@ void EnginePrediction::RunEnginePred()
     // get random_seed as its 0 in clientmode->createmove
     auto getRandomSeed = []()
     {
-		using MD5_PseudoRandom = unsigned long(__cdecl*)(std::uintptr_t);
+        using MD5_PseudoRandomFn = unsigned long(__cdecl*)(std::uintptr_t);
 		static auto offset = Utils::FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
-		static auto md5 = (MD5_PseudoRandom)(offset);
-		return md5(g::pCmd->command_number) & 0x7FFFFFFF;
+		static auto MD5_PseudoRandom = (MD5_PseudoRandomFn)(offset);
+		return MD5_PseudoRandom(g::pCmd->command_number) & 0x7FFFFFFF;
     };
 
 
