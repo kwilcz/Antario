@@ -102,7 +102,7 @@ private:
 public:
 	ItemDefinitionIndex GetItemDefinitionIndex()
 	{
-		static int m_iItemDefinitionIndex = g_pNetvars->GetOffset("DT_BaseAttributableItem", "m_iItemDefinitionIndex");
+		static int m_iItemDefinitionIndex = g_pNetvars->GetOffset("DT_BaseAttributableItem", "m_AttributeManager", "m_Item", "m_iItemDefinitionIndex");
 		return GetValue<ItemDefinitionIndex>(m_iItemDefinitionIndex);
 	}
 	float GetNextPrimaryAttack()
