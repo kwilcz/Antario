@@ -25,9 +25,9 @@ void EnginePrediction::RunEnginePred()
     auto getRandomSeed = []()
     {
         using MD5_PseudoRandomFn = unsigned long(__cdecl*)(std::uintptr_t);
-		static auto offset = Utils::FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
-		static auto MD5_PseudoRandom = (MD5_PseudoRandomFn)(offset);
-		return MD5_PseudoRandom(g::pCmd->command_number) & 0x7FFFFFFF;
+        static auto offset = Utils::FindSignature("client.dll", "55 8B EC 83 E4 F8 83 EC 70 6A 58");
+        static auto MD5_PseudoRandom = (MD5_PseudoRandomFn)(offset);
+        return MD5_PseudoRandom(g::pCmd->command_number) & 0x7FFFFFFF;
     };
 
 

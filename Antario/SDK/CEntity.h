@@ -73,7 +73,7 @@ public:
     {
         static int m_vecOrigin = g_pNetvars->GetOffset("DT_BaseEntity", "m_vecOrigin");
         return GetValue<Vector>(m_vecOrigin);
-    }	
+    }
     Vector GetViewOffset()
     {
         static int m_vecViewOffset = g_pNetvars->GetOffset("DT_BasePlayer", "localdata", "m_vecViewOffset[0]");
@@ -101,29 +101,29 @@ private:
     }
 
 public:
-	ItemDefinitionIndex GetItemDefinitionIndex()
-	{
-		static int m_iItemDefinitionIndex = g_pNetvars->GetOffset("DT_BaseAttributableItem", "m_AttributeManager", "m_Item", "m_iItemDefinitionIndex");
-		return GetValue<ItemDefinitionIndex>(m_iItemDefinitionIndex);
-	}
-	float GetNextPrimaryAttack()
-	{
-		static int m_flNextPrimaryAttack = g_pNetvars->GetOffset("DT_BaseCombatWeapon", "m_flNextPrimaryAttack");
-		return GetValue<float>(m_flNextPrimaryAttack);
-	}
-	int GetAmmo()
-	{
-		static int m_iClip1 = g_pNetvars->GetOffset("DT_BaseCombatWeapon", "m_iClip1");
-		return GetValue<int>(m_iClip1);
-	}
+    ItemDefinitionIndex GetItemDefinitionIndex()
+    {
+        static int m_iItemDefinitionIndex = g_pNetvars->GetOffset("DT_BaseAttributableItem", "m_AttributeManager", "m_Item", "m_iItemDefinitionIndex");
+        return GetValue<ItemDefinitionIndex>(m_iItemDefinitionIndex);
+    }
+    float GetNextPrimaryAttack()
+    {
+        static int m_flNextPrimaryAttack = g_pNetvars->GetOffset("DT_BaseCombatWeapon", "m_flNextPrimaryAttack");
+        return GetValue<float>(m_flNextPrimaryAttack);
+    }
+    int GetAmmo()
+    {
+        static int m_iClip1 = g_pNetvars->GetOffset("DT_BaseCombatWeapon", "m_iClip1");
+        return GetValue<int>(m_iClip1);
+    }
     WeaponInfo_t* GetCSWpnData()
     {
         using GetCSWpnDataFn = WeaponInfo_t * (__thiscall*)(void*);
         return Utils::CallVFunc<GetCSWpnDataFn>(this, 446)(this);
     }
-	std::string GetName()
-	{
+    std::string GetName()
+    {
 ///TODO: Test if szWeaponName returns proper value for m4a4 / m4a1-s or it doesnt recognize them.
         return std::string(this->GetCSWpnData()->szWeaponName);
-	}
+    }
 };
