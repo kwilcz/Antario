@@ -96,13 +96,13 @@ class C_BaseCombatWeapon : public C_BaseEntity
 {
 private:
     template<class T>
-    T GetPointer(int offset)
+    T GetPointer(const int offset)
     {
         return reinterpret_cast<T*>(reinterpret_cast<std::uintptr_t>(this) + offset);
     }
     // To get value from the pointer itself
     template<class T>
-    T GetValue(int offset)
+    T GetValue(const int offset)
     {
         return *reinterpret_cast<T*>(reinterpret_cast<std::uintptr_t>(this) + offset);
     }
@@ -110,14 +110,13 @@ private:
 public:
     ItemDefinitionIndex GetItemDefinitionIndex()
     {
-        static int m_iItemDefinitionIndex = g_pNetvars->GetOffset("DT_BaseAttributableItem", "m_AttributeManager",
-                                                                  "m_Item", "m_iItemDefinitionIndex");
+        static int m_iItemDefinitionIndex = g_pNetvars->GetOffset("DT_BaseAttributableItem", "m_AttributeManager", "m_Item", "m_iItemDefinitionIndex");
         return GetValue<ItemDefinitionIndex>(m_iItemDefinitionIndex);
     }
 
     float GetNextPrimaryAttack()
     {
-        static int m_flNextPrimaryAttack = g_pNetvars->GetOffset("DT_BaseCombatWeapon", "m_flNextPrimaryAttack");
+        static int m_flNextPrimaryAttack = g_pNetvars->GetOffset("DT_BaseCombatWeapon", "LocalActiveWeaponData", "m_flNextPrimaryAttack");
         return GetValue<float>(m_flNextPrimaryAttack);
     }
 
