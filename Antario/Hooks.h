@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Utils\DrawManager.h"
 #include "Utils\Interfaces.h"
 #include "SDK\IClientMode.h"
@@ -5,11 +7,11 @@
 #include "SDK\CInput.h"
 #include "Menu.h"
 
-namespace VTableIndexes
+namespace vtable_indexes
 {
-	constexpr auto Reset        = 16;
-	constexpr auto Present      = 17;
-	constexpr auto CreateMove   = 24;
+	constexpr auto reset        = 16;
+	constexpr auto present      = 17;
+	constexpr auto createMove   = 24;
 }
 
 class VMTHook;
@@ -34,28 +36,28 @@ private:
     /*-------------VMT Hook pointers---------------*/
     /*---------------------------------------------*/
 
-    std::unique_ptr<VMTHook>    pD3DDevice9Hook;
-    std::unique_ptr<VMTHook>    pClientModeHook;
+    std::unique_ptr<VMTHook> pD3DDevice9Hook;
+    std::unique_ptr<VMTHook> pClientModeHook;
 
     /*---------------------------------------------*/
     /*-------------Hook prototypes-----------------*/
     /*---------------------------------------------*/
 
-    typedef bool(__fastcall* CreateMove_t)  (IClientMode*, void*, float, CUserCmd*);
-    typedef long(__stdcall*  Reset_t)       (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-    typedef long(__stdcall*  Present_t)     (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
+    typedef bool (__fastcall* CreateMove_t) (IClientMode*, void*, float, CUserCmd*);
+    typedef long (__stdcall*  Reset_t)      (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+    typedef long (__stdcall*  Present_t)    (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 
 private:
-    void MouseEnableExecute();
+    static void MouseEnableExecute();
 
-    MenuMain nMenu;
-    HWND hCSGOWindow              = nullptr; // CSGO window handle
-    bool bInitializedDrawManager  = false;   // Check if we initialized our draw manager
-    WNDPROC pOriginalWNDProc      = nullptr; // Original CSGO window proc
-    std::unique_ptr<EventListener> pEventListener = nullptr; // Listens to csgo events, needs to be created
+    MenuMain                       nMenu;
+    HWND                           hCSGOWindow             = nullptr; // CSGO window handle
+    bool                           bInitializedDrawManager = false;   // Check if we initialized our draw manager
+    WNDPROC                        pOriginalWNDProc        = nullptr; // Original CSGO window proc
+    std::unique_ptr<EventListener> pEventListener          = nullptr; // Listens to csgo events, needs to be created
 };
-extern Hooks g_Hooks;
 
+extern Hooks g_Hooks;
 
 
 class VMTHook
@@ -73,7 +75,7 @@ public:
 
 
         this->pOriginalVMT = *this->ppBaseClass;
-        this->pNewVMT = std::make_unique<std::uintptr_t[]>(this->indexCount);
+        this->pNewVMT      = std::make_unique<std::uintptr_t[]>(this->indexCount);
 
         // copy original vtable to our local copy of it
         std::memcpy(this->pNewVMT.get(), this->pOriginalVMT, kSizeTable);
@@ -83,13 +85,13 @@ public:
     };
     ~VMTHook() { *this->ppBaseClass = this->pOriginalVMT; };
 
-    template <class Type>
-    Type GetOriginal(std::size_t index)
+    template<class Type>
+    Type GetOriginal(const std::size_t index)
     {
         return reinterpret_cast<Type>(this->pOriginalVMT[index]);
     };
 
-    HRESULT Hook(std::size_t index, void* fnNew)
+    HRESULT Hook(const std::size_t index, void* fnNew)
     {
         if (index > this->indexCount)   // check if given index is valid
             return E_INVALIDARG;
@@ -98,7 +100,7 @@ public:
         return S_OK;
     };
 
-    HRESULT Unhook(std::size_t index)
+    HRESULT Unhook(const std::size_t index)
     {
         if (index > this->indexCount)
             return E_INVALIDARG;
@@ -108,8 +110,8 @@ public:
     };
 
 private:
-    std::unique_ptr<std::uintptr_t[]> pNewVMT = nullptr;    // Actual used vtable
-    std::uintptr_t**    ppBaseClass  = nullptr;             // Saved pointer to original class
-    std::uintptr_t*     pOriginalVMT = nullptr;             // Saved original pointer to the VMT
-    std::size_t         indexCount = 0;                     // Count of indexes inside out f-ction
+    std::unique_ptr<std::uintptr_t[]> pNewVMT      = nullptr;    // Actual used vtable
+    std::uintptr_t**                  ppBaseClass  = nullptr;             // Saved pointer to original class
+    std::uintptr_t*                   pOriginalVMT = nullptr;             // Saved original pointer to the VMT
+    std::size_t                       indexCount   = 0;                     // Count of indexes inside out f-ction
 };

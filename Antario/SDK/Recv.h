@@ -179,168 +179,168 @@ private:
 
 inline int RecvTable::GetNumProps()
 {
-    return nProps;
+    return this->nProps;
 }
 
 inline RecvProp* RecvTable::GetProp(int i)
 {
-    return &pProps[i];
+    return &this->pProps[i];
 }
 
 inline const char* RecvTable::GetName()
 {
-    return pNetTableName;
+    return this->pNetTableName;
 }
 
 inline void RecvTable::SetInitialized(bool bInitialized)
 {
-    bInitialized = bInitialized;
+    this->bInitialized = bInitialized;
 }
 
 inline bool RecvTable::IsInitialized() const
 {
-    return bInitialized;
+    return this->bInitialized;
 }
 
 inline void RecvTable::SetInMainList(bool bInList)
 {
-    bInMainList = bInList;
+    this->bInMainList = bInList;
 }
 
 inline bool RecvTable::IsInMainList() const
 {
-    return bInMainList;
+    return this->bInMainList;
 }
 
 
 inline void RecvProp::InitArray(int nElements, int elementStride)
 {
-    RecvType = DPT_Array;
-    nElements = nElements;
-    ElementStride = elementStride;
+    this->RecvType = DPT_Array;
+    this->nElements = nElements;
+    this->ElementStride = elementStride;
 }
 
 inline int RecvProp::GetNumElements() const
 {
-    return nElements;
+    return this->nElements;
 }
 
 inline void RecvProp::SetNumElements(int nElements)
 {
-    nElements = nElements;
+    this->nElements = nElements;
 }
 
 inline int RecvProp::GetElementStride() const
 {
-    return ElementStride;
+    return this->ElementStride;
 }
 
 inline void RecvProp::SetElementStride(int stride)
 {
-    ElementStride = stride;
+    this->ElementStride = stride;
 }
 
 inline int RecvProp::GetFlags() const
 {
-    return Flags;
+    return this->Flags;
 }
 
 inline const char* RecvProp::GetName() const
 {
-    return pVarName;
+    return this->pVarName;
 }
 
 inline SendPropType RecvProp::GetType() const
 {
-    return RecvType;
+    return this->RecvType;
 }
 
 inline RecvTable* RecvProp::GetDataTable() const
 {
-    return pDataTable;
+    return this->pDataTable;
 }
 
 inline void RecvProp::SetDataTable(RecvTable *pTable)
 {
-    pDataTable = pTable;
+    this->pDataTable = pTable;
 }
 
 inline RecvVarProxyFn RecvProp::GetProxyFn() const
 {
-    return ProxyFn;
+    return this->ProxyFn;
 }
 
 inline void RecvProp::SetProxyFn(RecvVarProxyFn fn)
 {
-    ProxyFn = fn;
+    this->ProxyFn = fn;
 }
 
 inline DataTableRecvVarProxyFn RecvProp::GetDataTableProxyFn() const
 {
-    return DataTableProxyFn;
+    return this->DataTableProxyFn;
 }
 
 inline void RecvProp::SetDataTableProxyFn(DataTableRecvVarProxyFn fn)
 {
-    DataTableProxyFn = fn;
+    this->DataTableProxyFn = fn;
 }
 
 inline int RecvProp::GetOffset() const
 {
-    return Offset;
+    return this->Offset;
 }
 
 inline void RecvProp::SetOffset(int o)
 {
-    Offset = o;
+    this->Offset = o;
 }
 
 inline RecvProp* RecvProp::GetArrayProp() const
 {
-    return pArrayProp;
+    return this->pArrayProp;
 }
 
 inline void RecvProp::SetArrayProp(RecvProp *pProp)
 {
-    pArrayProp = pProp;
+    this->pArrayProp = pProp;
 }
 
 inline void RecvProp::SetArrayLengthProxy(ArrayLengthRecvProxyFn proxy)
 {
-    ArrayLengthProxy = proxy;
+    this->ArrayLengthProxy = proxy;
 }
 
 inline ArrayLengthRecvProxyFn RecvProp::GetArrayLengthProxy() const
 {
-    return ArrayLengthProxy;
+    return this->ArrayLengthProxy;
 }
 
 inline bool RecvProp::IsInsideArray() const
 {
-    return bInsideArray;
+    return this->bInsideArray;
 }
 
 inline void RecvProp::SetInsideArray()
 {
-    bInsideArray = true;
+    this->bInsideArray = true;
 }
 
 inline const void* RecvProp::GetExtraData() const
 {
-    return pExtraData;
+    return this->pExtraData;
 }
 
 inline void RecvProp::SetExtraData(const void *pData)
 {
-    pExtraData = pData;
+    this->pExtraData = pData;
 }
 
 inline const char* RecvProp::GetParentArrayPropName()
 {
-    return pParentArrayPropName;
+    return this->pParentArrayPropName;
 }
 
 inline void    RecvProp::SetParentArrayPropName(const char *pArrayPropName)
 {
-    pParentArrayPropName = pArrayPropName;
+    this->pParentArrayPropName = pArrayPropName;
 }

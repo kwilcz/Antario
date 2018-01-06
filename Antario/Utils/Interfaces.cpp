@@ -20,7 +20,7 @@ CGlobalVarsBase*    g_pGlobalVars   = nullptr;
 IGameEventManager2* g_pEventManager = nullptr;
 
 
-namespace Interfaces
+namespace interfaces
 {
     template<typename T>
     T* CaptureInterface(const char* szModuleName, const char* szInterfaceVersion)
@@ -28,13 +28,13 @@ namespace Interfaces
         HMODULE moduleHandle = GetModuleHandleA(szModuleName);
         if (moduleHandle)   /* In case of not finding module handle, throw an error. */
         {
-            CreateInterfaceFn pfnFactory = (CreateInterfaceFn)GetProcAddress(moduleHandle, "CreateInterface");
-            return (T*)pfnFactory(szInterfaceVersion, NULL);
+            CreateInterfaceFn pfnFactory = reinterpret_cast<CreateInterfaceFn>(GetProcAddress(moduleHandle, "CreateInterface"));
+            return reinterpret_cast<T*>(pfnFactory(szInterfaceVersion, nullptr));
         }
         Utils::Log(std::string("Error getting interface ") + std::string(szInterfaceVersion));
         return nullptr;
     }
-    
+
 
     void Init()
     {

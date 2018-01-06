@@ -7,8 +7,8 @@ ESP g_ESP;
 
 void ESP::RenderBox(C_BaseEntity* pEnt)
 {
-    Vector vecOrigin, vecBottom;
-    vecOrigin = vecBottom = pEnt->GetOrigin();
+    Vector vecBottom;
+    Vector vecOrigin = vecBottom = pEnt->GetOrigin();
 
     vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
 
@@ -23,8 +23,8 @@ void ESP::RenderBox(C_BaseEntity* pEnt)
 
     float sx = vecScreenOrigin.x;
     float sy = vecScreenOrigin.y;
-    float h = vecScreenBottom.y - vecScreenOrigin.y;
-    float w = h * 0.25f;
+    float h  = vecScreenBottom.y - vecScreenOrigin.y;
+    float w  = h * 0.25f;
 
     /* Draw rect around the entity */
     g_Render.Rect(sx - w, sy, sx + w, sy + h, (pEnt->GetTeam() == localTeam) ? teamColor : enemyColor);
@@ -40,15 +40,16 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
     g_pEngine->GetPlayerInfo(iterator, &pInfo);
 
 
-    Vector vecPosition = pEnt->GetEyePosition(); vecPosition.z += 30;
+    Vector vecPosition = pEnt->GetEyePosition();
+    vecPosition.z += 30;
     Vector vecScreenPos;
     if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
         return;
 
     g_Render.String(vecScreenPos.x, vecScreenPos.y,
-        CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
-        (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
-        g_Fonts.pFontTahoma10.get(), pInfo.szName);
+                    CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+                    (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
+                    g_Fonts.pFontTahoma10.get(), pInfo.szName);
 }
 
 void ESP::RenderWeaponName(C_BaseEntity* pEnt)
@@ -58,14 +59,18 @@ void ESP::RenderWeaponName(C_BaseEntity* pEnt)
     if (!weapon)
         return;
 
-    Vector vecPosition = pEnt->GetEyePosition(); vecPosition.z += 20;
+    Vector vecPosition = pEnt->GetEyePosition();
+    vecPosition.z += 20;
     Vector vecScreenPos;
     if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
         return;
 
-    /*auto StringToUpper = [](std::string strToConv) -> std::string
+    std::string strWeaponName = weapon->GetName();
+    strWeaponName.erase(0, 7);
+
+    const auto stringToUpper = [](std::string strToConv) -> std::string
     {
-        std::string tmp;
+        std::string tmp{};
         for (std::string::iterator p = strToConv.begin(); strToConv.end() != p; ++p)
         {
             *p = toupper(*p);
@@ -73,12 +78,12 @@ void ESP::RenderWeaponName(C_BaseEntity* pEnt)
         }
 
         return tmp;
-    };*/
+    };
 
     g_Render.String(vecScreenPos.x, vecScreenPos.y,
-        CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
-        (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
-        g_Fonts.pFontTahoma10.get(), weapon->GetName().c_str());
+                    CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+                    (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
+                    g_Fonts.pFontTahoma10.get(), stringToUpper(strWeaponName).c_str());
 }
 
 

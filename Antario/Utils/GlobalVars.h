@@ -4,7 +4,7 @@
 
 namespace g
 {
-    extern CUserCmd*   pCmd;
-    extern C_BaseEntity* pLocalEntity;
+    extern CUserCmd*      pCmd;
+    extern C_BaseEntity*  pLocalEntity;
     extern std::uintptr_t uRandomSeed;
 }

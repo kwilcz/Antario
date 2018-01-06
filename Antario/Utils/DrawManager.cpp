@@ -54,13 +54,13 @@ void DrawManager::RestoreDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
 }
 
 
-void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color)
+void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color) const
 {
     this->Line(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
 
-void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color)
+void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[2] = 
@@ -74,13 +74,13 @@ void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color
 }
 
 
-void DrawManager::Rect(Vector2D vecPos1, Vector2D vecPos2, Color color)
+void DrawManager::Rect(Vector2D vecPos1, Vector2D vecPos2, Color color) const
 {
     this->Rect(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
 
-void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color color)
+void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[5] =
@@ -98,12 +98,12 @@ void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color
     this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);   /* And enable again for the rest of the drawing */
 }
 
-void DrawManager::RectFilled(Vector2D vecPos1, Vector2D vecPos2, Color color)
+void DrawManager::RectFilled(Vector2D vecPos1, Vector2D vecPos2, Color color) const
 {
     this->RectFilled(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
-void DrawManager::RectFilled(float posx1, float posy1, float posx2, float posy2, Color color)
+void DrawManager::RectFilled(float posx1, float posy1, float posx2, float posy2, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[4] =
@@ -118,7 +118,7 @@ void DrawManager::RectFilled(float posx1, float posy1, float posx2, float posy2,
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
-void DrawManager::Triangle(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color)
+void DrawManager::Triangle(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[4] =
@@ -134,7 +134,7 @@ void DrawManager::Triangle(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color co
 }
 
 
-void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color)
+void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[3] = 
@@ -149,7 +149,7 @@ void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Co
 }
 
 
-void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType vertical)
+void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType vertical) const
 {
     D3DCOLOR dwColor  = COL2DWORD(col1);
     D3DCOLOR dwColor2 = COL2DWORD(col2);
@@ -187,7 +187,7 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
 }
 
 
-void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...)
+void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     posx = std::roundf(posx); posy = std::roundf(posy);

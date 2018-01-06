@@ -1,4 +1,3 @@
-#include <utility>
 #include "NetvarManager.h"
 #include "..\SDK\IBaseClientDll.h"
 

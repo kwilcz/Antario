@@ -34,7 +34,7 @@ private:
     *
     * Get the offset of the last netvar from map and return the sum of it and accum
     */
-    int GetOffsetRecursive(MapType &map, int acc, const char *name)
+    static int GetOffsetRecursive(MapType &map, int acc, const char *name)
     {
         return acc + map[name]->offset;
     }

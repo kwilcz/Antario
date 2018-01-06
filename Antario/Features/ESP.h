@@ -13,7 +13,7 @@ private:
     void RenderName(C_BaseEntity* pEnt, int iterator);
     void RenderWeaponName(C_BaseEntity* pEnt);
 
-    int localTeam;
+    int localTeam{};
     Color teamColor{ 195, 240, 100, 255 };
     Color enemyColor{ 250, 165, 110, 255 };
 };

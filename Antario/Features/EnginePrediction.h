@@ -1,8 +1,6 @@
 #pragma once
-#include "..\SDK\CInput.h"
-#include "..\SDK\CEntity.h"
 
-namespace EnginePrediction
+namespace engine_prediction
 {
     void RunEnginePred();
     void EndEnginePred();

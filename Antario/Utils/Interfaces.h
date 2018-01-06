@@ -1,10 +1,8 @@
-#ifdef _WIN32
 #pragma once
 #include <Windows.h>
-#endif
 
 
-namespace Interfaces
+namespace interfaces
 {
     // Used to initialize all the interfaces at one time
     void Init();

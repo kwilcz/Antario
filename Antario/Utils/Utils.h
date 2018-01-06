@@ -6,19 +6,18 @@
 #include <chrono>
 #include "..\SDK\IVEngineClient.h"
 
-#define INRANGE(x,a,b)    (x >= a && x <= b)
-#define getByte( x )    (getBits(x[0]) << 4 | getBits(x[1]))
-#define getBits( x )    (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
+#define INRANGE(x,a,b)   (x >= a && x <= b)
+#define GET_BYTE( x )    (GET_BITS(x[0]) << 4 | GET_BITS(x[1]))
+#define GET_BITS( x )    (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
 
 class Utils
 {
 public:
-    template <typename T>
-    static T CallVFunc(void* ppClass, int iIndex)
+    template<typename T>
+    static T CallVFunc(void* ppClass, const int iIndex)
     {
-        return (*(T**)ppClass)[iIndex];
+        return (*static_cast<T**>(ppClass))[iIndex];
     }
-
 
 
     static uintptr_t FindSignature(const char* szModule, const char* szSignature)
@@ -34,7 +33,7 @@ public:
             if (!*pat)
                 return firstMatch;
 
-            if (*(PBYTE)pat == '\?' || *(BYTE*)pCur == getByte(pat))
+            if (*(PBYTE)pat == '\?' || *(BYTE*)pCur == GET_BYTE(pat))
             {
                 if (!firstMatch)
                     firstMatch = pCur;
@@ -65,7 +64,7 @@ public:
     */
     static void GetCurrentSystemTime(tm& timeInfo)
     {
-        std::chrono::system_clock::time_point systemNow = std::chrono::system_clock::now();
+        const std::chrono::system_clock::time_point systemNow = std::chrono::system_clock::now();
         std::time_t now_c = std::chrono::system_clock::to_time_t(systemNow);
         localtime_s(&timeInfo, &now_c); // using localtime_s as std::localtime is not thread-safe.
     };
@@ -76,10 +75,10 @@ public:
     *   Format: [HH:MM:SS] str
     *   @str: Debug message to be shown.
     */
-    static void Log(std::string str, ...)
-    { 
+    static void Log(const std::string& str, ...)
+    {
 #ifdef _DEBUG
-        tm timeInfo;
+        tm timeInfo { };
         Utils::GetCurrentSystemTime(timeInfo);
 
         std::stringstream ssTime; // Temp stringstream to keep things clean
@@ -90,19 +89,21 @@ public:
     };
 
 
+
     /**
     *   Log(HRESULT) - Sets up an error message when you pass HRESULT
     *   Message contains error code only, no specific information
     */
-    static void Log(HRESULT hr)
+    static void Log(const HRESULT hr)
     {
 #ifdef _DEBUG
         std::stringstream strFormatted;
         strFormatted << "Operation failed, error code = 0x" << std::hex << hr;
-                
+
         Utils::Log(strFormatted.str());
 #endif // _DEBUG
     };
+
 
 
     /**
@@ -112,7 +113,7 @@ public:
     */
     static bool WorldToScreen(const Vector &origin, Vector &screen)
     {
-        auto ScreenTransform = [&origin, &screen]() -> bool
+        const auto screenTransform = [&origin, &screen]() -> bool
         {
             static std::uintptr_t pViewMatrix;
             if (!pViewMatrix)
@@ -123,14 +124,15 @@ public:
                 pViewMatrix += 176;
             }
 
-            const VMatrix& w2sMatrix = *(VMatrix*)pViewMatrix;
+            const VMatrix& w2sMatrix = *reinterpret_cast<VMatrix*>(pViewMatrix);
             screen.x = w2sMatrix.m[0][0] * origin.x + w2sMatrix.m[0][1] * origin.y + w2sMatrix.m[0][2] * origin.z + w2sMatrix.m[0][3];
             screen.y = w2sMatrix.m[1][0] * origin.x + w2sMatrix.m[1][1] * origin.y + w2sMatrix.m[1][2] * origin.z + w2sMatrix.m[1][3];
             screen.z = 0.0f;
 
             float w = w2sMatrix.m[3][0] * origin.x + w2sMatrix.m[3][1] * origin.y + w2sMatrix.m[3][2] * origin.z + w2sMatrix.m[3][3];
 
-            if (w < 0.001f) {
+            if (w < 0.001f)
+            {
                 screen.x *= 100000;
                 screen.y *= 100000;
                 return true;
@@ -143,7 +145,7 @@ public:
             return false;
         };
 
-        if (!ScreenTransform())
+        if (!screenTransform())
         {
             int iScreenWidth, iScreenHeight;
             g_pEngine->GetScreenSize(iScreenWidth, iScreenHeight);

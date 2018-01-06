@@ -16,7 +16,7 @@ public:
         g_pEventManager->RemoveListener(this);
     }
 
-    void FireGameEvent(IGameEvent* event)
+    void FireGameEvent(IGameEvent* event) override
     {
         // call functions here
     }

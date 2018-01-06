@@ -19,7 +19,7 @@ struct Color
     Color& operator /= (float div)
     {
         Color& color = *this;
-        float flDiv  = 1.f / div;
+        const float flDiv  = 1.f / div;
         color.red    = static_cast<int>(color.red * flDiv);
         color.green  = static_cast<int>(color.green * flDiv);
         color.blue   = static_cast<int>(color.blue * flDiv);
