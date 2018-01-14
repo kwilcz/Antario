@@ -46,7 +46,9 @@ void engine_prediction::RunEnginePred()
     CMoveData data;
     memset(&data, 0, sizeof(CMoveData));
 
-    g_pPrediction->SetupMove(g::pLocalEntity, g::pCmd, nullptr, &data);
+	g_pMoveHelper->SetHost(g::pLocalEntity);
+	//https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/game/shared/gamemovement.cpp#L1135
+    g_pPrediction->SetupMove(g::pLocalEntity, g::pCmd, g_pMoveHelper, &data);
     g_pMovement->ProcessMovement(g::pLocalEntity, &data);
     g_pPrediction->FinishMove(g::pLocalEntity, g::pCmd, &data);
 }
@@ -54,6 +56,7 @@ void engine_prediction::RunEnginePred()
 void engine_prediction::EndEnginePred()
 {
     g_pMovement->FinishTrackPredictionErrors(g::pLocalEntity);
+	g_pMoveHelper->SetHost(nullptr);
 
     g_pGlobalVars->curtime      = flOldCurtime;
     g_pGlobalVars->frametime    = flOldFrametime;

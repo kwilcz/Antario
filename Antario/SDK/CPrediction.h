@@ -17,6 +17,7 @@ public:
         return Utils::CallVFunc<OriginalFn>(this, 1)(this, host);
     }
 };
+extern IMoveHelper* g_pMoveHelper;
 
 struct CMoveData { byte data[184]; };
 
