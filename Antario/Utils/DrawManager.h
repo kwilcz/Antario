@@ -25,7 +25,7 @@ public: // Function members
 
     // Drawing functions
 
-    void Line   (Vector2D vecPos1, Vector2D vecPos2, Color color) const;
+    void Line   (Vector2D vecPos1, Vector2D vecPos2, Color color)                   const;
     void Line   (float posx1, float posy1, float posx2, float posy2, Color color) const;
     void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color) const;
     void Rect   (float posx1, float posy1, float posx2, float posy2, Color color) const;
@@ -35,6 +35,7 @@ public: // Function members
     void TriangleFilled     (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const;
     void RectFilledGradient (Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType type) const;
 
+    void String (Vector2D vecPos, DWORD dwFlags, Color color, CD3DFont * pFont, const char * szText, ...) const;
     void String (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const;
 
 
@@ -42,11 +43,11 @@ public: // Function members
     Vector2D GetScreenCenter();
 
 private: // Variable members
-    LPDIRECT3DDEVICE9   pDevice;
-    D3DVIEWPORT9        pViewPort;
-
+    LPDIRECT3DDEVICE9 pDevice;
+    D3DVIEWPORT9      pViewPort;
 };
 extern DrawManager g_Render;
+
 
 struct Fonts
 {
@@ -60,6 +61,7 @@ public:
         hr = pFontTahoma10->DeleteDeviceObjects();
         if (FAILED(hr)) { Utils::Log("Deleting proceture failed for font Tahoma 10"); }
     };
+
     void InvalidateDeviceObjects()
     {
         HRESULT hr;
@@ -68,9 +70,9 @@ public:
         hr = pFontTahoma10->InvalidateDeviceObjects();
         if (FAILED(hr)) { Utils::Log("Invalidating failed for font Tahoma 10"); }
     };
+
     void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     {
-
         HRESULT hr;
         hr = pFontTahoma8->InitDeviceObjects(pDevice);
         if (FAILED(hr)) { Utils::Log(hr); }

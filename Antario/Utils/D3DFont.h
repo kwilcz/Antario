@@ -68,4 +68,7 @@ public:
     // Constructor / destructor
     CD3DFont(const TCHAR* strFontName, DWORD dwHeight, DWORD dwWeight, DWORD dwFlags = 0L);
     ~CD3DFont();
+
+    // Height of the font in pixels. Used to prevent getting "text extent" multiple time.
+    float   flHeight;
 };

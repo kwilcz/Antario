@@ -250,6 +250,13 @@ HRESULT CD3DFont::InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice)
     DeleteObject(hFont);
     DeleteDC(hDC);
 
+    this->flHeight = static_cast<float>([this]()
+    {
+        SIZE size;
+        this->GetTextExtent("WJ", &size);
+        return size.cy;
+    }());
+
     return S_OK;
 }
 

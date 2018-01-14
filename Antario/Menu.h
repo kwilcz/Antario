@@ -5,126 +5,161 @@
 
 /// TODO LIST:
 /// - Sliders
-/// - Combo boxes
 
 
 struct MenuStyle
 {
-    int   iPaddingX      = 20;                         /*- Padding between sections -*/
-    int   iPaddingY      = 10;                         /*- Padding between selectables -*/
-    Color colSectionOutl = {0, 0, 0, 100};             /*- Color of the section outline -*/
-    Color colCheckbox1   = {50, 50, 50, 255};          /*- Color of the first gradient color of the checkbox -*/
-    Color colCheckbox2   = {35, 35, 35, 255};          /*- Color of the second gradient color of the checkbox -*/
-    Color colText        = {160, 160, 160, 255};       /*- Color of the text inside the main window -*/
-    Color colHeaderText  = {200, 200, 215};            /*- Color of the text inside the header strip -*/
+    int   iPaddingX       = 20;                         /*- Padding between sections                            -*/
+    int   iPaddingY       = 10;                         /*- Padding between selectables                         -*/
+    Color colSectionOutl  = Color(15, 15, 15, 200);     /*- Color of the section outline                        -*/
+    Color colSectionFill  = Color(0, 0, 0, 25);         /*- Color filling the section bounds                    -*/
+    Color colCheckbox1    = Color(50, 50, 50, 255);     /*- Color of the first gradient color of the checkbox   -*/
+    Color colCheckbox2    = Color(35, 35, 35, 255);     /*- Color of the second gradient color of the checkbox  -*/
+    Color colText         = Color(160, 160, 160, 255);  /*- Color of the text inside the main window            -*/
+    Color colHeaderText   = Color(200, 200, 215);       /*- Color of the text inside the header strip           -*/
+    Color colComboBoxRect = { 50, 50, 50, 180 };        /*- Color of the combobox rectangle                     -*/
 };
+
 
 
 class MouseCursor
 {
 public:
-         MouseCursor() { this->vecPointPos = g_Render.GetScreenCenter(); };
-    void Render();
-    void RunThink(UINT uMsg, LPARAM lParam);
+    MouseCursor() { this->vecPointPos = g_Render.GetScreenCenter(); };
+    virtual void        Render();
+    virtual void        RunThink(UINT uMsg, LPARAM lParam);
+        
+    Vector2D            GetPosition() const          { return vecPointPos; };  /* Set&get actual mouse position */
+    virtual void        SetPosition(Vector2D vecPos) { this->vecPointPos = vecPos; };
+    
+    /* Checks if the mouse is in specified bounds */
+    virtual bool        IsInBounds(Vector2D vecDst1, Vector2D vecDst2);
 
-    // Set&get actual mouse position
-    Vector2D GetPosition() { return vecPointPos; };
-    void     SetPosition(Vector2D vecPos) { this->vecPointPos = vecPos; };
-
-    // Checks if the mouse is in specified bounds
-    bool IsInBounds(Vector2D vecDst1, Vector2D vecDst2);
-
-    bool     bLMBPressed = false;
-    bool     bRMBPressed = false;
-    Vector2D vecPointPos;
+    bool     bLMBPressed = false;   /* Actual state of Left Mouse Button (pressed or not)   */
+    bool     bRMBPressed = false;   /* Actual state of Right Mouse Button (pressed or not)  */
+    Vector2D vecPointPos;           /* Current mouse cursor position                        */
 };
+
 
 
 class MenuMain
 {
 public:
-    MenuMain(): pParent(nullptr) {} ;
-    virtual ~MenuMain() = default;
+                 MenuMain(): pParent(nullptr), flMaxChildWidth(0) {} ;
+    virtual      ~MenuMain() = default;
     virtual void RunThink(UINT uMsg, LPARAM lParam);
     virtual void Initialize();
-    virtual void UpdateData();
-    virtual void Render();
+    virtual void UpdateData();      /* Updates all the needed data like size, position, etc. */
+    virtual void Render();          /* Renders the object                                    */
 
     // Size and position get/set
-    virtual Vector2D GetPos()                               { return this->vecPosition; };
-    virtual void     SetPos(const Vector2D& vecNewPosition) { this->vecPosition = vecNewPosition; };
-    virtual Vector2D GetSize()                              { return this->vecSize; };
-    virtual void     SetSize(const Vector2D& vecNewSize)    { this->vecSize     = vecNewSize; };
+    virtual Vector2D GetPos()                        { return this->vecPosition; };
+    virtual void     SetPos(Vector2D vecNewPosition) { this->vecPosition = vecNewPosition; };
+    virtual Vector2D GetSize()                       { return this->vecSize; };
+    virtual void     SetSize(Vector2D vecNewSize)    { this->vecSize - vecNewSize; };
+    virtual float    GetMaxChildWidth()              { return this->flMaxChildWidth; };
     
     // Parent/child setting functions
-    virtual void SetParent(MenuMain* newParent);
-    virtual void AddChild(const std::shared_ptr<MenuMain>& child);
+    virtual void SetParent(MenuMain* parent);
+    virtual void AddChild(std::shared_ptr<MenuMain> child);
 
-    static MenuStyle                    style;
-    static std::unique_ptr<MouseCursor> mouseCursor;  // Pointer to our mouse cursor
-    static CD3DFont*                    pFont;                         // Pointer to the font we will be using
+    static std::unique_ptr<MouseCursor> mouseCursor; /* Pointer to our mouse cursor                             */
+    static MenuStyle style;                          /* Struct containing all colors / paddings in our menu.    */
+    static CD3DFont* pFont;                          /* Pointer to the font used in the menu.                   */
+
 protected:
-    MenuMain*                              pParent;
+    virtual void AddCheckBox   (std::string strLabel, bool *bValue);
+    virtual void AddButton     (std::string strLabel, void(&fnPointer)(), Vector2D vecButtonSize = Vector2D(0, 0));
+    virtual void AddCombo      (std::string strLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
+
+protected:
     std::vector<std::shared_ptr<MenuMain>> vecChildren;
-    std::string                            strLabel;       // Label / Name of the window
-    Vector2D                               vecPosition;    // Coordinates to top-left corner of the drawed ent.
-    Vector2D                               vecSize;        // Size of the drawed ent.
+    MenuMain*   pParent;
+    std::string strLabel;           /* Label / Name of the window.                                  */
+    float       flMaxChildWidth;    /* Maximum child width. Set mainly for buttons and selectables. */
+    Vector2D    vecPosition;        /* Coordinates to top-left corner of the drawed ent.            */
+    Vector2D    vecSize;            /* Size of the drawed ent.                                      */
 };
+
 
 
 class BaseWindow : public MenuMain
 {
 public:
     BaseWindow(): pHeaderFont(nullptr), iHeaderHeight(0) {} ;
-    BaseWindow(Vector2D             vecPosition, Vector2D vecSize, CD3DFont* pFont, CD3DFont* pHeaderFont,
-                        std::string strLabel = "");
+    BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* font, CD3DFont* headerFont, std::string strLabel = "");
     virtual void Render();
     virtual void UpdateData();
 
-    static bool bIsDragged;// Defines if the window is currently dragged
+    static bool bIsDragged;         /* Says if the window is currently dragged. Defined as static as its the same for all children */
 private:
-    virtual int GetHeaderHeight();
+    virtual int  GetHeaderHeight();
 
-    CD3DFont* pHeaderFont;      // Header only font
-    int       iHeaderHeight;    // Header height in pixels
+    CD3DFont* pHeaderFont;          /* Header only font         */
+    int       iHeaderHeight;        /* Header height in pixels  */
 };
+
 
 
 class BaseSection : public BaseWindow
 {
-public:
-                 BaseSection(Vector2D vecSize, int iNumRows);
+public: 
+    BaseSection(Vector2D vecSize, int iNumRows);
     virtual void Render();
     virtual void UpdateData();
 
 private:
-    virtual void SetupPositions();
-    bool         bIsInitialized = false;
-    int          iNumRows;
+    void SetupPositions();          /* Calculates proper positions for all child selectables.   */
+    bool bIsInitialized = false;    /* Local boolean for initialization purposes.               */
+    int iNumRows;                   /* Number of vertical rows we will split section to.        */
+
 };
+
 
 
 class Checkbox : public MenuMain
 {
 public:
-                 Checkbox(std::string strLabel, bool* bValue);
+    Checkbox(std::string strLabel, bool *bValue, MenuMain* pParent);
     virtual void Render();
     virtual void UpdateData();
 private:
     Vector2D vecSelectableSize;
     Vector2D vecSelectablePosition;
-    bool     bIsHovered;
-    bool*    bCheckboxValue;
+    bool    bIsHovered;             /* Defines if the selectable is hovered with the mouse cursor.  */
+    bool*   bCheckboxValue;         /* The value we are changing with the checkbox                  */
 };
+
 
 
 class Button : public MenuMain
 {
 public:
-                 Button(std::string strLabel, void (&fnPointer)());
+    Button(std::string strLabel, void (&fnPointer)(), MenuMain* pParent, Vector2D vecButtonSize = Vector2D(0, 0));
     virtual void Render();
     virtual void UpdateData();
 private:
-    void (*fnActionPlay)();
-    bool   bIsHovered;
+    bool    bIsActivated;           /* Defines if we activated the button */
+    void    (*fnActionPlay)();      /* Pointer to the function that will be run at the button press. */
+    bool    bIsHovered;             /* Defines if the selectable is hovered with the mouse cursor.   */
+};
+
+
+
+class ComboBox : public MenuMain
+{
+public:
+    ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, MenuMain* pParent);
+    virtual void Render();
+    virtual void UpdateData();
+
+    virtual Vector2D GetSelectableSize();
+private:
+    bool bIsActive;                             /* Boolean defining if we are supposed to draw our menu or not. */
+    bool bIsButtonHeld;
+    bool bIsHovered;
+    int  idHovered;
+    int* iCurrentValue;                         /* Current selected option. Defined as a vector index.          */
+    std::vector<std::string> vecSelectables;    /* Vector of strings that will appear as diff settings.         */
+    Vector2D vecButtonPosition;                 /* Position of the button activating our dropdown menu          */
 };

@@ -186,6 +186,11 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
+void DrawManager::String(Vector2D vecPos, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const
+{
+    this->String(vecPos.x, vecPos.y, dwFlags, color, pFont, szText);
+}
+
 
 void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const
 {

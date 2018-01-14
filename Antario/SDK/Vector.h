@@ -558,11 +558,11 @@ public:
     bool IsValid() const;
 
     // array access...
-    float operator[](int i) const;
+    float  operator[](int i) const;
     float& operator[](int i);
 
     // Base address...
-    float* Base();
+    float*       Base();
     float const* Base() const;
 
     // Initialization methods
@@ -573,21 +573,21 @@ public:
     bool operator!=(const Vector2D& v) const;
 
     // arithmetic operations
-    Vector2D&	operator+=(const Vector2D &v);
-    Vector2D&	operator-=(const Vector2D &v);
-    Vector2D&	operator*=(const Vector2D &v);
-    Vector2D&	operator*=(float s);
-    Vector2D&	operator/=(const Vector2D &v);
-    Vector2D&	operator/=(float s);
+    Vector2D& operator+=(const Vector2D& v);
+    Vector2D& operator-=(const Vector2D& v);
+    Vector2D& operator*=(const Vector2D& v);
+    Vector2D& operator*=(float           s);
+    Vector2D& operator/=(const Vector2D& v);
+    Vector2D& operator/=(float           s);
 
     // negate the Vector2D components
-    void	Negate();
+    void Negate();
 
     // Get the Vector2D's magnitude.
-    float	Length() const;
+    float Length() const;
 
     // Get the Vector2D's magnitude squared.
-    float	LengthSqr(void) const;
+    float LengthSqr(void) const;
 
     // return true if this vector is (0,0) within tolerance
     bool IsZero(float tolerance = 0.01f) const
@@ -596,56 +596,57 @@ public:
             y > -tolerance && y < tolerance);
     }
 
-    float	Normalize();
+    float Normalize();
 
     // Normalize in place and return the old length.
-    float	NormalizeInPlace();
+    float NormalizeInPlace();
 
     // Compare length.
-    bool	IsLengthGreaterThan(float val) const;
-    bool	IsLengthLessThan(float val) const;
+    bool IsLengthGreaterThan(float val) const;
+    bool IsLengthLessThan(float    val) const;
 
     // Get the distance from this Vector2D to the other one.
-    float	DistTo(const Vector2D &vOther) const;
+    float DistTo(const Vector2D& vOther) const;
 
     // Get the distance from this Vector2D to the other one squared.
-    float	DistToSqr(const Vector2D &vOther) const;
+    float DistToSqr(const Vector2D& vOther) const;
 
     // Copy
-    void	CopyToArray(float* rgfl) const;
+    void CopyToArray(float* rgfl) const;
 
     // Multiply, add, and assign to this (ie: *this = a + b * scalar). This
     // is about 12% faster than the actual Vector2D equation (because it's done per-component
     // rather than per-Vector2D).
-    void	MulAdd(const Vector2D& a, const Vector2D& b, float scalar);
+    void MulAdd(const Vector2D& a, const Vector2D& b, float scalar);
 
     // Dot product.
-    float	Dot(const Vector2D& vOther) const;
+    float Dot(const Vector2D& vOther) const;
 
     // assignment
-    Vector2D& operator=(const Vector2D &vOther);
+    Vector2D& operator=(const Vector2D& vOther);
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
     // copy constructors
     Vector2D(const Vector2D &vOther);
 
     // arithmetic operations
-    Vector2D	operator-(void) const;
+    Vector2D operator-(void) const;
 
-    Vector2D	operator+(const Vector2D& v) const;
-    Vector2D	operator-(const Vector2D& v) const;
-    Vector2D	operator*(const Vector2D& v) const;
-    Vector2D	operator/(const Vector2D& v) const;
-    Vector2D    operator+(int   i1) const;
-    Vector2D	operator*(float fl) const;
-    Vector2D	operator/(float fl) const;
+    Vector2D operator+(const Vector2D& v) const;
+    Vector2D operator-(const Vector2D& v) const;
+    Vector2D operator*(const Vector2D& v) const;
+    Vector2D operator/(const Vector2D& v) const;
+    Vector2D operator+(const int       i1) const;
+    Vector2D operator+(const float     fl) const;
+    Vector2D operator*(const float     fl) const;
+    Vector2D operator/(const float     fl) const;
 
     // Cross product between two vectors.
-    Vector2D	Cross(const Vector2D &vOther) const;
+    Vector2D Cross(const Vector2D& vOther) const;
 
     // Returns a Vector2D with the min or max in X, Y, and Z.
-    Vector2D	Min(const Vector2D &vOther) const;
-    Vector2D	Max(const Vector2D &vOther) const;
+    Vector2D Min(const Vector2D& vOther) const;
+    Vector2D Max(const Vector2D& vOther) const;
 
 #else
 
@@ -671,17 +672,17 @@ void Vector2DClear(Vector2D& a);
 void Vector2DCopy(const Vector2D& src, Vector2D& dst);
 
 // Vector2D arithmetic
-void Vector2DAdd(const Vector2D& a, const Vector2D& b, Vector2D& result);
-void Vector2DSubtract(const Vector2D& a, const Vector2D& b, Vector2D& result);
-void Vector2DMultiply(const Vector2D& a, float b, Vector2D& result);
-void Vector2DMultiply(const Vector2D& a, const Vector2D& b, Vector2D& result);
-void Vector2DDivide(const Vector2D& a, float b, Vector2D& result);
-void Vector2DDivide(const Vector2D& a, const Vector2D& b, Vector2D& result);
-void Vector2DMA(const Vector2D& start, float s, const Vector2D& dir, Vector2D& result);
+void Vector2DAdd(const Vector2D&      a, const Vector2D& b, Vector2D&       result);
+void Vector2DSubtract(const Vector2D& a, const Vector2D& b, Vector2D&       result);
+void Vector2DMultiply(const Vector2D& a, float           b, Vector2D&       result);
+void Vector2DMultiply(const Vector2D& a, const Vector2D& b, Vector2D&       result);
+void Vector2DDivide(const Vector2D&   a, float           b, Vector2D&       result);
+void Vector2DDivide(const Vector2D&   a, const Vector2D& b, Vector2D&       result);
+void Vector2DMA(const Vector2D&       start, float       s, const Vector2D& dir, Vector2D& result);
 
 // Store the min or max of each of x, y, and z into the result.
-void Vector2DMin(const Vector2D &a, const Vector2D &b, Vector2D &result);
-void Vector2DMax(const Vector2D &a, const Vector2D &b, Vector2D &result);
+void Vector2DMin(const Vector2D& a, const Vector2D& b, Vector2D& result);
+void Vector2DMax(const Vector2D& a, const Vector2D& b, Vector2D& result);
 
 #define Vector2DExpand( v ) (v).x, (v).y
 
@@ -920,6 +921,13 @@ inline void Vector2DAdd(const Vector2D& a, const int b, Vector2D& c)
     c.y = a.y + b;
 }
 
+inline void Vector2DAdd(const Vector2D& a, const float b, Vector2D& c)
+{
+    Assert(a.IsValid());
+    c.x = a.x + b;
+    c.y = a.y + b;
+}
+
 inline void Vector2DSubtract(const Vector2D& a, const Vector2D& b, Vector2D& c)
 {
     Assert(a.IsValid() && b.IsValid());
@@ -927,7 +935,7 @@ inline void Vector2DSubtract(const Vector2D& a, const Vector2D& b, Vector2D& c)
     c.y = a.y - b.y;
 }
 
-inline void Vector2DMultiply(const Vector2D& a, float b, Vector2D& c)
+inline void Vector2DMultiply(const Vector2D& a, const float b, Vector2D& c)
 {
     Assert(a.IsValid() && IsFinite(b));
     c.x = a.x * b;
@@ -942,7 +950,7 @@ inline void Vector2DMultiply(const Vector2D& a, const Vector2D& b, Vector2D& c)
 }
 
 
-inline void Vector2DDivide(const Vector2D& a, float b, Vector2D& c)
+inline void Vector2DDivide(const Vector2D& a, const float b, Vector2D& c)
 {
     Assert(a.IsValid());
     Assert(b != 0.0f);
@@ -1152,14 +1160,21 @@ inline Vector2D Vector2D::operator-(const Vector2D& v) const
     return res;
 }
 
-inline Vector2D Vector2D::operator+(int v) const
+inline Vector2D Vector2D::operator+(const int i1) const
 {
     Vector2D res;
-    Vector2DAdd(*this, v, res);
+    Vector2DAdd(*this, i1, res);
     return res;
 }
 
-inline Vector2D Vector2D::operator*(float fl) const
+inline Vector2D Vector2D::operator+(const float fl) const
+{
+    Vector2D res;
+    Vector2DAdd(*this, fl, res);
+    return res;
+}
+
+inline Vector2D Vector2D::operator*(const float fl) const
 {
     Vector2D res;
     Vector2DMultiply(*this, fl, res);
@@ -1173,7 +1188,7 @@ inline Vector2D Vector2D::operator*(const Vector2D& v) const
     return res;
 }
 
-inline Vector2D Vector2D::operator/(float fl) const
+inline Vector2D Vector2D::operator/(const float fl) const
 {
     Vector2D res;
     Vector2DDivide(*this, fl, res);
@@ -1187,7 +1202,7 @@ inline Vector2D Vector2D::operator/(const Vector2D& v) const
     return res;
 }
 
-inline Vector2D operator*(float fl, const Vector2D& v)
+inline Vector2D operator*(const float fl, const Vector2D& v)
 {
     return v * fl;
 }
