@@ -13,34 +13,32 @@ struct Color
     }
 
     Color(int r, int g, int b, int a = 255)
-        : red{ r }, green{ g }, blue{ b }, alpha{ a } { }
+        : red{ r }, green{ g }, blue{ b }, alpha{ a }
+    { }
 
-    Color& operator *=(const float coeff)
+    Color& operator /= (float div)
     {
-        this->red   = static_cast<int>(this->red   * coeff);
-        this->green = static_cast<int>(this->green * coeff);
-        this->blue  = static_cast<int>(this->blue  * coeff);
-        return *this;
+        Color& color = *this;
+        const float flDiv  = 1.f / div;
+        color.red    = static_cast<int>(color.red * flDiv);
+        color.green  = static_cast<int>(color.green * flDiv);
+        color.blue   = static_cast<int>(color.blue * flDiv);
+        return color;
     }
 
-    Color& operator /=(const float div)
+    Color& operator *= (float coeff)
     {
-        const auto flDiv = 1.f / div;
-        *this *= flDiv;
-        return *this;
+        Color& color = *this;
+        color.red    = static_cast<int>(color.red * coeff);
+        color.green  = static_cast<int>(color.green * coeff);
+        color.blue   = static_cast<int>(color.blue * coeff);
+        return color;
     }
 
-    Color& operator *(const float coeff) const
-    {
-        auto color    = *this;
-        return color *= coeff;
-    }
-
-
-    static Color Black()    { return {0, 0, 0};       }
-    static Color Grey()     { return {127, 127, 127}; }
-    static Color White()    { return {255, 255, 255}; }
-    static Color Red()      { return {255, 0, 0};     }
-    static Color Green()    { return { 0, 255, 0 };   }
-    static Color Blue()     { return { 0, 0, 255 };   }
+    static Color Black()    { return Color(0, 0, 0); }
+    static Color Grey()     { return Color(127, 127, 127); }
+    static Color White()    { return Color(255, 255, 255); }
+    static Color Red()      { return Color(255, 0, 0); }
+    static Color Green()    { return Color(0, 255, 0); }
+    static Color Blue()     { return Color(0, 0, 255); }
 };
