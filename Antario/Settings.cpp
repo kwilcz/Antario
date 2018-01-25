@@ -38,7 +38,7 @@ void Settings::Initialize(MenuMain* pMenuObj)
 void Settings::SaveSettings(const std::string& strFileName, MenuMain* pMenuObj)
 {
     /* Loop through menu content and get its values */
-    std::function<void(MenuMain*/*, Parent pointer for sections in cfgFile*/)> loopChildSettings;
+    std::function<void(MenuMain* /*, Parent pointer for sections in cfgFile*/)> loopChildSettings;
     loopChildSettings = [&loopChildSettings](MenuMain* pMenuObj/*, Parent/section pointer for sections in cfgFile*/) -> void
     {
         /* Replaces spaces with underscores, useful with xml parsing, can be deleted otherwise. */
