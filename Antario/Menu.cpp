@@ -132,6 +132,7 @@ BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, 
     this->vecSize       = vecSize;
     this->iHeaderHeight = this->BaseWindow::GetHeaderHeight();
     this->MenuMain::SetPos(vecPosition);
+    this->type = MenuSelectableType::TYPE_WINDOW;
 }
 
 
@@ -223,11 +224,13 @@ int BaseWindow::GetHeaderHeight()
 
 
 
-BaseSection::BaseSection(Vector2D vecSize, int iNumRows)
+BaseSection::BaseSection(Vector2D vecSize, int iNumRows, std::string strLabel)
 {
-    this->vecSize = vecSize;
-    this->iNumRows = iNumRows;
+    this->vecSize         = vecSize;
+    this->iNumRows        = iNumRows;
+    this->strLabel        = strLabel;
     this->flMaxChildWidth = vecSize.x / iNumRows - 2 * this->style.iPaddingX;
+    this->type            = MenuSelectableType::TYPE_SECTION;
 }
 
 
@@ -294,6 +297,7 @@ Checkbox::Checkbox(std::string strLabel, bool *bValue, MenuMain* pParent)
 
     this->vecSize = Vector2D(100, this->pFont->flHeight);
     this->vecSelectableSize = Vector2D(std::roundf(this->pFont->flHeight * 0.70f), std::roundf(this->pFont->flHeight * 0.70f));
+    this->type = MenuSelectableType::TYPE_CHECKBOX;
 }
 
 
@@ -351,6 +355,7 @@ Button::Button(std::string strLabel, void (&fnPointer)(), MenuMain* pParent, Vec
 
     this->vecSize.x = vecButtonSize == Vector2D(0, 0) ? this->pParent->GetMaxChildWidth() : vecButtonSize.x;
     this->vecSize.y = this->pFont->flHeight + static_cast<float>(this->style.iPaddingY);
+    this->type = MenuSelectableType::TYPE_BUTTON;
 }
 
 
@@ -402,6 +407,7 @@ ComboBox::ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions,
 
     this->vecSize.x = this->pParent->GetMaxChildWidth();
     this->vecSize.y = this->pFont->flHeight + static_cast<float>(this->style.iPaddingY);
+    this->type = MenuSelectableType::TYPE_COMBO;
 }
 
 
@@ -540,7 +546,7 @@ void MenuMain::Initialize()
     /* Create our main window (Could have multiple if you'd create vec. for it) */
     std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); 
     {
-        std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2);
+        std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 1");
         {
             sectMain->AddCheckBox  ("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
             sectMain->AddCheckBox  ("Show Player Names", &g_Settings.bShowNames);
@@ -548,7 +554,7 @@ void MenuMain::Initialize()
             sectMain->AddCombo     ("Test", std::vector<std::string>{"test", "test2"}, &testint);
         }
         mainWindow->AddChild(sectMain);
-        std::shared_ptr<BaseSection> sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2);
+        std::shared_ptr<BaseSection> sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 2");
         {
             sectMain2->AddCheckBox("Test Pad1", &g_Settings.bBhopEnabled);
             sectMain2->AddCheckBox("Test Pad2", &g_Settings.bBhopEnabled);

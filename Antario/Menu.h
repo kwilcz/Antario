@@ -5,6 +5,7 @@
 
 /// TODO LIST:
 /// - Sliders
+enum class MenuSelectableType;
 
 
 struct MenuStyle
@@ -67,15 +68,17 @@ public:
     static MenuStyle style;                          /* Struct containing all colors / paddings in our menu.    */
     static CD3DFont* pFont;                          /* Pointer to the font used in the menu.                   */
 
+    std::vector<std::shared_ptr<MenuMain>> vecChildren;
+    MenuSelectableType                     type;     /* Type of an object.                                      */
+    std::string                            strLabel; /* Label / Name of the window.                             */
+
 protected:
     virtual void AddCheckBox   (std::string strLabel, bool *bValue);
     virtual void AddButton     (std::string strLabel, void(&fnPointer)(), Vector2D vecButtonSize = Vector2D(0, 0));
     virtual void AddCombo      (std::string strLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
 
 protected:
-    std::vector<std::shared_ptr<MenuMain>> vecChildren;
     MenuMain*   pParent;
-    std::string strLabel;           /* Label / Name of the window.                                  */
     float       flMaxChildWidth;    /* Maximum child width. Set mainly for buttons and selectables. */
     Vector2D    vecPosition;        /* Coordinates to top-left corner of the drawed ent.            */
     Vector2D    vecSize;            /* Size of the drawed ent.                                      */
@@ -104,7 +107,7 @@ private:
 class BaseSection : public BaseWindow
 {
 public: 
-    BaseSection(Vector2D vecSize, int iNumRows);
+    BaseSection(Vector2D vecSize, int iNumRows, std::string strLabel);
     virtual void Render();
     virtual void UpdateData();
 
@@ -123,11 +126,12 @@ public:
     Checkbox(std::string strLabel, bool *bValue, MenuMain* pParent);
     virtual void Render();
     virtual void UpdateData();
+
+    bool*   bCheckboxValue;         /* The value we are changing with the checkbox                  */
 private:
     Vector2D vecSelectableSize;
     Vector2D vecSelectablePosition;
     bool    bIsHovered;             /* Defines if the selectable is hovered with the mouse cursor.  */
-    bool*   bCheckboxValue;         /* The value we are changing with the checkbox                  */
 };
 
 
@@ -152,14 +156,24 @@ public:
     ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, MenuMain* pParent);
     virtual void Render();
     virtual void UpdateData();
-
     virtual Vector2D GetSelectableSize();
+
+    int* iCurrentValue;                         /* Current selected option. Defined as a vector index.          */
 private:
     bool bIsActive;                             /* Boolean defining if we are supposed to draw our menu or not. */
     bool bIsButtonHeld;
     bool bIsHovered;
     int  idHovered;
-    int* iCurrentValue;                         /* Current selected option. Defined as a vector index.          */
     std::vector<std::string> vecSelectables;    /* Vector of strings that will appear as diff settings.         */
     Vector2D vecButtonPosition;                 /* Position of the button activating our dropdown menu          */
+};
+
+enum class MenuSelectableType
+{
+    TYPE_MAIN,
+    TYPE_WINDOW,
+    TYPE_SECTION,
+    TYPE_CHECKBOX,
+    TYPE_BUTTON,
+    TYPE_COMBO
 };
