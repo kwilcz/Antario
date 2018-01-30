@@ -45,6 +45,9 @@
     <ClCompile Include="Antario\Utils\GlobalVars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Antario\Settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Antario\Hooks.h">
