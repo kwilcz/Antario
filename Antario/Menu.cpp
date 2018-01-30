@@ -18,19 +18,19 @@ void Detach() { g_Settings.bCheatActive = false; }
 
 void MouseCursor::Render()
 {
-    const float x = this->vecPointPos.x;
-    const float y = this->vecPointPos.y;
+    const auto x = this->vecPointPos.x;
+    const auto y = this->vecPointPos.y;
 
     // Draw inner fill color
-    Vector2D vecPos1 = Vector2D(x + 1, y + 1);
-    Vector2D vecPos2 = Vector2D(x + 25, y + 12);
-    Vector2D vecPos3 = Vector2D(x + 12, y + 25);
+    Vector2D vecPos1 = { x + 1,  y + 1 };
+    Vector2D vecPos2 = { x + 25, y + 12 };
+    Vector2D vecPos3 = { x + 12, y + 25 };
     g_Render.TriangleFilled(vecPos1, vecPos2, vecPos3, g_Settings.colCursor);
 
     // Draw second smaller inner fill color
-    vecPos1 = Vector2D(x + 6, y + 6);
-    vecPos2 = Vector2D(x + 19, y + 12);
-    vecPos3 = Vector2D(x + 12, y + 19);
+    vecPos1 = { x + 6,  y + 6 };
+    vecPos2 = { x + 19, y + 12 };
+    vecPos3 = { x + 12, y + 19 };
     g_Render.TriangleFilled(vecPos1, vecPos2, vecPos3, g_Settings.colCursor);
 
     // Draw border
@@ -38,7 +38,7 @@ void MouseCursor::Render()
 }
 
 
-void MouseCursor::RunThink(UINT uMsg, LPARAM lParam)
+void MouseCursor::RunThink(const UINT uMsg, const LPARAM lParam)
 {
     switch (uMsg)
     {
@@ -63,7 +63,7 @@ void MouseCursor::RunThink(UINT uMsg, LPARAM lParam)
 }
 
 
-bool MouseCursor::IsInBounds(Vector2D vecDst1, Vector2D vecDst2)
+bool MouseCursor::IsInBounds(const Vector2D vecDst1, const Vector2D vecDst2)
 {
     return vecPointPos.x > vecDst1.x && vecPointPos.x < vecDst2.x && vecPointPos.y > vecDst1.y && vecPointPos.y < vecDst2.y;
 }
@@ -75,7 +75,7 @@ void MenuMain::SetParent(MenuMain* newParent)
 }
 
 
-void MenuMain::AddChild(std::shared_ptr<MenuMain> child)
+void MenuMain::AddChild(const std::shared_ptr<MenuMain>& child)
 {
     this->vecChildren.push_back(child);
 }
@@ -90,20 +90,22 @@ void MenuMain::Render()
 }
 
 
-void MenuMain::RunThink(UINT uMsg, LPARAM lParam)
+void MenuMain::RunThink(const UINT uMsg, const LPARAM lParam)
 {
     this->mouseCursor->RunThink(uMsg, lParam);
-    /// TODO: Capture keyboard input
+///TODO: Capture keyboard input, mainly for bind system
 }
 
 
-void MenuMain::UpdateData()
+bool MenuMain::UpdateData()
 {
     if (!this->vecChildren.empty())
     {
         for (auto& it : this->vecChildren)
-            it->UpdateData();
+            if (it->UpdateData())
+                return true;        /* Return true if our updatedata did change something. */
     }
+    return false;
 }
 
 
@@ -130,8 +132,9 @@ BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, 
     this->pHeaderFont   = pHeaderFont;
     this->strLabel      = strLabel;
     this->vecSize       = vecSize;
+
     this->iHeaderHeight = this->BaseWindow::GetHeaderHeight();
-    this->MenuMain::SetPos(vecPosition);
+    this->vecPosition   = vecPosition;
 }
 
 
@@ -156,9 +159,10 @@ void BaseWindow::Render()
 }
 
 
-void BaseWindow::UpdateData()
+bool BaseWindow::UpdateData()
 {
-    static bool bIsInitialized = false;
+    static auto bIsInitialized = false;
+    auto bIsChanged = false;
 
     const auto setChildPos = [&]()    // Set the position of all child sections
     {
@@ -185,17 +189,19 @@ void BaseWindow::UpdateData()
                 flBiggestWidth = it->GetSize().x;
         }
     };
+
     if (!bIsInitialized)
         setChildPos();
     
-
-    const Vector2D vecHeaderBounds = Vector2D(this->vecPosition.x + this->vecSize.x,
-                                              this->vecPosition.y + this->iHeaderHeight);
+    /* Area where dragging windows is active */
+    const Vector2D vecHeaderBounds = { this->vecPosition.x + this->vecSize.x,
+                                       this->vecPosition.y + this->iHeaderHeight };
 
     // Check if mouse has been pressed in the proper area. If yes, save window state as dragged.
     if (this->mouseCursor->bLMBPressed && MenuMain::mouseCursor->IsInBounds(this->vecPosition, vecHeaderBounds))
         this->bIsDragged = true;
-    else if (!this->mouseCursor->bLMBPressed)
+    else 
+    if (!this->mouseCursor->bLMBPressed)
         this->bIsDragged = false;
 
 
@@ -203,8 +209,7 @@ void BaseWindow::UpdateData()
     static Vector2D vecOldMousePos = this->mouseCursor->vecPointPos;
     if (this->bIsDragged)
     {
-        Vector2D vecNewPos = this->vecPosition + (this->mouseCursor->vecPointPos - vecOldMousePos);
-        this->SetPos(vecNewPos);
+        this->SetPos(this->vecPosition + (this->mouseCursor->vecPointPos - vecOldMousePos));
         vecOldMousePos = this->mouseCursor->vecPointPos;
         setChildPos();
     }
@@ -212,7 +217,7 @@ void BaseWindow::UpdateData()
         vecOldMousePos = this->mouseCursor->vecPointPos;
     
     // Call the inherited "UpdateData" function from the MenuMain class to loop through childs
-    MenuMain::UpdateData();
+    return MenuMain::UpdateData();
 }
 
 
@@ -240,10 +245,10 @@ void BaseSection::Render()
 }
 
 
-void BaseSection::UpdateData()
+bool BaseSection::UpdateData()
 {
     this->SetupPositions();
-    MenuMain::UpdateData();
+    return MenuMain::UpdateData();
 }
 
 
@@ -252,9 +257,9 @@ void BaseSection::SetupPositions()
     if (!this->bIsDragged && this->bIsInitialized)
         return;
 
-    float flUsedArea    = 0.f;             /* Specifies used rows in our menu window */
-    float flColumnShift = 0.f;          /* Specifies which column we draw in by shifting drawing "cursor" */
-    int   iLeftRows     = this->iNumRows - 1; /* Rows we have left to draw in */
+    float flUsedArea    = 0.f;                  /* Specifies used rows in our menu window */
+    float flColumnShift = 0.f;                  /* Specifies which column we draw in by shifting drawing "cursor" */
+    int   iLeftRows     = this->iNumRows - 1;   /* Rows we have left to draw in */
     
     for (std::size_t it = 0; it < this->vecChildren.size(); it++)
     {
@@ -263,9 +268,11 @@ void BaseSection::SetupPositions()
 
         /* Check if we will exceed bounds of the section */
         if ((flPosY + this->vecChildren.at(it)->GetSize().y) > (this->GetPos().y + this->GetSize().y))
-        {   /* Check if we have any left rows to draw in */
+        {   
+            /* Check if we have any left rows to draw in */
             if (iLeftRows > 0)
-            {   /* Shift our X position and run this loop instance once again */
+            {   
+                /* Shift our X position and run this loop instance once again */
                 flColumnShift += this->GetSize().x / this->iNumRows;
                 flUsedArea = 0.f;
                 --iLeftRows;
@@ -273,7 +280,7 @@ void BaseSection::SetupPositions()
                 continue;
             }
             else
-                break;  /* Don't set up positions if there are too many selectables so its easy to spot an error */
+                break;  /* Don't set up positions if there are too many selectables so its easy to spot an error as they will draw in top-left corner. */
         }
 
         this->vecChildren.at(it)->SetPos(Vector2D(flPosX, flPosY));
@@ -288,40 +295,48 @@ void BaseSection::SetupPositions()
 
 Checkbox::Checkbox(std::string strLabel, bool *bValue, MenuMain* pParent)
 {
-    this->pParent = pParent;
-    this->strLabel = strLabel;
+    this->pParent        = pParent;
+    this->strLabel       = strLabel;
     this->bCheckboxValue = bValue;
+    this->bIsHovered     = false;
 
-    this->vecSize = Vector2D(100, this->pFont->flHeight);
-    this->vecSelectableSize = Vector2D(std::roundf(this->pFont->flHeight * 0.70f), std::roundf(this->pFont->flHeight * 0.70f));
+    this->vecSize           = { 100, this->pFont->flHeight };
+    this->vecSelectableSize = { std::roundf(this->pFont->flHeight * 0.70f), std::roundf(this->pFont->flHeight * 0.70f) };
 }
 
 
 void Checkbox::Render()
 {
+    /* Fill the inside of the button depending on activation */
     if (*this->bCheckboxValue)
+    {
         g_Render.RectFilledGradient(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize,
                                     this->style.colCheckbox1, this->style.colCheckbox2,
                                     GradientType::GRADIENT_VERTICAL);
+    }
     else
         g_Render.RectFilled(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, this->style.colCheckbox1);
 
+    /* Render the outline */
     g_Render.Rect(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize,
                   Color(15, 15, 15, 220));
-    g_Render.String((this->vecSelectablePosition.x + this->vecSelectableSize.x + this->style.iPaddingX * 0.5f),
-                    this->vecPosition.y, CD3DFONT_DROPSHADOW, this->style.colText, this->pFont, this->strLabel.c_str());
+
+    /* Render button label as its name */
+    g_Render.String(this->vecSelectablePosition.x + this->vecSelectableSize.x + this->style.iPaddingX * 0.5f, this->vecPosition.y, 
+                    CD3DFONT_DROPSHADOW, this->style.colText, this->pFont, this->strLabel.c_str());
+
 
     if (this->bIsHovered)
-        g_Render.RectFilled(this->vecSelectablePosition + 1, this->vecSelectablePosition + this->vecSelectableSize,
-                            Color(100, 100, 100, 50));
+        g_Render.RectFilled(this->vecSelectablePosition + 1, this->vecSelectablePosition + this->vecSelectableSize, this->style.colHover);
 }
 
 
-void Checkbox::UpdateData()
+bool Checkbox::UpdateData()
 {
-    static bool bIsChanged = false;
+    static bool bIsChanged  = false;
     const float flVectorpos = (this->pFont->flHeight - this->vecSelectableSize.y) * 0.5f;
 
+    /* Setup the position of our selectable area */
     this->vecSelectablePosition = this->vecPosition + Vector2D(flVectorpos, flVectorpos);
 
     if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
@@ -329,7 +344,7 @@ void Checkbox::UpdateData()
         if (this->mouseCursor->bLMBPressed && !bIsChanged)
         {
             *this->bCheckboxValue = !*this->bCheckboxValue;
-            bIsChanged            = true;
+            bIsChanged = true;
         }
         else 
         if (!this->mouseCursor->bLMBPressed && bIsChanged)
@@ -339,16 +354,20 @@ void Checkbox::UpdateData()
     }
     else
         this->bIsHovered = false;
+
+    return this->bIsHovered && bIsChanged;
 }
 
 
 
 Button::Button(std::string strLabel, void (&fnPointer)(), MenuMain* pParent, Vector2D vecButtonSize)
 {
-    this->pParent = pParent;
-    this->strLabel = strLabel;
+    this->pParent      = pParent;
+    this->strLabel     = strLabel;
     this->fnActionPlay = fnPointer;
-
+    this->bIsActivated = false;
+    this->bIsHovered   = false;
+    
     this->vecSize.x = vecButtonSize == Vector2D(0, 0) ? this->pParent->GetMaxChildWidth() : vecButtonSize.x;
     this->vecSize.y = this->pFont->flHeight + static_cast<float>(this->style.iPaddingY);
 }
@@ -356,37 +375,42 @@ Button::Button(std::string strLabel, void (&fnPointer)(), MenuMain* pParent, Vec
 
 void Button::Render()
 {
+    /* Fill the body of the button */
     g_Render.RectFilledGradient(this->vecPosition, this->vecPosition + this->vecSize, this->style.colCheckbox1,
-        this->style.colCheckbox2, GradientType::GRADIENT_VERTICAL);
+                                this->style.colCheckbox2, GradientType::GRADIENT_VERTICAL);
+    /* Button outline */
     g_Render.Rect(this->vecPosition, this->vecPosition + this->vecSize, this->style.colSectionOutl);
+
+    /* Text inside the button */
     g_Render.String(this->vecPosition.x + this->vecSize.x / 2.f, this->vecPosition.y + this->vecSize.y / 2.f,
-        CD3DFONT_DROPSHADOW | CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, this->style.colText, this->pFont,
-        this->strLabel.c_str());
+                    CD3DFONT_DROPSHADOW | CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, this->style.colText, this->pFont,
+                    this->strLabel.c_str());
+
 
     if (this->bIsHovered)
-        g_Render.RectFilled(this->vecPosition + 1, this->vecPosition + this->vecSize, Color(100, 100, 100, 50));
+        g_Render.RectFilled(this->vecPosition + 1, this->vecPosition + this->vecSize, this->style.colHover);
 }
 
 
-void Button::UpdateData()
-{
-    this->bIsActivated = false;
-
+bool Button::UpdateData()
+{    
     if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
     {
-        if (this->mouseCursor->bLMBPressed && !bIsActivated)
+        if (this->mouseCursor->bLMBPressed && !this->bIsActivated)
         {
-            this->fnActionPlay();   // Run the function passed as an arg.
-            bIsActivated = true;
+            this->fnActionPlay();   /* Run the function passed as an arg. */
+            this->bIsActivated = true;
         }
         else 
         if (!this->mouseCursor->bLMBPressed && bIsActivated)
-            bIsActivated = false;
+            this->bIsActivated = false;
 
         this->bIsHovered = true;
     }
     else
         this->bIsHovered = false;
+
+    return this->bIsActivated;
 }
 
 
@@ -399,6 +423,8 @@ ComboBox::ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions,
     this->vecSelectables = vecBoxOptions;
     this->iCurrentValue  = iCurrentValue;
     this->bIsHovered     = false;
+    this->bIsButtonHeld  = false;
+    this->idHovered      = -2;
 
     this->vecSize.x = this->pParent->GetMaxChildWidth();
     this->vecSize.y = this->pFont->flHeight + static_cast<float>(this->style.iPaddingY);
@@ -445,7 +471,7 @@ void ComboBox::Render()
     drawTriangle();
 
     if (this->bIsHovered)
-        g_Render.RectFilled(this->vecButtonPosition, this->vecButtonPosition + this->vecSize.y, Color(100, 100, 100, 50));
+        g_Render.RectFilled(this->vecButtonPosition, this->vecButtonPosition + this->vecSize.y, this->style.colHover);
 
     g_Render.Rect(this->vecPosition, this->vecPosition + this->vecSize, this->style.colSectionOutl);
     if (this->bIsActive)
@@ -462,14 +488,13 @@ void ComboBox::Render()
         if (this->idHovered != -1)
         {
             const Vector2D vecElementPos = { this->vecPosition.x, this->vecPosition.y + this->vecSize.y * (this->idHovered + 1) };
-            g_Render.RectFilled(vecElementPos, Vector2D(vecElementPos.x + this->vecSize.x - this->vecSize.y, vecElementPos.y + this->vecSize.y),
-                                Color(100, 100, 100, 50));
+            g_Render.RectFilled(vecElementPos, Vector2D(vecElementPos.x + this->vecSize.x - this->vecSize.y, vecElementPos.y + this->vecSize.y), this->style.colHover);
         }
     }
 }
 
 
-void ComboBox::UpdateData()
+bool ComboBox::UpdateData()
 {
     this->vecButtonPosition = Vector2D(this->vecPosition.x + this->vecSize.x - this->vecSize.y, this->vecPosition.y);
 
@@ -492,13 +517,14 @@ void ComboBox::UpdateData()
 
     if (this->bIsActive)
     {
+        /* Check if moure cursor is in bounds of entire combo so we wont have to loop through specific sub-options. */
         if (this->mouseCursor->IsInBounds(Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y),
                                           Vector2D(this->vecPosition.x + this->vecSize.x - this->vecSize.y,
                                                    this->vecPosition.y + this->vecSize.y * (this->vecSelectables.size() + 1))))
         {
             for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
             {
-                const Vector2D vecElementPos = Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y * (it + 1));
+                const auto vecElementPos = Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y * (it + 1));
                 if (this->mouseCursor->IsInBounds(vecElementPos, Vector2D(vecElementPos.x + this->vecSize.x - this->vecSize.y, vecElementPos.y + this->vecSize.y)))
                 {
                     if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
@@ -515,11 +541,19 @@ void ComboBox::UpdateData()
             }
         }
         else
+        {
             this->idHovered = -1;
+
+            ///* Turn off combo if we click out-of-bounds */
+            if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+                this->bIsActive = false;
+        }
     }
 
     if (!g_Settings.bMenuOpened) 
         this->bIsActive = false;
+
+    return this->bIsButtonHeld && this->idHovered >= 0 || this->idHovered >= 0;
 }
 
 
@@ -532,8 +566,6 @@ Vector2D ComboBox::GetSelectableSize()
 }
 
 
-
-
 void MenuMain::Initialize()
 {
     static int testint;
@@ -542,14 +574,17 @@ void MenuMain::Initialize()
     {
         std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2);
         {
-            sectMain->AddCheckBox  ("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
-            sectMain->AddCheckBox  ("Show Player Names", &g_Settings.bShowNames);
-            sectMain->AddButton    ("Shutdown", Detach);
-            sectMain->AddCombo     ("Test", std::vector<std::string>{"test", "test2"}, &testint);
+            sectMain->AddCheckBox ("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
+            sectMain->AddCheckBox ("Show Player Names", &g_Settings.bShowNames);
+            sectMain->AddButton   ("Shutdown", Detach);
+            sectMain->AddCombo    ("Test", std::vector<std::string>{ "test", "test2", "test3" }, &testint);
         }
         mainWindow->AddChild(sectMain);
+
+        /* This section will allign itself below the first one. If we make them both half as wide, and twice as high, they will allign side-by-side. */
         std::shared_ptr<BaseSection> sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2);
         {
+            /* To be removed */
             sectMain2->AddCheckBox("Test Pad1", &g_Settings.bBhopEnabled);
             sectMain2->AddCheckBox("Test Pad2", &g_Settings.bBhopEnabled);
             sectMain2->AddCheckBox("Test Pad3", &g_Settings.bBhopEnabled);
