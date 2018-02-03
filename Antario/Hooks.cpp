@@ -164,16 +164,26 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     // for now as a lambda, to be transfered somewhere
     // Thanks uc/WasserEsser for pointing out my mistake!
+    // Working when you HOLD th button, not when you press it.
     const auto getButtonHeld = [uMsg, wParam](bool& bButton, int vKey)
     {
-        if (uMsg == WM_KEYDOWN && wParam == vKey)
+		if (wParam != vKey) return;
+
+        if (uMsg == WM_KEYDOWN)
             bButton = true;
-        else if (uMsg == WM_KEYUP && wParam == vKey)
+        else if (uMsg == WM_KEYUP)
             bButton = false;
     };
 
-    // Working when you HOLD the insert button, not when you press it.
-    getButtonHeld(g_Settings.bMenuOpened, VK_INSERT);
+	const auto getButtonToggle = [uMsg, wParam](bool& bButton, int vKey)
+	{
+		if (wParam != vKey) return;
+
+		if (uMsg == WM_KEYUP)
+			bButton = !bButton;
+	};
+
+	getButtonToggle(g_Settings.bMenuOpened, VK_INSERT);
 
     if (g_Hooks.bInitializedDrawManager)
     {
