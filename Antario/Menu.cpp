@@ -536,6 +536,7 @@ bool ComboBox::UpdateData()
                     if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
                     {
                         *this->iCurrentValue = it;
+                        this->bIsActive = false;
                         this->bIsButtonHeld = true;
                     }
                     else
