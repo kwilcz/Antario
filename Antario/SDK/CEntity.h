@@ -128,8 +128,7 @@ public:
 
     WeaponInfo_t* GetCSWpnData()
     {
-        using GetCSWpnDataFn = WeaponInfo_t * (__thiscall*)(void*);
-        return Utils::CallVFunc<GetCSWpnDataFn>(this, 446)(this);
+        return Utils::CallVFunc<446, WeaponInfo_t*>(this);
     }
 
     std::string GetName()

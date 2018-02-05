@@ -13,10 +13,11 @@
 class Utils
 {
 public:
-    template<typename T>
-    static T CallVFunc(void* ppClass, const int iIndex)
+    template<unsigned int IIdx, typename TRet, typename ... TArgs>
+    static auto CallVFunc(void* thisptr, TArgs ... argList) -> TRet
     {
-        return (*static_cast<T**>(ppClass))[iIndex];
+        using Fn = TRet(__thiscall*)(void*, decltype(argList)...);
+        return (*static_cast<Fn**>(thisptr))[IIdx](thisptr, argList...);
     }
 
 
