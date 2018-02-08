@@ -398,16 +398,16 @@ void Button::Render()
 
 
 bool Button::UpdateData()
-{    
+{
+    static bool bLMBPressedLast;
     if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
     {
-        if (this->mouseCursor->bLMBPressed && !this->bIsActivated)
+        if (bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsActivated)
         {
-            this->fnActionPlay();   /* Run the function passed as an arg. */
+            this->fnActionPlay(); /* Run the function passed as an arg. */
             this->bIsActivated = true;
         }
-        else 
-        if (!this->mouseCursor->bLMBPressed && bIsActivated)
+        else if (!this->mouseCursor->bLMBPressed && bIsActivated)
             this->bIsActivated = false;
 
         this->bIsHovered = true;
@@ -415,6 +415,7 @@ bool Button::UpdateData()
     else
         this->bIsHovered = false;
 
+    bLMBPressedLast = this->mouseCursor->bLMBPressed;
     return this->bIsActivated;
 }
 
