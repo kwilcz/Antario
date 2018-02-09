@@ -10,15 +10,15 @@ enum class MenuSelectableType;
 
 struct MenuStyle
 {
-    int   iPaddingX = 20;                     /*- Padding between sections                            -*/
-    int   iPaddingY = 10;                     /*- Padding between selectables                         -*/
-    Color colHover = { 100, 100, 100, 50 };  /*- Color applied on the obj when mouse hovers above it -*/
-    Color colSectionOutl = { 15, 15, 15, 200 };    /*- Color of the section outline                        -*/
-    Color colSectionFill = { 0, 0, 0, 25 };        /*- Color filling the section bounds                    -*/
-    Color colCheckbox1 = { 50, 50, 50, 255 };    /*- Color of the first gradient color of the checkbox   -*/
-    Color colCheckbox2 = { 35, 35, 35, 255 };    /*- Color of the second gradient color of the checkbox  -*/
-    Color colText = { 160, 160, 160, 255 }; /*- Color of the text inside the main window            -*/
-    Color colHeaderText = { 200, 200, 215 };      /*- Color of the text inside the header strip           -*/
+    int   iPaddingX       = 20;                     /*- Padding between sections                            -*/
+    int   iPaddingY       = 6;                      /*- Padding between selectables                         -*/
+    Color colHover        = { 100, 100, 100, 50 };  /*- Color applied on the obj when mouse hovers above it -*/
+    Color colSectionOutl  = { 15, 15, 15, 200 };    /*- Color of the section outline                        -*/
+    Color colSectionFill  = { 0, 0, 0, 25 };        /*- Color filling the section bounds                    -*/
+    Color colCheckbox1    = { 50, 50, 50, 255 };    /*- Color of the first gradient color of the checkbox   -*/
+    Color colCheckbox2    = { 35, 35, 35, 255 };    /*- Color of the second gradient color of the checkbox  -*/
+    Color colText         = { 160, 160, 160, 255 }; /*- Color of the text inside the main window            -*/
+    Color colHeaderText   = { 200, 200, 215 };      /*- Color of the text inside the header strip           -*/
     Color colComboBoxRect = { 50, 50, 50, 180 };    /*- Color of the combobox rectangle                     -*/
 };
 
@@ -75,6 +75,7 @@ public:
     std::string                            strLabel; /* Label / Name of the window.                             */
 
 protected:
+    virtual void AddDummy();
     virtual void AddCheckBox(std::string strSelectableLabel, bool *bValue);
     virtual void AddButton(std::string strSelectableLabel, void(&fnPointer)(), Vector2D vecButtonSize = Vector2D(0, 0));
     virtual void AddCombo(std::string strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
@@ -158,15 +159,24 @@ public:
     ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, MenuMain* pParent);
     virtual void Render();
     virtual bool UpdateData();
-    virtual Vector2D GetSelectableSize();
 
-    int* iCurrentValue;                         /* Current selected option. Defined as a vector index.          */
+    virtual Vector2D GetSelectableSize();
 private:
-    bool bIsActive;                             /* Boolean defining if we are supposed to draw our menu or not. */
-    bool bIsButtonHeld;
-    int  idHovered;
+    bool  bIsActive;                            /* Boolean defining if we are supposed to draw our list or not. */
+    bool  bIsButtonHeld;
+    int   idHovered;            
+    int*  iCurrentValue;                        /* Current selected option. Defined as a vector index.          */
+    Vector2D vecSelectableSize;                 /* Size of the internal selectable size of the combo            */
+    Vector2D vecSelectablePosition;             /* Position of the selectable                                   */
     std::vector<std::string> vecSelectables;    /* Vector of strings that will appear as diff settings.         */
-    Vector2D vecButtonPosition;                 /* Position of the button activating our dropdown menu          */
+};
+
+class DummySpace : public MenuMain
+{
+public:
+         DummySpace(Vector2D size) { this->vecSize = size; };
+    void Render()     override { };
+    bool UpdateData() override { return false; };
 };
 
 enum class MenuSelectableType
