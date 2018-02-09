@@ -535,17 +535,18 @@ bool ComboBox::UpdateData()
                     const auto vecElementPos = Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y * (it + 1));
                     if (this->mouseCursor->IsInBounds(vecElementPos, Vector2D(vecElementPos.x + this->vecSize.x - this->vecSize.y, vecElementPos.y + this->vecSize.y)))
                     {
+                        this->idHovered = it;
+
                         if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
                         {
                             *this->iCurrentValue = it;
-                            this->bIsActive = false;
-                            this->bIsButtonHeld = true;
+                            this->bIsButtonHeld  = true;
+                            this->idHovered      = -1;
+                            this->bIsActive      = false;
                         }
-                        else
-                            if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-                                this->bIsButtonHeld = false;
-
-                        this->idHovered = it;
+                        else 
+                        if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
+                            this->bIsButtonHeld = false;                        
                     }
                 }
             }
