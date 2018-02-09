@@ -109,26 +109,26 @@ bool MenuMain::UpdateData()
 }
 
 
-void MenuMain::AddCheckBox(std::string strLabel, bool* bValue)
+void MenuMain::AddCheckBox(std::string strSelectableLabel, bool* bValue)
 {
-    this->AddChild(std::make_shared<Checkbox>(strLabel, bValue, this));
+    this->AddChild(std::make_shared<Checkbox>(strSelectableLabel, bValue, this));
 }
 
-void MenuMain::AddButton(std::string strLabel, void (&fnPointer)(), Vector2D vecButtonSize)
+void MenuMain::AddButton(std::string strSelectableLabel, void (&fnPointer)(), Vector2D vecButtonSize)
 {
-    this->AddChild(std::make_shared<Button>(strLabel, fnPointer, this, vecButtonSize));
+    this->AddChild(std::make_shared<Button>(strSelectableLabel, fnPointer, this, vecButtonSize));
 }
 
-void MenuMain::AddCombo(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex)
+void MenuMain::AddCombo(std::string strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex)
 {
-    this->AddChild(std::make_shared<ComboBox>(strLabel, vecBoxOptions, iVecIndex, this));
+    this->AddChild(std::make_shared<ComboBox>(strSelectableLabel, vecBoxOptions, iVecIndex, this));
 }
 
 
 
-BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pFont, CD3DFont* pHeaderFont, std::string strLabel)
+BaseWindow::BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* pUsedFont, CD3DFont* pHeaderFont, std::string strLabel)
 {
-    this->pFont         = pFont;
+    this->pFont         = pUsedFont;
     this->pHeaderFont   = pHeaderFont;
     this->strLabel      = strLabel;
     this->vecSize       = vecSize;
@@ -163,7 +163,6 @@ void BaseWindow::Render()
 bool BaseWindow::UpdateData()
 {
     static auto bIsInitialized = false;
-    auto bIsChanged = false;
 
     const auto setChildPos = [&]()    // Set the position of all child sections
     {
@@ -345,7 +344,7 @@ bool Checkbox::UpdateData()
 
     if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
     {
-        if (this->mouseCursor->bLMBPressed && !bIsChanged)
+        if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !bIsChanged)
         {
             *this->bCheckboxValue = !*this->bCheckboxValue;
             bIsChanged            = true;
@@ -359,6 +358,7 @@ bool Checkbox::UpdateData()
     else
         this->bIsHovered = false;
 
+    this->bLMBPressedLast = this->mouseCursor->bLMBPressed;
     return this->bIsHovered && bIsChanged;
 }
 
@@ -399,15 +399,15 @@ void Button::Render()
 
 bool Button::UpdateData()
 {
-    static bool bLMBPressedLast;
     if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
     {
-        if (bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsActivated)
+        if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsActivated)
         {
             this->fnActionPlay(); /* Run the function passed as an arg. */
             this->bIsActivated = true;
         }
-        else if (!this->mouseCursor->bLMBPressed && bIsActivated)
+        else 
+        if (!this->mouseCursor->bLMBPressed && bIsActivated)
             this->bIsActivated = false;
 
         this->bIsHovered = true;
@@ -415,7 +415,7 @@ bool Button::UpdateData()
     else
         this->bIsHovered = false;
 
-    bLMBPressedLast = this->mouseCursor->bLMBPressed;
+    this->bLMBPressedLast = this->mouseCursor->bLMBPressed;
     return this->bIsActivated;
 }
 
@@ -508,7 +508,7 @@ bool ComboBox::UpdateData()
 
     if (mouseCursor->IsInBounds(this->vecButtonPosition, this->vecButtonPosition + this->vecSize.y))
     {
-        if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+        if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
         {
             this->bIsActive = !bIsActive;
             this->bIsButtonHeld = true;
@@ -520,47 +520,51 @@ bool ComboBox::UpdateData()
         this->bIsHovered = true;
     }
     else
+    {
         this->bIsHovered = false;
 
-    if (this->bIsActive)
-    {
-        /* Check if moure cursor is in bounds of entire combo so we wont have to loop through specific sub-options. */
-        if (this->mouseCursor->IsInBounds(Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y),
-                                          Vector2D(this->vecPosition.x + this->vecSize.x - this->vecSize.y,
-                                                   this->vecPosition.y + this->vecSize.y * (this->vecSelectables.size() + 1))))
+        if (this->bIsActive)
         {
-            for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
+            /* Check if moure cursor is in bounds of entire combo so we wont have to loop through specific sub-options. */
+            if (this->mouseCursor->IsInBounds(Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y),
+                Vector2D(this->vecPosition.x + this->vecSize.x - this->vecSize.y,
+                    this->vecPosition.y + this->vecSize.y * (this->vecSelectables.size() + 1))))
             {
-                const auto vecElementPos = Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y * (it + 1));
-                if (this->mouseCursor->IsInBounds(vecElementPos, Vector2D(vecElementPos.x + this->vecSize.x - this->vecSize.y, vecElementPos.y + this->vecSize.y)))
+                for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
                 {
-                    if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+                    const auto vecElementPos = Vector2D(this->vecPosition.x, this->vecPosition.y + this->vecSize.y * (it + 1));
+                    if (this->mouseCursor->IsInBounds(vecElementPos, Vector2D(vecElementPos.x + this->vecSize.x - this->vecSize.y, vecElementPos.y + this->vecSize.y)))
                     {
-                        *this->iCurrentValue = it;
-                        this->bIsButtonHeld = true;
-                    }
-                    else
-                    if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-                        this->bIsButtonHeld = false;
+                        if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+                        {
+                            *this->iCurrentValue = it;
+                            this->bIsActive = false;
+                            this->bIsButtonHeld = true;
+                        }
+                        else
+                            if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
+                                this->bIsButtonHeld = false;
 
-                    this->idHovered = it;
+                        this->idHovered = it;
+                    }
                 }
             }
-        }
-        else
-        {
-            this->idHovered = -1;
+            else
+            {
+                this->idHovered = -1;
 
-            ///* Turn off combo if we click out-of-bounds */
-            if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
-                this->bIsActive = false;
+                ///* Turn off combo if we click out-of-bounds */
+                if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+                    this->bIsActive = false;
+            }
         }
     }
 
     if (!g_Settings.bMenuOpened) 
         this->bIsActive = false;
 
-    return this->bIsButtonHeld && this->idHovered >= 0 || this->idHovered >= 0;
+    this->bLMBPressedLast = this->mouseCursor->bLMBPressed;
+    return (this->bIsButtonHeld && this->idHovered >= 0) || this->idHovered >= 0;
 }
 
 
@@ -585,19 +589,13 @@ void MenuMain::Initialize()
             sectMain->AddCheckBox ("Show Player Names", &g_Settings.bShowNames);
             sectMain->AddButton   ("Shutdown", Detach);
             sectMain->AddCombo    ("Test", std::vector<std::string>{ "test", "test2", "test3" }, &testint);
+            sectMain->AddButton   ("Shutdown", Detach);
+
         }
         mainWindow->AddChild(sectMain);
         std::shared_ptr<BaseSection> sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 2");
         {
             /* To be removed */
-            sectMain2->AddCheckBox("Test Pad1", &g_Settings.bBhopEnabled);
-            sectMain2->AddCheckBox("Test Pad2", &g_Settings.bBhopEnabled);
-            sectMain2->AddCheckBox("Test Pad3", &g_Settings.bBhopEnabled);
-            sectMain2->AddCheckBox("Test Pad4", &g_Settings.bBhopEnabled);
-            sectMain2->AddCheckBox("Test Pad5", &g_Settings.bBhopEnabled);
-            sectMain2->AddCheckBox("Test Pad6", &g_Settings.bBhopEnabled);
-            sectMain2->AddCheckBox("Test Pad7", &g_Settings.bBhopEnabled);
-            sectMain2->AddCheckBox("Test Pad8", &g_Settings.bBhopEnabled);
         }
         mainWindow->AddChild(sectMain2);
     }
