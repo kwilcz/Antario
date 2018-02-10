@@ -533,13 +533,11 @@ bool ComboBox::UpdateData()
 
                     if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
                     {
-<<<<<<< HEAD
                         *this->iCurrentValue = it;
                         this->bIsButtonHeld  = true;
                         this->idHovered      = -1;
                         this->bIsActive      = false;
                         return true;
-=======
                         this->idHovered = it;
 
                         if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
@@ -551,8 +549,7 @@ bool ComboBox::UpdateData()
                         }
                         else 
                         if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-                            this->bIsButtonHeld = false;                        
->>>>>>> db8cb122cac59e72dfbf3553e3abc4ca21fa105d
+                            this->bIsButtonHeld = false;
                     }
                     else 
                     if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
