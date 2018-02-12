@@ -8,15 +8,14 @@
 
 #include "Definitions.h"
 #include <sstream>
-#include <math.h>
 
 #define CHECK_VALID( _v ) 0
 
-#define FastSqrt(x)			(sqrt)(x)
+#define FastSqrt(x)	(sqrt)(x)
 
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 
-#define M_PI_2      M_PI * 2.f
+#define M_PI_2      (M_PI * 2.f)
 
 #define M_PI_F		((float)(M_PI))	// Shouldn't collide with anything.
 
@@ -24,11 +23,11 @@
 
 // NJS: Inlined to prevent floats from being autopromoted to doubles, as with the old system.
 #ifndef RAD2DEG
-#define RAD2DEG( x  )  ( (float)(x) * (float)(180.f / M_PI_F) )
+#define RAD2DEG(x)  ((float)(x) * (float)(180.f / M_PI_F))
 #endif
 
 #ifndef DEG2RAD
-#define DEG2RAD( x  )  ( (float)(x) * (float)(M_PI_F / 180.f) )
+#define DEG2RAD(x)  ((float)(x) * (float)(M_PI_F / 180.f))
 #endif
 
 // MOVEMENT INFO

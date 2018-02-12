@@ -79,7 +79,8 @@ protected:
     virtual void AddCheckBox(std::string strSelectableLabel, bool *bValue);
     virtual void AddButton(std::string strSelectableLabel, void(&fnPointer)(), Vector2D vecButtonSize = Vector2D(0, 0));
     virtual void AddCombo(std::string strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
-    virtual void AddFlSlider(std::string strLabel, float* flValue, float flMinValue, float flMaxValue);
+    virtual void AddSlider(std::string strLabel, float* flValue, float flMinValue, float flMaxValue);
+    virtual void AddSlider(std::string strLabel, int* iValue, int iMinValue, int iMaxValue);
 
 protected:
     bool        bIsHovered;         /* Defines if the selectable is hovered with the mouse cursor.   */
@@ -173,23 +174,24 @@ private:
 };
 
 
-class SliderFloat : public MenuMain
+template <typename T>
+class Slider : public MenuMain
 {
 public:
-    SliderFloat(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue, MenuMain* pParent);
+    Slider(const std::string& strLabel, T* flValue, T flMinValue, T flMaxValue, MenuMain* pParent);
     virtual void Render();
     virtual bool UpdateData();
 
     float GetValuePerPixel() const;
-    void  SetValue(float flValue);
+    void  SetValue(T flValue);
 private:
-    float* flValue;                             /* SliderFloat current value                         */
-    float  flMin;                               /* Minimal slider value                              */
-    float  flMax;                               /* Maximal slider value                              */
-    float  flDragX;                             /* Mouse position at the start of the drag           */
-    float  flDragOffset;                        /* Offset of the mouse position                      */
-    float  flButtonPosX;
-    bool   bPressed;
+    T*    nValue;                               /* Slider current value                              */
+    T     nMin;                                 /* Minimal slider value                              */
+    T     nMax;                                 /* Maximal slider value                              */
+    float flDragX;                              /* Mouse position at the start of the drag           */
+    float flDragOffset;                         /* Offset of the mouse position                      */
+    float flButtonPosX;
+    bool  bPressed;
 
     Vector2D vecSelectableSize;                 /* Size of the internal selectable size of the combo */
     Vector2D vecSelectablePosition;             /* Position of the selectable                        */
