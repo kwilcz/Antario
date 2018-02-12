@@ -159,7 +159,7 @@ void BaseWindow::Render()
                                 Color(35, 35, 35, 230), GradientType::GRADIENT_VERTICAL);
 
     // Draw header string, defined as label.
-    g_Render.String(this->vecPosition.x + (this->vecSize.x * 0.5f), this->vecPosition.y, CD3DFONT_CENTERED_X,
+    g_Render.String(this->vecPosition.x + (this->vecSize.x * 0.5f), this->vecPosition.y + (this->iHeaderHeight * 0.5f), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y,
                     this->style.colHeaderText, this->pHeaderFont, this->strLabel.c_str());
 
     // Render all childrens
