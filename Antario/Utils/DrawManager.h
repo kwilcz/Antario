@@ -29,11 +29,12 @@ public: // Function members
     void Line   (float posx1, float posy1, float posx2, float posy2, Color color) const;
     void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color) const;
     void Rect   (float posx1, float posy1, float posx2, float posy2, Color color) const;
-    void RectFilled         (Vector2D vecPos1, Vector2D vecPos2, Color color) const;
-    void RectFilled         (float posx1, float posy1, float posx2, float posy2, Color color) const;
-    void Triangle           (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const;
-    void TriangleFilled     (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const;
-    void RectFilledGradient (Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType type) const;
+    void RectFilled          (Vector2D vecPos1, Vector2D vecPos2, Color color) const;
+    void RectFilled          (float posx1, float posy1, float posx2, float posy2, Color color) const;
+    void Triangle            (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const;
+    void TriangleFilled      (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const;
+    void RectFilledGradient  (Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType type) const;
+    void RectFilledMultiColor(const Vector2D& vecPos1, const Vector2D& vecPos2, Color col1, Color col2, Color col3, Color col4) const;
 
     void String (Vector2D vecPos, DWORD dwFlags, Color color, CD3DFont * pFont, const char * szText, ...) const;
     void String (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const;

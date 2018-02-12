@@ -186,6 +186,22 @@ void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color c
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
+
+void DrawManager::RectFilledMultiColor(const Vector2D& vecPos1, const Vector2D& vecPos2, Color colUprLeft, Color colUprRight, Color colBotLeft, Color colBotRight) const
+{
+    Vertex vert[4] =
+    {
+        { vecPos1.x, vecPos1.y, 0.0f, 1.0f, COL2DWORD(colUprLeft)  },
+        { vecPos2.x, vecPos1.y, 0.0f, 1.0f, COL2DWORD(colUprRight) },
+        { vecPos1.x, vecPos2.y, 0.0f, 1.0f, COL2DWORD(colBotLeft)  },
+        { vecPos2.x, vecPos2.y, 0.0f, 1.0f, COL2DWORD(colBotRight) }
+    };
+
+    this->pDevice->SetTexture(0, nullptr);
+    this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
+}
+
+
 void DrawManager::String(Vector2D vecPos, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const
 {
     this->String(vecPos.x, vecPos.y, dwFlags, color, pFont, szText);
