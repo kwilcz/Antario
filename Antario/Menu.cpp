@@ -495,6 +495,7 @@ void ComboBox::Render()
     }
 }
 
+
 bool ComboBox::UpdateData()
 {
     this->vecSelectablePosition = Vector2D(this->vecPosition.x, this->vecPosition.y + this->pFont->flHeight + this->style.iPaddingY * 0.5f);
@@ -503,12 +504,11 @@ bool ComboBox::UpdateData()
     {
         if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
         {
-            this->bIsActive = !bIsActive;
+            this->bIsActive     = !bIsActive;
             this->bIsButtonHeld = true;
             return true;
         }
-        else
-        if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
+        else if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
             this->bIsButtonHeld = false;
 
         this->bIsHovered = true;
@@ -533,26 +533,17 @@ bool ComboBox::UpdateData()
 
                     if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
                     {
-                        *this->iCurrentValue = it;
-                        this->bIsButtonHeld  = true;
-                        this->idHovered      = -1;
-                        this->bIsActive      = false;
-                        return true;
                         this->idHovered = it;
 
-                        if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+                        if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
                         {
                             *this->iCurrentValue = it;
                             this->bIsButtonHeld  = true;
                             this->idHovered      = -1;
                             this->bIsActive      = false;
                         }
-                        else 
-                        if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-                            this->bIsButtonHeld = false;
                     }
-                    else 
-                    if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
+                    else if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
                         this->bIsButtonHeld = false;
                 }
             }
@@ -561,10 +552,13 @@ bool ComboBox::UpdateData()
             this->idHovered = -1;
     }
 
-    if (!g_Settings.bMenuOpened) 
+    if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
+        this->bIsButtonHeld = false;
+
+    if (!g_Settings.bMenuOpened)
         this->bIsActive = false;
 
-    return false;
+    return this->idHovered >= 0 || (this->bIsButtonHeld && this->idHovered == -1);
 }
 
 Vector2D ComboBox::GetSelectableSize()
