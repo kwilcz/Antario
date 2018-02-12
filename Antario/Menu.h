@@ -79,6 +79,7 @@ protected:
     virtual void AddCheckBox(std::string strSelectableLabel, bool *bValue);
     virtual void AddButton(std::string strSelectableLabel, void(&fnPointer)(), Vector2D vecButtonSize = Vector2D(0, 0));
     virtual void AddCombo(std::string strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
+    virtual void AddFlSlider(std::string strLabel, float* flValue, float flMinValue, float flMaxValue);
 
 protected:
     bool        bIsHovered;         /* Defines if the selectable is hovered with the mouse cursor.   */
@@ -171,6 +172,30 @@ private:
     std::vector<std::string> vecSelectables;    /* Vector of strings that will appear as diff settings.         */
 };
 
+
+class SliderFloat : public MenuMain
+{
+public:
+    SliderFloat(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue, MenuMain* pParent);
+    virtual void Render();
+    virtual bool UpdateData();
+
+    float GetValuePerPixel() const;
+    void  SetValue(float flValue);
+private:
+    float* flValue;                             /* SliderFloat current value                         */
+    float  flMin;                               /* Minimal slider value                              */
+    float  flMax;                               /* Maximal slider value                              */
+    float  flDragX;                             /* Mouse position at the start of the drag           */
+    float  flDragOffset;                        /* Offset of the mouse position                      */
+    float  flButtonPosX;
+    bool   bPressed;
+
+    Vector2D vecSelectableSize;                 /* Size of the internal selectable size of the combo */
+    Vector2D vecSelectablePosition;             /* Position of the selectable                        */
+};
+
+
 class DummySpace : public MenuMain
 {
 public:
@@ -186,5 +211,6 @@ enum class MenuSelectableType
     TYPE_SECTION,
     TYPE_CHECKBOX,
     TYPE_BUTTON,
-    TYPE_COMBO
+    TYPE_COMBO,
+    TYPE_SLIDER,
 };

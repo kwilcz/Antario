@@ -2,7 +2,6 @@
 #include "Settings.h"
 #include "SDK\IVEngineClient.h"
 
-
 // Defined to avoid including windowsx.h
 #define GET_X_LPARAM(lp)                        ((float)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((float)(short)HIWORD(lp))
@@ -104,8 +103,7 @@ bool MenuMain::UpdateData()
 }
 
 void MenuMain::AddDummy()
-{
-    
+{    
     this->AddChild(std::make_shared<DummySpace>(Vector2D(this->GetMaxChildWidth(), this->pFont->flHeight + this->style.iPaddingY)));
 }
 
@@ -122,6 +120,11 @@ void MenuMain::AddButton(std::string strSelectableLabel, void (&fnPointer)(), Ve
 void MenuMain::AddCombo(std::string strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex)
 {
     this->AddChild(std::make_shared<ComboBox>(strSelectableLabel, vecBoxOptions, iVecIndex, this));
+}
+
+void MenuMain::AddFlSlider(std::string strLabel, float* flValue, float flMinValue, float flMaxValue)
+{
+    this->AddChild(std::make_shared<SliderFloat>(strLabel, flValue, flMinValue, flMaxValue, this));
 }
 
 
@@ -577,10 +580,103 @@ Vector2D ComboBox::GetSelectableSize()
 
 
 
+SliderFloat::SliderFloat(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue, MenuMain* pParent) : flDragX(0), flDragOffset(0)
+{
+    this->pParent  = pParent;
+    this->strLabel = strLabel;
+    this->flValue  = flValue;
+    this->flMin    = flMinValue;
+    this->flMax    = flMaxValue;
+
+    this->vecSize.x         = this->pParent->GetMaxChildWidth();
+    this->vecSize.y         = (this->pFont->flHeight + static_cast<float>(this->style.iPaddingY) * 0.5f) * 2.f;
+    this->vecSelectableSize = { this->vecSize.x, this->pFont->flHeight + (static_cast<float>(this->style.iPaddingY) * 0.5f) };
+    this->type              = MenuSelectableType::TYPE_SLIDER;
+}
+
+
+void SliderFloat::Render()
+{
+    std::stringstream ssToRender;
+    ssToRender << strLabel << ": " << *this->flValue;
+
+    /* Render the label (name) above the combo */
+    g_Render.String(this->vecPosition, CD3DFONT_DROPSHADOW, this->style.colText, this->pFont, ssToRender.str().c_str());
+
+    /* Render the selectable with the value in the middle */
+    g_Render.RectFilled(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, this->style.colComboBoxRect);
+
+    /* Render outline */
+    g_Render.Rect(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, this->style.colSectionOutl);
+
+    /* Represented position of the value & its outline */
+    g_Render.RectFilled(Vector2D(this->flButtonPosX - 1, this->vecSelectablePosition.y),
+                        Vector2D(this->flButtonPosX + 1, this->vecSelectablePosition.y + this->vecSelectableSize.y),
+                        Color::White());
+    g_Render.Rect(Vector2D(this->flButtonPosX - 2, this->vecSelectablePosition.y),
+                  Vector2D(this->flButtonPosX + 1, this->vecSelectablePosition.y + this->vecSelectableSize.y), Color::Black());
+
+    /* Fill the part of slider before the represented value */
+    if (this->flButtonPosX - 2 > this->vecSelectablePosition.x + 1)
+        g_Render.RectFilledGradient(this->vecSelectablePosition + 1,
+                                    Vector2D(this->flButtonPosX - 2, this->vecSelectablePosition.y + this->vecSelectableSize.y),
+                                    Color(200, 0, 100), Color(255, 0, 100), GradientType::GRADIENT_HORIZONTAL);
+    ///TODO: Make colors not hardcoded + smaller slider.
+}
+
+
+bool SliderFloat::UpdateData()
+{
+    this->vecSelectablePosition = Vector2D(this->vecPosition.x, this->vecPosition.y + this->pFont->flHeight + this->style.iPaddingY * 0.5f);
+    this->flButtonPosX          = this->vecSelectablePosition.x + ((*this->flValue - this->flMin) * this->vecSize.x / (this->flMax - this->flMin));
+
+    if (mouseCursor->IsInBounds(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize))
+    {
+        this->bIsHovered = true;
+        if (this->mouseCursor->bLMBPressed)
+            this->bPressed = true;
+    }
+    if (!this->mouseCursor->bLMBPressed)
+        this->bPressed = false;
+
+
+    if (this->bPressed)
+    {
+        if (!flDragX)
+            this->flDragX = this->mouseCursor->GetPosition().x;
+
+        this->flDragOffset = this->flDragX - this->flButtonPosX;
+        this->flDragX      = this->mouseCursor->GetPosition().x;
+
+        this->SetValue((this->flDragOffset * this->GetValuePerPixel()) + *this->flValue);
+        return true;
+    }
+
+    return false;
+}
+
+
+float SliderFloat::GetValuePerPixel() const
+{
+    return (this->flMax - this->flMin) / this->vecSize.x;
+}
+
+
+void SliderFloat::SetValue(float flValue)
+{
+    flValue = max(flValue, this->flMin);
+    flValue = min(flValue, this->flMax);
+
+    *this->flValue = flValue;
+}
+
+
+
 void MenuMain::Initialize()
 {
     static int testint;
     static int testint2;
+    static float float123 = 10.f;
     /* Create our main window (Could have multiple if you'd create vec. for it) */
     std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); 
     {
@@ -589,10 +685,8 @@ void MenuMain::Initialize()
             sectMain->AddCheckBox ("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
             sectMain->AddCheckBox ("Show Player Names", &g_Settings.bShowNames);
             sectMain->AddButton   ("Shutdown", Detach);
-            sectMain->AddDummy    ();
+            sectMain->AddFlSlider ("TestSlider", &float123, 0, 20);
             sectMain->AddCombo    ("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
-            sectMain->AddButton   ("TestButton", Detach);
-            sectMain->AddCheckBox ("CheckboxSect1", &g_Settings.bShowNames);
         }
         mainWindow->AddChild(sectMain);
         std::shared_ptr<BaseSection> sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 2");
