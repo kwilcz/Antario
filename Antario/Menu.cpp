@@ -568,7 +568,7 @@ bool ComboBox::UpdateData()
     if (!g_Settings.bMenuOpened)
         this->bIsActive = false;
 
-    return false;
+    return this->idHovered >= 0 || (this->bIsButtonHeld && this->idHovered == -1);
 }
 
 
