@@ -184,6 +184,7 @@ bool BaseWindow::UpdateData()
             if (flPosY + it->GetSize().y > this->GetPos().y + this->GetSize().y)
             {
                 flPosY -= flUsedArea;
+                flPosY += static_cast<float>(this->iHeaderHeight);
                 flUsedArea = 0.f;
                 flPosX += flBiggestWidth + this->style.iPaddingX;
             }
