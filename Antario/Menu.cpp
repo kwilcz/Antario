@@ -435,7 +435,7 @@ ComboBox::ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions,
     this->iCurrentValue  = iCurrentValue;
     this->bIsHovered     = false;
     this->bIsButtonHeld  = false;
-    this->idHovered      = -2;
+    this->idHovered      = -1;
 
     this->vecSize.x         = this->pParent->GetMaxChildWidth();
     this->vecSize.y         = (this->pFont->flHeight + static_cast<float>(this->style.iPaddingY) * 0.5f) * 2.f;
