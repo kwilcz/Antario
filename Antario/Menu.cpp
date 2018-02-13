@@ -517,30 +517,28 @@ bool ComboBox::UpdateData()
             this->bIsButtonHeld = true;
             return true;
         }
-        else if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
+
+        if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
             this->bIsButtonHeld = false;
 
         this->bIsHovered = true;
     }
     else
+    {
         this->bIsHovered = false;
 
-    if (this->bIsActive)
-    {
-        if (this->mouseCursor->IsInBounds(Vector2D(this->vecSelectablePosition.x, this->vecSelectablePosition.y + this->vecSelectableSize.y),
-                                          Vector2D(this->vecSelectablePosition.x + this->vecSelectableSize.x,
-                                                   this->vecSelectablePosition.y + this->vecSelectableSize.y * (this->vecSelectables.size() + 1))))
+        if (this->bIsActive)
         {
-            for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
+            if (this->mouseCursor->IsInBounds(Vector2D(this->vecSelectablePosition.x, this->vecSelectablePosition.y + this->vecSelectableSize.y),
+                                              Vector2D(this->vecSelectablePosition.x + this->vecSelectableSize.x,
+                                                       this->vecSelectablePosition.y + this->vecSelectableSize.y * (this->vecSelectables.size() + 1))))
             {
-                const auto vecElementPos = Vector2D(this->vecSelectablePosition.x, this->vecSelectablePosition.y + this->vecSelectableSize.y * (it + 1));
-
-                if (this->mouseCursor->IsInBounds(vecElementPos, Vector2D(vecElementPos.x + this->vecSelectableSize.x,
-                                                                          vecElementPos.y + this->vecSelectableSize.y)))
+                for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
                 {
-                    this->idHovered = it;
+                    const auto vecElementPos = Vector2D(this->vecSelectablePosition.x, this->vecSelectablePosition.y + this->vecSelectableSize.y * (it + 1));
 
-                    if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+                    if (this->mouseCursor->IsInBounds(vecElementPos, Vector2D(vecElementPos.x + this->vecSelectableSize.x,
+                                                                              vecElementPos.y + this->vecSelectableSize.y)))
                     {
                         this->idHovered = it;
 
@@ -550,25 +548,29 @@ bool ComboBox::UpdateData()
                             this->bIsButtonHeld  = true;
                             this->idHovered      = -1;
                             this->bIsActive      = false;
+                            return true;
                         }
+
+                        if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
+                            this->bIsButtonHeld = false;
                     }
-                    else if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-                        this->bIsButtonHeld = false;
                 }
             }
+            else
+            {
+                this->idHovered = -1;
+                if (this->mouseCursor->bLMBPressed)
+                    this->bIsActive = false;
+            }
         }
-        else
-            this->idHovered = -1;
     }
-
-    if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-        this->bIsButtonHeld = false;
 
     if (!g_Settings.bMenuOpened)
         this->bIsActive = false;
 
-    return this->idHovered >= 0 || (this->bIsButtonHeld && this->idHovered == -1);
+    return false;
 }
+
 
 Vector2D ComboBox::GetSelectableSize()
 {
