@@ -37,27 +37,44 @@ void MouseCursor::Render()
     g_Render.Triangle(Vector2D(x, y), Vector2D(x + 25, y + 12), Vector2D(x + 12, y + 25), Color(0, 0, 0, 200));
 }
 
+
 void MouseCursor::RunThink(const UINT uMsg, const LPARAM lParam)
 {
     switch (uMsg)
     {
-        case WM_MOUSEMOVE:
-        case WM_NCMOUSEMOVE:
-            this->SetPosition(Vector2D(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
-            break;
-        case WM_LBUTTONDOWN:
-            this->bLMBPressed = true;
-            break;
-        case WM_LBUTTONUP:
+    case WM_MOUSEMOVE:
+    case WM_NCMOUSEMOVE:
+        this->SetPosition(Vector2D(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+        break;
+    case WM_LBUTTONDOWN:
+        this->bLMBPressed = true;
+        break;
+    case WM_LBUTTONUP:
+        this->bLMBHeld    = false;
+        this->bLMBPressed = false;
+        break;
+    case WM_RBUTTONDOWN:
+        this->bRMBPressed = true;
+        break;
+    case WM_RBUTTONUP:
+        this->bRMBHeld    = false;
+        this->bRMBPressed = false;
+        break;
+    default:
+        break;
+    }
+    if (this->bLMBPressed)
+    {
+        if (this->bLMBHeld)
             this->bLMBPressed = false;
-            break;
-        case WM_RBUTTONDOWN:
-            this->bRMBPressed = true;
-            break;
-        case WM_RBUTTONUP:
+
+        this->bLMBHeld = true;
+    }
+    if (this->bRMBPressed)
+    {
+        if (this->bRMBHeld)
             this->bRMBPressed = false;
-            break;
-        default: break;
+        this->bRMBHeld        = true;
     }
 }
 
@@ -88,7 +105,10 @@ void MenuMain::Render()
 void MenuMain::RunThink(const UINT uMsg, const LPARAM lParam)
 {
     this->mouseCursor->RunThink(uMsg, lParam);
-///TODO: Capture keyboard input, mainly for bind system
+
+    /* Suggestion: Run mouse input through all chlid objects with uMsg & lParam 
+     * Would save some performance (minor). I'm just too lazy to do it */
+    this->UpdateData();
 }
 
 bool MenuMain::UpdateData()
@@ -208,7 +228,7 @@ bool BaseWindow::UpdateData()
     if (this->mouseCursor->bLMBPressed && MenuMain::mouseCursor->IsInBounds(this->vecPosition, vecHeaderBounds))
         this->bIsDragged = true;
     else 
-    if (!this->mouseCursor->bLMBPressed)
+    if (!this->mouseCursor->bLMBHeld)
         this->bIsDragged = false;
 
 
@@ -345,22 +365,15 @@ bool Checkbox::UpdateData()
 
     if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
     {
-        if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !bIsChanged)
-        {
+        if (this->mouseCursor->bLMBPressed)
             *this->bCheckboxValue = !*this->bCheckboxValue;
-            bIsChanged            = true;
-        }
-        else 
-        if (!this->mouseCursor->bLMBPressed && bIsChanged)
-            bIsChanged = false;
 
         this->bIsHovered = true;
     }
     else
         this->bIsHovered = false;
 
-    this->bLMBPressedLast = this->mouseCursor->bLMBPressed;
-    return this->bIsHovered && bIsChanged;
+    return this->bIsHovered && this->mouseCursor->bLMBPressed;
 }
 
 
@@ -400,22 +413,15 @@ bool Button::UpdateData()
 {
     if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
     {
-        if (this->bLMBPressedLast && !this->mouseCursor->bLMBPressed && !this->bIsActivated)
-        {
+        if (this->mouseCursor->bLMBPressed)
             this->fnActionPlay(); /* Run the function passed as an arg. */
-            this->bIsActivated = true;
-        }
-        else 
-        if (!this->mouseCursor->bLMBPressed && bIsActivated)
-            this->bIsActivated = false;
 
         this->bIsHovered = true;
     }
     else
         this->bIsHovered = false;
 
-    this->bLMBPressedLast = this->mouseCursor->bLMBPressed;
-    return this->bIsActivated;
+    return this->bIsHovered && this->mouseCursor->bLMBPressed;
 }
 
 
@@ -511,17 +517,13 @@ bool ComboBox::UpdateData()
 
     if (mouseCursor->IsInBounds(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize))
     {
-        if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+        this->bIsHovered = true;
+
+        if (this->mouseCursor->bLMBPressed)
         {
-            this->bIsActive     = !bIsActive;
-            this->bIsButtonHeld = true;
+            this->bIsActive = !bIsActive;
             return true;
         }
-
-        if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-            this->bIsButtonHeld = false;
-
-        this->bIsHovered = true;
     }
     else
     {
@@ -538,21 +540,17 @@ bool ComboBox::UpdateData()
                     const auto vecElementPos = Vector2D(this->vecSelectablePosition.x, this->vecSelectablePosition.y + this->vecSelectableSize.y * (it + 1));
 
                     if (this->mouseCursor->IsInBounds(vecElementPos, Vector2D(vecElementPos.x + this->vecSelectableSize.x,
-                                                                              vecElementPos.y + this->vecSelectableSize.y)))
+                                                                              vecElementPos.y + this->vecSelectableSize.y + 1)))
                     {
                         this->idHovered = it;
 
-                        if (this->mouseCursor->bLMBPressed && !this->bIsButtonHeld)
+                        if (this->mouseCursor->bLMBPressed)
                         {
                             *this->iCurrentValue = it;
-                            this->bIsButtonHeld  = true;
                             this->idHovered      = -1;
                             this->bIsActive      = false;
                             return true;
                         }
-
-                        if (!this->mouseCursor->bLMBPressed && this->bIsButtonHeld)
-                            this->bIsButtonHeld = false;
                     }
                 }
             }
@@ -582,7 +580,7 @@ Vector2D ComboBox::GetSelectableSize()
 
 
 template<typename T>
-inline Slider<T>::Slider(const std::string& strLabel, T* flValue, T flMinValue, T flMaxValue, MenuMain* pParent)
+Slider<T>::Slider(const std::string& strLabel, T* flValue, T flMinValue, T flMaxValue, MenuMain* pParent)
 {
     this->pParent      = pParent;
     this->strLabel     = strLabel;
@@ -624,7 +622,7 @@ void Slider<T>::Render()
         g_Render.RectFilledGradient(this->vecSelectablePosition + 1,
                                     Vector2D(this->flButtonPosX - 2, this->vecSelectablePosition.y + this->vecSelectableSize.y),
                                     Color(200, 0, 100), Color(255, 0, 100), GradientType::GRADIENT_HORIZONTAL);
-    ///TODO: Make colors not hardcoded + smaller slider.
+///TODO: Make colors not hardcoded + smaller slider.
 }
 
 
@@ -640,7 +638,7 @@ bool Slider<T>::UpdateData()
         if (this->mouseCursor->bLMBPressed)
             this->bPressed = true;
     }
-    if (!this->mouseCursor->bLMBPressed)
+    if (!this->mouseCursor->bLMBHeld)
         this->bPressed = false;
 
 
@@ -685,23 +683,22 @@ void MenuMain::Initialize()
     static float float123 = 10.f;
     static int testint3 = 2;
     /* Create our main window (Could have multiple if you'd create vec. for it) */
-    std::shared_ptr<BaseWindow> mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main"); 
+    auto mainWindow = std::make_shared<BaseWindow>(Vector2D(450, 450), Vector2D(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main");
     {
-        std::shared_ptr<BaseSection> sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 1");
+        auto sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 1");
         {
-            sectMain->AddCheckBox ("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
-            sectMain->AddCheckBox ("Show Player Names", &g_Settings.bShowNames);
-            sectMain->AddButton   ("Shutdown", Detach);
-            sectMain->AddSlider   ("TestSlider", &float123, 0, 20);
-            sectMain->AddSlider   ("intslider", &testint3, 0, 10);
-
-            sectMain->AddCombo    ("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
+            sectMain->AddCheckBox("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
+            sectMain->AddCheckBox("Show Player Names", &g_Settings.bShowNames);
+            sectMain->AddButton("Shutdown", Detach);
+            sectMain->AddSlider("TestSlider", &float123, 0, 20);
+            sectMain->AddSlider("intslider", &testint3, 0, 10);
+            sectMain->AddCombo("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
         }
         mainWindow->AddChild(sectMain);
-        std::shared_ptr<BaseSection> sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 2");
+        auto sectMain2 = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 2");
         {
             /* To be removed */
-            sectMain2->AddCombo   ("TestCombo2", std::vector<std::string>{ "ttest", "ttest2", "ttest3" }, &testint2);
+            sectMain2->AddCombo("TestCombo2", std::vector<std::string>{ "ttest", "ttest2", "ttest3" }, &testint2);
             sectMain2->AddCheckBox("CheckboxSect2_1", &g_Settings.bShowNames);
             sectMain2->AddCheckBox("CheckboxSect2_2", &g_Settings.bShowNames);
         }

@@ -40,6 +40,8 @@ public:
 
     bool     bLMBPressed = false; /* Actual state of Left Mouse Button (pressed or not)   */
     bool     bRMBPressed = false; /* Actual state of Right Mouse Button (pressed or not)  */
+    bool     bLMBHeld = false;
+    bool     bRMBHeld = false;
     Vector2D vecPointPos;         /* Current mouse cursor position                        */
 };
 
