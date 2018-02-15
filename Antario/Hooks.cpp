@@ -187,10 +187,11 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     if (g_Hooks.bInitializedDrawManager)
     {
         // our wndproc capture fn
-        g_Hooks.nMenu.RunThink(uMsg, lParam);
-
         if (g_Settings.bMenuOpened)
-            return true;    // Disable game wndproc usage when we use the menu
+        {
+            g_Hooks.nMenu.RunThink(uMsg, lParam);
+            return true;
+        }
     }
 
     // Call original wndproc to make game use input again
