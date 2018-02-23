@@ -363,7 +363,7 @@ bool Checkbox::UpdateData()
     /* Setup the position of our selectable area */
     this->vecSelectablePosition = this->vecPosition + Vector2D(flVectorpos, flVectorpos);
 
-    if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSize)))
+    if (this->mouseCursor->IsInBounds(this->vecPosition, (this->vecPosition + this->vecSelectableSize)))
     {
         if (this->mouseCursor->bLMBPressed)
             *this->bCheckboxValue = !*this->bCheckboxValue;
