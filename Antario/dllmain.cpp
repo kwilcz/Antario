@@ -29,7 +29,9 @@ VOID WINAPI OnDllDetach()
 #ifdef _DEBUG
     fclose((FILE*)stdin);
     fclose((FILE*)stdout);
-    FreeConsole();  // Free allocated memory and remove console
+    HWND hw_ConsoleHwnd = GetConsoleWindow(); //Get the HWND of the console.
+    FreeConsole(); //Detach the console.
+    PostMessageW(hw_ConsoleHwnd, WM_CLOSE, 0, 0); //Destroys the window.
 #endif
 }
 
