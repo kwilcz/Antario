@@ -21,6 +21,12 @@ DWORD WINAPI OnDllAttach(PVOID base)
         using namespace std::literals::chrono_literals;
         std::this_thread::sleep_for(1s);
     }
+    
+    //Detach and destroy the allocated console window.
+    HWND hw_ConsoleHandle = GetConsoleWindow();
+    FreeConsole();
+    PostMessageW(*p_hw_ConsoleHandle, WM_CLOSE, 0, 0);
+    
     FreeLibraryAndExitThread(static_cast<HMODULE>(base), 1);
 }
 
