@@ -336,8 +336,7 @@ void Checkbox::Render()
     if (*this->bCheckboxValue)
     {
         g_Render.RectFilledGradient(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize,
-                                    this->style.colCheckbox1, this->style.colCheckbox2,
-                                    GradientType::GRADIENT_VERTICAL);
+				  Color(200, 0, 100), Color(255, 0, 100), GradientType::GRADIENT_HORIZONTAL);
     }
     else
         g_Render.RectFilled(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, this->style.colCheckbox1);
@@ -394,8 +393,8 @@ Button::Button(std::string strLabel, void (&fnPointer)(), MenuMain* pParent, Vec
 void Button::Render()
 {
     /* Fill the body of the button */
-    g_Render.RectFilledGradient(this->vecPosition, this->vecPosition + this->vecSize, this->style.colCheckbox1,
-                                this->style.colCheckbox2, GradientType::GRADIENT_VERTICAL);
+    g_Render.RectFilledGradient(this->vecPosition, this->vecPosition + this->vecSize, Color(200, 0, 100),
+				    Color(255, 0, 100), GradientType::GRADIENT_HORIZONTAL);
     /* Button outline */
     g_Render.Rect(this->vecPosition, this->vecPosition + this->vecSize, this->style.colSectionOutl);
 
