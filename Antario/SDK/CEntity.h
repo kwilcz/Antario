@@ -96,6 +96,7 @@ public:
 		return GetValue<float>(m_flMaxspeed);
     }
 
+	// TODO: crashes
 	Vector GetVelocity()
     {
 		static int m_vecVelocity = g_pNetvars->GetOffset("DT_BasePlayer", "m_vecVelocity[0]");
