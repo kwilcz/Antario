@@ -98,7 +98,7 @@ public:
 
 	Vector GetVelocity()
     {
-		static int m_vecVelocity = g_pNetvars->GetOffset("DT_BasePlayer", "m_vecVelocity[0");
+		static int m_vecVelocity = g_pNetvars->GetOffset("DT_BasePlayer", "m_vecVelocity[0]");
 		return GetValue<Vector>(m_vecVelocity);
  }
 };
