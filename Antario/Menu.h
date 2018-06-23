@@ -15,8 +15,8 @@ struct MenuStyle
     Color colHover        = { 100, 100, 100, 50 };  /*- Color applied on the obj when mouse hovers above it -*/
     Color colSectionOutl  = { 15, 15, 15, 200 };    /*- Color of the section outline                        -*/
     Color colSectionFill  = { 0, 0, 0, 25 };        /*- Color filling the section bounds                    -*/
-    Color colCheckbox1    = { 50, 50, 50, 255 };    /*- Color of the first gradient color of the checkbox   -*/
-    Color colCheckbox2    = { 35, 35, 35, 255 };    /*- Color of the second gradient color of the checkbox  -*/
+    Color colCheckboxDisabled    = { 50, 50, 50, 255 };    /*- Color of the first gradient color of the checkbox   -*/
+    Color colCheckboxEnabled    = { 35, 35, 35, 255 };    /*- Color of the second gradient color of the checkbox  -*/
     Color colText         = { 160, 160, 160, 255 }; /*- Color of the text inside the main window            -*/
     Color colHeaderText   = { 200, 200, 215 };      /*- Color of the text inside the header strip           -*/
     Color colComboBoxRect = { 50, 50, 50, 180 };    /*- Color of the combobox rectangle                     -*/

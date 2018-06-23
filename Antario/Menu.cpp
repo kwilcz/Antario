@@ -335,12 +335,11 @@ void Checkbox::Render()
     /* Fill the inside of the button depending on activation */
     if (*this->bCheckboxValue)
     {
-        g_Render.RectFilledGradient(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize,
-                                    this->style.colCheckbox1, this->style.colCheckbox2,
-                                    GradientType::GRADIENT_VERTICAL);
+        g_Render.RectFilled(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize,
+                                    this->style.colCheckboxEnabled);
     }
     else
-        g_Render.RectFilled(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, this->style.colCheckbox1);
+        g_Render.RectFilled(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize, this->style.colCheckboxDisabled);
 
     /* Render the outline */
     g_Render.Rect(this->vecSelectablePosition, this->vecSelectablePosition + this->vecSelectableSize,
