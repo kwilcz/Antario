@@ -28,13 +28,14 @@ public:
     * The best would be if they'd get          *
     * initialized in the class itself.         */
 
-    bool  bCheatActive = true;
-    bool  bMenuOpened  = false;
-    bool  bBhopEnabled = true;
-    bool  bShowBoxes   = true;
-    bool  bShowNames   = true;
-    bool  bShowWeapons = true;
-    Color colCursor    = Color(0, 150, 255, 100);
+    bool  bCheatActive		= true;
+    bool  bMenuOpened		= false;
+    bool  bBhopEnabled		= true;
+	bool  bAirStrafeEnabled	= true;
+    bool  bShowBoxes		= true;
+    bool  bShowNames		= true;
+    bool  bShowWeapons		= true;
+    Color colCursor			= Color(0, 150, 255, 100);
 };
 
 extern Settings g_Settings;

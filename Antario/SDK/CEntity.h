@@ -89,6 +89,18 @@ public:
     }
 
     Vector GetEyePosition() { return this->GetOrigin() + this->GetViewOffset(); }
+
+	float GetMaxSpeed()
+    {
+		static int m_flMaxspeed = g_pNetvars->GetOffset("DT_BasePlayer", "m_flMaxspeed");
+		return GetValue<float>(m_flMaxspeed);
+    }
+
+	Vector GetVelocity()
+    {
+		static int m_vecVelocity = g_pNetvars->GetOffset("DT_BasePlayer", "m_vecVelocity[0");
+		return GetValue<Vector>(m_vecVelocity);
+ }
 };
 
 
