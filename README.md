@@ -10,7 +10,7 @@ As this base is NOT finished yet, feel free to post issues / pull requests with 
  * Easy to understand VMT hooking class
  * Debug console output
  * Basic Hooking/Unhooking concept
- * Bunnyhop included (wow such feature)
+ * Air strafe and bunnyhop included
  * Engine prediction with a simple tickbase fix and spread fix (for nospread servers)
 
 
