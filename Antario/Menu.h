@@ -16,7 +16,7 @@ struct MenuStyle
     Color colSectionOutl		= { 15, 15, 15, 200 };		/*- Color of the section outline                        -*/
     Color colSectionFill		= { 0, 0, 0, 25 };			/*- Color filling the section bounds                    -*/
     Color colCheckboxDisabled	= { 50, 50, 50, 255 };		/*- Color of the first gradient color of the checkbox   -*/
-    Color colCheckboxEnabled    = { 35, 35, 35, 255 };		/*- Color of the second gradient color of the checkbox  -*/
+    Color colCheckboxEnabled    = { 255, 35, 100, 255 };		/*- Color of the second gradient color of the checkbox  -*/
 	Color colButtonGradient1	= { 255, 0, 100, 255 };		/*- Color of the first gradient color of the button     -*/
 	Color colButtonGradient2	= { 200, 0, 100 };			/*- Color of the second gradient color of the button    -*/
     Color colText				= { 160, 160, 160, 255 };	/*- Color of the text inside the main window            -*/
