@@ -687,7 +687,6 @@ void MenuMain::Initialize()
         auto sectMain = std::make_shared<BaseSection>(Vector2D(310, 100), 2, "Test Section 1");
         {
             sectMain->AddCheckBox("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
-			sectMain->AddCheckBox("Air Strafe Enabled", &g_Settings.bAirStrafeEnabled);
             sectMain->AddCheckBox("Show Player Names", &g_Settings.bShowNames);
             sectMain->AddButton("Shutdown", Detach);
             sectMain->AddSlider("TestSlider", &float123, 0, 20);
