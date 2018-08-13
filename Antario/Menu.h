@@ -32,39 +32,44 @@ public:
     virtual void Render();
     virtual void RunThink(UINT uMsg, LPARAM lParam);
 
-    Vector2D     GetPosition() const { return vecPointPos; }; /* Set&get actual mouse position */
-    virtual void SetPosition(Vector2D vecPos) { this->vecPointPos = vecPos; };
+    SPoint     GetPosition() const { return vecPointPos; }; /* Set&get actual mouse position */
+    virtual void SetPosition(SPoint ptPos) { this->vecPointPos = ptPos; };
 
     /* Checks if the mouse is in specified bounds */
-    virtual bool IsInBounds(Vector2D vecDst1, Vector2D vecDst2);
+    virtual bool IsInBounds(const SPoint& vecDst1, const SPoint& vecDst2);
+    virtual bool IsInBounds(const SRect& rcRect);
 
     bool     bLMBPressed = false; /* Actual state of Left Mouse Button (pressed or not)   */
     bool     bRMBPressed = false; /* Actual state of Right Mouse Button (pressed or not)  */
     bool     bLMBHeld = false;
     bool     bRMBHeld = false;
-    Vector2D vecPointPos;         /* Current mouse cursor position                        */
+    SPoint   vecPointPos;         /* Current mouse cursor position                        */
 };
 
 
 
 class MenuMain
 {
+protected:
+    using SSize = SPoint;
 public:
-    MenuMain() : pParent(nullptr), flMaxChildWidth(0) {};
+    MenuMain() : type(), bIsHovered(false), bLMBPressedLast(false), pParent(nullptr), flMaxChildWidth(0) {}
     virtual      ~MenuMain() = default;
     virtual void RunThink(UINT uMsg, LPARAM lParam);
     virtual void Initialize();
     virtual bool UpdateData();      /* Updates all the needed data like size, position, etc. */
     virtual void Render();          /* Renders the object                                    */
 
-                                    /* Size and position get/set     */
-    virtual Vector2D GetPos() { return this->vecPosition; };
-    virtual void     SetPos(Vector2D vecNewPosition) { this->vecPosition = vecNewPosition; };
-    virtual Vector2D GetSize() { return this->vecSize; };
-    virtual void     SetSize(Vector2D vecNewSize) { this->vecSize - vecNewSize; };
-    virtual float    GetMaxChildWidth() { return this->flMaxChildWidth; };
+    /* Size and position get/set     */
+
+    virtual SPoint GetPos() { return this->ptPosition; };
+    virtual void   SetPos(SPoint ptNewPosition) { this->ptPosition = ptNewPosition; };
+    virtual SPoint GetSize() { return this->szSize; };
+    virtual void   SetSize(SSize szNewSize) { this->szSize - szNewSize; };
+    virtual int    GetMaxChildWidth() { return this->flMaxChildWidth; };
 
     /* Parent/child setting functions */
+
     virtual void SetParent(MenuMain* parent);
     virtual void AddChild(const std::shared_ptr<MenuMain>& child);
 
@@ -79,18 +84,18 @@ public:
 protected:
     virtual void AddDummy();
     virtual void AddCheckBox(std::string strSelectableLabel, bool *bValue);
-    virtual void AddButton(std::string strSelectableLabel, void(&fnPointer)(), Vector2D vecButtonSize = Vector2D(0, 0));
+    virtual void AddButton(std::string strSelectableLabel, void(&fnPointer)(), SPoint ptButtonSize = SPoint(0, 0));
     virtual void AddCombo(std::string strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
     virtual void AddSlider(std::string strLabel, float* flValue, float flMinValue, float flMaxValue);
     virtual void AddSlider(std::string strLabel, int* iValue, int iMinValue, int iMaxValue);
 
 protected:
-    bool        bIsHovered;         /* Defines if the selectable is hovered with the mouse cursor.   */
-    bool        bLMBPressedLast;
-    MenuMain*   pParent;
-    float       flMaxChildWidth;    /* Maximum child width. Set mainly for buttons and selectables. */
-    Vector2D    vecPosition;        /* Coordinates to top-left corner of the drawed ent.            */
-    Vector2D    vecSize;            /* Size of the drawed ent.                                      */
+    bool      bIsHovered;        /* Defines if the selectable is hovered with the mouse cursor.  */
+    bool      bLMBPressedLast;
+    MenuMain* pParent;
+    int       flMaxChildWidth;   /* Maximum child width. Set mainly for buttons and selectables. */
+    SPoint    ptPosition;        /* Coordinates to top-left corner of the drawed ent.            */
+    SSize     szSize;            /* Size of the drawed ent.                                      */
 };
 
 
@@ -99,7 +104,7 @@ class BaseWindow : public MenuMain
 {
 public:
     BaseWindow() : pHeaderFont(nullptr), iHeaderHeight(0) {};
-    BaseWindow(Vector2D vecPosition, Vector2D vecSize, CD3DFont* font, CD3DFont* headerFont, std::string strLabel = "");
+    BaseWindow(SPoint ptPosition, SPoint szSize, CD3DFont* font, CD3DFont* headerFont, std::string strLabel = "");
     virtual void Render();
     virtual bool UpdateData();
 
@@ -116,7 +121,7 @@ private:
 class BaseSection : public BaseWindow
 {
 public:
-    BaseSection(Vector2D vecSize, int iNumRows, std::string strLabel);
+    BaseSection(SPoint szSize, int iNumRows, std::string strLabel);
     virtual void Render();
     virtual bool UpdateData();
 
@@ -138,8 +143,8 @@ public:
 
     bool*   bCheckboxValue;         /* The value we are changing with the checkbox                  */
 private:
-    Vector2D vecSelectableSize;
-    Vector2D vecSelectablePosition;
+    SSize  szSelectableSize;
+    SPoint ptSelectablePosition;
 };
 
 
@@ -147,7 +152,7 @@ private:
 class Button : public MenuMain
 {
 public:
-    Button(std::string strLabel, void(&fnPointer)(), MenuMain* pParent, Vector2D vecButtonSize = Vector2D(0, 0));
+    Button(std::string strLabel, void(&fnPointer)(), MenuMain* pParent, SPoint ptButtonSize = SPoint(0, 0));
     virtual void Render();
     virtual bool UpdateData();
 private:
@@ -164,15 +169,15 @@ public:
     virtual void Render();
     virtual bool UpdateData();
 
-    virtual Vector2D GetSelectableSize();
+    virtual SPoint GetSelectableSize();
 private:
-    bool  bIsActive;                            /* Boolean defining if we are supposed to draw our list or not. */
-    bool  bIsButtonHeld;
-    int   idHovered;            
-    int*  iCurrentValue;                        /* Current selected option. Defined as a vector index.          */
-    Vector2D vecSelectableSize;                 /* Size of the internal selectable size of the combo            */
-    Vector2D vecSelectablePosition;             /* Position of the selectable                                   */
-    std::vector<std::string> vecSelectables;    /* Vector of strings that will appear as diff settings.         */
+    bool   bIsActive;            /* Boolean defining if we are supposed to draw our list or not.     */
+    bool   bIsButtonHeld;         
+    int    idHovered;             
+    int*   iCurrentValue;        /* Current selected option. Defined as a vector index.              */
+    SPoint szSelectableSize;     /* Size of the internal selectable size of the combo                */
+    SPoint ptSelectablePosition; /* Position of the selectable                                       */
+    std::vector<std::string> vecSelectables;  /* Vector of strings that will appear as diff settings. */
 };
 
 
@@ -180,30 +185,30 @@ template <typename T>
 class Slider : public MenuMain
 {
 public:
-    Slider(const std::string& strLabel, T* flValue, T flMinValue, T flMaxValue, MenuMain* pParent);
+    Slider(const std::string& strLabel, T* tValue, T tMinValue, T tMaxValue, MenuMain* pParent);
     virtual void Render();
     virtual bool UpdateData();
 
     float GetValuePerPixel() const;
     void  SetValue(T flValue);
 private:
-    T*    nValue;                               /* Slider current value                              */
-    T     nMin;                                 /* Minimal slider value                              */
-    T     nMax;                                 /* Maximal slider value                              */
-    float flDragX;                              /* Mouse position at the start of the drag           */
-    float flDragOffset;                         /* Offset of the mouse position                      */
-    float flButtonPosX;
-    bool  bPressed;
+    T*     nValue;                /* Slider current value                    */
+    T      nMin;                  /* Minimal slider value                    */
+    T      nMax;                  /* Maximal slider value                    */
+    int    iDragX;                /* Mouse position at the start of the drag */
+    int    iDragOffset;           /* Offset of the mouse position            */
+    int    iButtonPosX;           /* Slider button representing value        */
+    bool   bPressed;
 
-    Vector2D vecSelectableSize;                 /* Size of the internal selectable size of the combo */
-    Vector2D vecSelectablePosition;             /* Position of the selectable                        */
+    SPoint szSelectableSize;     /* Size of the internal selectable size of the combo */
+    SPoint ptSelectablePosition; /* Position of the selectable                        */
 };
 
 
 class DummySpace : public MenuMain
 {
 public:
-         DummySpace(Vector2D size) { this->vecSize = size; };
+         DummySpace(SPoint size) { this->szSize = size; };
     void Render()     override { };
     bool UpdateData() override { return false; };
 };

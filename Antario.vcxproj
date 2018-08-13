@@ -115,7 +115,7 @@
     <ClInclude Include="Antario\SDK\CEntity.h" />
     <ClInclude Include="Antario\SDK\CInput.h" />
     <ClInclude Include="Antario\SDK\ClientClass.h" />
-    <ClInclude Include="Antario\SDK\Color.h" />
+    <ClInclude Include="Antario\Utils\Color.h" />
     <ClInclude Include="Antario\SDK\CPrediction.h" />
     <ClInclude Include="Antario\SDK\Definitions.h" />
     <ClInclude Include="Antario\SDK\IBaseClientDll.h" />
@@ -140,6 +140,8 @@
     <ClInclude Include="Antario\SDK\Vector.h" />
     <ClInclude Include="Antario\SDK\VMatrix.h" />
     <ClInclude Include="Antario\Utils\NetvarManager.h" />
+    <ClInclude Include="Antario\Utils\SPoint.h" />
+    <ClInclude Include="Antario\Utils\SRect.h" />
     <ClInclude Include="Antario\Utils\Utils.h" />
     <ClInclude Include="Antario\Features\ESP.h" />
   </ItemGroup>

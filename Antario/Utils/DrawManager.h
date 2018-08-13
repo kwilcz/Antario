@@ -1,8 +1,9 @@
 #pragma once
 #include <memory>
+#include "SRect.h"      // Includes both SPoint and SRect
 #include "D3DFont.h"
-#include "..\SDK\Color.h"
 #include "..\SDK\Vector.h"
+#include "..\Utils\Color.h"
 #include "..\Utils\Utils.h"
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
@@ -20,28 +21,47 @@ public: // Function members
     void InitDeviceObjects      (LPDIRECT3DDEVICE9 pDevice);
     void RestoreDeviceObjects   (LPDIRECT3DDEVICE9 pDevice);
     void InvalidateDeviceObjects();
-    void SetupRenderStates      ();
+    void SetupRenderStates      () const;
 
 
     // Drawing functions
 
-    void Line   (Vector2D vecPos1, Vector2D vecPos2, Color color)                   const;
-    void Line   (float posx1, float posy1, float posx2, float posy2, Color color) const;
-    void Rect   (Vector2D vecPos1, Vector2D vecPos2, Color color) const;
-    void Rect   (float posx1, float posy1, float posx2, float posy2, Color color) const;
-    void RectFilled          (Vector2D vecPos1, Vector2D vecPos2, Color color) const;
-    void RectFilled          (float posx1, float posy1, float posx2, float posy2, Color color) const;
-    void Triangle            (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const;
-    void TriangleFilled      (Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const;
-    void RectFilledGradient  (Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType type) const;
-    void RectFilledMultiColor(const Vector2D& vecPos1, const Vector2D& vecPos2, Color col1, Color col2, Color col3, Color col4) const;
+    void Line(SPoint vecPos1, SPoint vecPos2, Color color) const;
+    void Line(int posx1, int posy1, int posx2, int posy2, Color color) const;
 
-    void String (Vector2D vecPos, DWORD dwFlags, Color color, CD3DFont * pFont, const char * szText, ...) const;
-    void String (float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const;
+    void Rect(SRect rcBouds, Color color) const;
+    void Rect(SPoint vecPos1, SPoint vecPos2, Color color) const;
+    void Rect(int posx1, int posy1, int posx2, int posy2, Color color) const;
 
+    void RectBordered(SRect rcBouds, Color color) const;
+    void RectBordered(SPoint vecPos1, SPoint vecPos2, Color color) const;
+    void RectBordered(int posx1, int posy1, int posx2, int posy2, Color color) const;
+
+    void RectFilled(SRect rcPosition, Color color) const;
+    void RectFilled(SPoint vecPos1, SPoint vecPos2, Color color) const;
+    void RectFilled(int posx1, int posy1, int posx2, int posy2, Color color) const;
+
+    void Triangle(SPoint pos1, SPoint pos2, SPoint pos3, Color color) const;
+    void TriangleFilled(SPoint pos1, SPoint pos2, SPoint pos3, Color color) const;
+
+    void RectFilledGradient(SRect rcBoudingRect, Color col1, Color col2, GradientType type) const;
+    void RectFilledGradient(SPoint vecPos1, SPoint vecPos2, Color col1, Color col2, GradientType type) const;
+    void RectFilledGradient(int posx1, int posy1, int posx2, int posy2, Color col1, Color col2, GradientType vertical) const;
+
+    void RectFilledGradientMultiColor(SRect rcBoudingRect, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const;
+    void RectFilledGradientMultiColor(SPoint vecPos1, SPoint vecPos2, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const;
+    void RectFilledGradientMultiColor(int posx1, int posy1, int posx2, int posy2, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const;
+
+    void String(SPoint vecPos, DWORD dwFlags, Color color, CD3DFont * pFont, const char * szText) const;
+    void String(int posx, int posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText) const;
 
     // Helpers
-    Vector2D GetScreenCenter();
+    SPoint            GetScreenCenter() const;
+    D3DVIEWPORT9      GetViewport()     const { D3DVIEWPORT9 tmpVp; pDevice->GetViewport(&tmpVp); return tmpVp; }
+    LPDIRECT3DDEVICE9 GetRenderDevice() const { return pDevice; }
+    void SetCustomViewport(const D3DVIEWPORT9& pNewViewport);
+    void SetCustomViewport(const SRect& vpRect);
+    void RestoreOriginalViewport();
 
 private: // Variable members
     LPDIRECT3DDEVICE9 pDevice;
@@ -50,6 +70,7 @@ private: // Variable members
 extern DrawManager g_Render;
 
 
+///TODO: Change these logs
 struct Fonts
 {
 public:

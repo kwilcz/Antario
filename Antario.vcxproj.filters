@@ -119,9 +119,6 @@
     <ClInclude Include="Antario\SDK\PlayerInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Antario\SDK\Color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Antario\SDK\CPrediction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -159,6 +156,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\Features\Features.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\Utils\SPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\Utils\SRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\Utils\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

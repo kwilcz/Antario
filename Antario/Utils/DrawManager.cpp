@@ -1,5 +1,4 @@
 #include "DrawManager.h"
-#include <assert.h>
 
 // Init out global vars
 Fonts       g_Fonts;
@@ -14,7 +13,8 @@ struct Vertex
 
 DrawManager::DrawManager()
 {
-    this->pDevice         = nullptr;
+    this->pViewPort = {};
+    this->pDevice   = nullptr;
     g_Fonts.pFontTahoma10 = nullptr;
 }
 
@@ -54,42 +54,48 @@ void DrawManager::RestoreDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
 }
 
 
-void DrawManager::Line(Vector2D vecPos1, Vector2D vecPos2, Color color) const
+void DrawManager::Line(SPoint vecPos1, SPoint vecPos2, Color color) const
 {
     this->Line(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
 
-void DrawManager::Line(float posx1, float posy1, float posx2, float posy2, Color color) const
+void DrawManager::Line(int posx1, int posy1, int posx2, int posy2, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
-    Vertex vert[2] = 
-    {  
-        { posx1, posy1, 0.0f, 1.0f, dwColor },
-        { posx2, posy2, 0.0f, 1.0f, dwColor } 
+    Vertex vert[2] =
+    {
+        { float(posx1), float(posy1), 0.0f, 1.0f, dwColor },
+        { float(posx2), float(posy2), 0.0f, 1.0f, dwColor }
     };
-    
+
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_LINELIST, 1, &vert, sizeof(Vertex));
 }
 
 
-void DrawManager::Rect(Vector2D vecPos1, Vector2D vecPos2, Color color) const
+void DrawManager::Rect(SRect rcBouds, Color color) const
+{
+    this->Rect(rcBouds.left, rcBouds.top, rcBouds.right, rcBouds.bottom, color);
+}
+
+
+void DrawManager::Rect(SPoint vecPos1, SPoint vecPos2, Color color) const
 {
     this->Rect(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
 
-void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color color) const
+void DrawManager::Rect(int posx1, int posy1, int posx2, int posy2, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[5] =
     {   // Draw lines between declared points, needs primitive count as number of lines (4 here)
-        { posx1, posy1, 0.0f, 1.0f, dwColor },  // Top left corner
-        { posx2, posy1, 0.0f, 1.0f, dwColor },  // Top right corner
-        { posx2, posy2, 0.0f, 1.0f, dwColor },  // Bottom right corner
-        { posx1, posy2, 0.0f, 1.0f, dwColor },  // Bottom left corner
-        { posx1, posy1, 0.0f, 1.0f, dwColor }   // Back to top left to finish drawing
+        { float(posx1), float(posy1), 1.0f, 1.0f, dwColor }, // Top left corner
+        { float(posx2), float(posy1), 1.0f, 1.0f, dwColor }, // Top right corner
+        { float(posx2), float(posy2), 1.0f, 1.0f, dwColor }, // Bottom right corner
+        { float(posx1), float(posy2), 1.0f, 1.0f, dwColor }, // Bottom left corner
+        { float(posx1), float(posy1), 1.0f, 1.0f, dwColor }  // Back to top left to finish drawing
     };
 
     this->pDevice->SetTexture(0, nullptr);
@@ -98,35 +104,63 @@ void DrawManager::Rect(float posx1, float posy1, float posx2, float posy2, Color
     this->pDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);   /* And enable again for the rest of the drawing */
 }
 
-void DrawManager::RectFilled(Vector2D vecPos1, Vector2D vecPos2, Color color) const
+void DrawManager::RectBordered(SRect rcBounds, Color color) const
+{
+    this->RectBordered(rcBounds.left, rcBounds.top, rcBounds.right, rcBounds.bottom, color);
+}
+
+
+void DrawManager::RectBordered(SPoint vecPos1, SPoint vecPos2, Color color) const
+{
+    this->RectBordered(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
+}
+
+
+void DrawManager::RectBordered(int posx1, int posy1, int posx2, int posy2, Color color) const
+{
+    auto col  = Color::Black();
+    col.alpha = color.alpha;
+    this->Rect(posx1, posy1, posx2, posy2, color);
+    this->Rect(posx1 - 1, posy1 - 1, posx2 + 1, posy2 + 1, col);
+    this->Rect(posx1 + 1, posy1 + 1, posx2 - 1, posy2 - 1, col);
+}
+
+void DrawManager::RectFilled(SRect rcPosition, Color color) const
+{
+    this->RectFilled(rcPosition.left, rcPosition.top, rcPosition.right, rcPosition.bottom, color);
+}
+
+
+void DrawManager::RectFilled(SPoint vecPos1, SPoint vecPos2, Color color) const
 {
     this->RectFilled(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, color);
 }
 
-void DrawManager::RectFilled(float posx1, float posy1, float posx2, float posy2, Color color) const
+void DrawManager::RectFilled(int posx1, int posy1, int posx2, int posy2, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
+
     Vertex vert[4] =
     {
-        { posx1, posy1, 0.0f, 1.0f, dwColor },
-        { posx2, posy1, 0.0f, 1.0f, dwColor },
-        { posx1, posy2, 0.0f, 1.0f, dwColor },
-        { posx2, posy2, 0.0f, 1.0f, dwColor }
+        { float(posx1), float(posy1), 0.0f, 1.0f, dwColor },
+        { float(posx2), float(posy1), 0.0f, 1.0f, dwColor },
+        { float(posx1), float(posy2), 0.0f, 1.0f, dwColor },
+        { float(posx2), float(posy2), 0.0f, 1.0f, dwColor }
     };
-    
+        
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
-void DrawManager::Triangle(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const
+void DrawManager::Triangle(SPoint pos1, SPoint pos2, SPoint pos3, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
     Vertex vert[4] =
     {
-        { pos1.x, pos1.y, 0.0f, 1.0f, dwColor },
-        { pos2.x, pos2.y, 0.0f, 1.0f, dwColor },
-        { pos3.x, pos3.y, 0.0f, 1.0f, dwColor },
-        { pos1.x, pos1.y, 0.0f, 1.0f, dwColor }
+        { float(pos1.x), float(pos1.y), 0.0f, 1.0f, dwColor },
+        { float(pos2.x), float(pos2.y), 0.0f, 1.0f, dwColor },
+        { float(pos3.x), float(pos3.y), 0.0f, 1.0f, dwColor },
+        { float(pos1.x), float(pos1.y), 0.0f, 1.0f, dwColor }
     };
 
     this->pDevice->SetTexture(0, nullptr);
@@ -134,14 +168,14 @@ void DrawManager::Triangle(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color co
 }
 
 
-void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Color color) const
+void DrawManager::TriangleFilled(SPoint pos1, SPoint pos2, SPoint pos3, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
-    Vertex vert[3] = 
-    {  
-        { pos1.x, pos1.y, 0.0f, 1.0f, dwColor },
-        { pos2.x, pos2.y, 0.0f, 1.0f, dwColor },
-        { pos3.x, pos3.y, 0.0f, 1.0f, dwColor }
+    Vertex vert[3] =
+    {
+        { float(pos1.x), float(pos1.y), 0.0f, 1.0f, dwColor },
+        { float(pos2.x), float(pos2.y), 0.0f, 1.0f, dwColor },
+        { float(pos3.x), float(pos3.y), 0.0f, 1.0f, dwColor }
     };
 
     this->pDevice->SetTexture(0, nullptr);
@@ -149,70 +183,90 @@ void DrawManager::TriangleFilled(Vector2D pos1, Vector2D pos2, Vector2D pos3, Co
 }
 
 
-void DrawManager::RectFilledGradient(Vector2D vecPos1, Vector2D vecPos2, Color col1, Color col2, GradientType vertical) const
+void DrawManager::RectFilledGradient(SRect rcBoudingRect, Color col1, Color col2, GradientType type) const
 {
-    D3DCOLOR dwColor  = COL2DWORD(col1);
-    D3DCOLOR dwColor2 = COL2DWORD(col2);
+    this->RectFilledGradient(rcBoudingRect.left, rcBoudingRect.top, rcBoudingRect.right, rcBoudingRect.bottom, col1, col2, type);
+}
+
+void DrawManager::RectFilledGradient(SPoint vecPos1, SPoint vecPos2, Color col1, Color col2, GradientType vertical) const
+{
+    this->RectFilledGradient(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, col1, col2, vertical);
+}
+
+void DrawManager::RectFilledGradient(int posx1, int posy1, int posx2, int posy2, Color col1, Color col2, GradientType vertical) const
+{
+    const auto dwColor  = COL2DWORD(col1);
+    const auto dwColor2 = COL2DWORD(col2);
     D3DCOLOR dwcol1, dwcol2, dwcol3, dwcol4;
 
     switch (vertical)
     {
-        case GradientType::GRADIENT_VERTICAL:
-            dwcol1 = dwColor;
-            dwcol2 = dwColor;
-            dwcol3 = dwColor2;
-            dwcol4 = dwColor2;
-            break;
-        case GradientType::GRADIENT_HORIZONTAL:
-            dwcol1 = dwColor;
-            dwcol2 = dwColor2;
-            dwcol3 = dwColor;
-            dwcol4 = dwColor2;
-            break;
-        default:
-            dwcol1 = D3DCOLOR_RGBA(255, 255, 255, 255);
-            dwcol4 = dwcol3 = dwcol2 = dwcol1;
+    case GradientType::GRADIENT_VERTICAL:
+        dwcol1 = dwColor;
+        dwcol2 = dwColor;
+        dwcol3 = dwColor2;
+        dwcol4 = dwColor2;
+        break;
+    case GradientType::GRADIENT_HORIZONTAL:
+        dwcol1 = dwColor;
+        dwcol2 = dwColor2;
+        dwcol3 = dwColor;
+        dwcol4 = dwColor2;
+        break;
+    default:
+        dwcol1 = D3DCOLOR_RGBA(255, 255, 255, 255);
+        dwcol4 = dwcol3 = dwcol2 = dwcol1;
     }
 
     Vertex vert[4] =
     {
-        { vecPos1.x, vecPos1.y, 0.0f, 1.0f, dwcol1 },
-        { vecPos2.x, vecPos1.y, 0.0f, 1.0f, dwcol2 },
-        { vecPos1.x, vecPos2.y, 0.0f, 1.0f, dwcol3 },
-        { vecPos2.x, vecPos2.y, 0.0f, 1.0f, dwcol4 }
+        { float(posx1), float(posy1), 0.0f, 1.0f, dwcol1 },
+        { float(posx2), float(posy1), 0.0f, 1.0f, dwcol2 },
+        { float(posx1), float(posy2), 0.0f, 1.0f, dwcol3 },
+        { float(posx2), float(posy2), 0.0f, 1.0f, dwcol4 }
     };
-  
+    
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
+void DrawManager::RectFilledGradientMultiColor(SRect rcBoudingRect, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const
+{
+    this->RectFilledGradientMultiColor(rcBoudingRect.left, rcBoudingRect.top, rcBoudingRect.right, rcBoudingRect.bottom, colTopLeft, colTopRight,
+        colBottomLeft, colBottomRight);
+}
 
-void DrawManager::RectFilledMultiColor(const Vector2D& vecPos1, const Vector2D& vecPos2, Color colUprLeft, Color colUprRight, Color colBotLeft, Color colBotRight) const
+
+void DrawManager::RectFilledGradientMultiColor(SPoint vecPos1, SPoint vecPos2, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const
+{
+    this->RectFilledGradientMultiColor(vecPos1.x, vecPos1.y, vecPos2.x, vecPos2.y, colTopLeft, colTopRight, colBottomLeft, colBottomRight);
+}
+
+
+void DrawManager::RectFilledGradientMultiColor(int posx1, int posy1, int posx2, int posy2, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const
 {
     Vertex vert[4] =
     {
-        { vecPos1.x, vecPos1.y, 0.0f, 1.0f, COL2DWORD(colUprLeft)  },
-        { vecPos2.x, vecPos1.y, 0.0f, 1.0f, COL2DWORD(colUprRight) },
-        { vecPos1.x, vecPos2.y, 0.0f, 1.0f, COL2DWORD(colBotLeft)  },
-        { vecPos2.x, vecPos2.y, 0.0f, 1.0f, COL2DWORD(colBotRight) }
+        { float(posx1), float(posy1), 0.0f, 1.0f, COL2DWORD(colTopLeft) },
+        { float(posx2), float(posy1), 0.0f, 1.0f, COL2DWORD(colTopRight) },
+        { float(posx1), float(posy2), 0.0f, 1.0f, COL2DWORD(colBottomLeft) },
+        { float(posx2), float(posy2), 0.0f, 1.0f, COL2DWORD(colBottomRight) }
     };
-
+        
     this->pDevice->SetTexture(0, nullptr);
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
 
-void DrawManager::String(Vector2D vecPos, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const
+void DrawManager::String(SPoint vecPos, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText) const
 {
-    this->String(vecPos.x, vecPos.y, dwFlags, color, pFont, szText);
+    pFont->DrawString(vecPos.x, vecPos.y, COL2DWORD(color), szText, dwFlags);
 }
 
 
-void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText, ...) const
+void DrawManager::String(int posx, int posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText) const
 {
-    D3DCOLOR dwColor = COL2DWORD(color);
-    posx = std::roundf(posx); posy = std::roundf(posy);
-    pFont->DrawString(posx, posy, dwColor, szText, dwFlags);    // To make life easier
+    pFont->DrawString(posx, posy, COL2DWORD(color), szText, dwFlags);
 }
 
 
@@ -220,7 +274,7 @@ void DrawManager::String(float posx, float posy, DWORD dwFlags, Color color, CD3
 *   SetupRenderStates - Sets RenderStates for our custom StateBlock
 *   It's required to draw everything independent on game settings.
 */
-void DrawManager::SetupRenderStates()
+void DrawManager::SetupRenderStates() const
 {
     this->pDevice->SetVertexShader(nullptr);
     this->pDevice->SetPixelShader(nullptr);
@@ -247,13 +301,29 @@ void DrawManager::SetupRenderStates()
     this->pDevice->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
 
     this->pDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
-    this->pDevice->SetRenderState(D3DRS_COLORWRITEENABLE,
-        D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
-        D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
+    this->pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED  | D3DCOLORWRITEENABLE_GREEN |
+                                                          D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
 }
 
 
-Vector2D DrawManager::GetScreenCenter()
+SPoint DrawManager::GetScreenCenter() const
 {
-    return Vector2D((static_cast<float>(this->pViewPort.Width)*0.5f), (static_cast<float>(this->pViewPort.Height)*0.5f));
+    return SPoint(static_cast<int>(static_cast<int>(this->pViewPort.Width) * 0.5f), static_cast<int>(static_cast<int>(this->pViewPort.Height) * 0.5f));
+}
+
+
+void DrawManager::SetCustomViewport(const D3DVIEWPORT9& pNewViewport)
+{
+    this->pDevice->SetViewport(&pNewViewport);
+}
+
+void DrawManager::SetCustomViewport(const SRect& vpRect)
+{
+    auto newVP = D3DVIEWPORT9{ DWORD(vpRect.left), DWORD(vpRect.top), DWORD(vpRect.Width()), DWORD(vpRect.Height()), 0, 0 };
+    this->SetCustomViewport(newVP);
+}
+
+void DrawManager::RestoreOriginalViewport()
+{
+    this->pDevice->SetViewport(&this->pViewPort);
 }

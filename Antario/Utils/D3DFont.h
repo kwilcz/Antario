@@ -70,5 +70,5 @@ public:
     ~CD3DFont();
 
     // Height of the font in pixels. Used to prevent getting "text extent" multiple time.
-    float   flHeight;
+    int iHeight;
 };
