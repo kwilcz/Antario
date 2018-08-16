@@ -53,10 +53,7 @@ void Hooks::Init()
 
 void Hooks::Restore()
 {
-    Utils::Log("Enabling mouse pointer.");
-    g_pEngine->ExecuteClientCmd("cl_mouseenable 1"); //Renable the mouse after exit
-
-    Utils::Log("Unhooking in progress...");
+	Utils::Log("Unhooking in progress...");
     {   // Unhook every function we hooked and restore original one
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::reset);
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::present);
@@ -101,14 +98,12 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 
 void __fastcall Hooks::LockCursor(ISurface* thisptr, void* edx)
 {
-	if (g_Settings.bMenuOpened)
-	{
-		g_pSurface->UnlockCursor();
-		return;
-	}
-
 	static auto oLockCursor = g_Hooks.pSurfaceHook->GetOriginal<LockCursor_t>(67);
-	oLockCursor(thisptr, edx);
+
+	if (!g_Settings.bMenuOpened)
+		return oLockCursor(thisptr, edx);
+
+	g_pSurface->UnlockCursor();
 }
 
 
@@ -150,7 +145,6 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
         else
         {
             g_Render.SetupRenderStates(); // Sets up proper render states for our state block
-            g_Hooks.MouseEnableExecute(); // Handles in-game cursor
 
             std::string szWatermark = "Antario";
             g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(),
@@ -212,20 +206,4 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     // Call original wndproc to make game use input again
     return CallWindowProcA(g_Hooks.pOriginalWNDProc, hWnd, uMsg, wParam, lParam);
-}
-
-
-void Hooks::MouseEnableExecute()
-{
-    static bool bIsHeld = false;
-    if (g_Settings.bMenuOpened && !bIsHeld)
-    {
-        g_pEngine->ExecuteClientCmd("cl_mouseenable 0");
-        bIsHeld = true;
-    }
-    else if (!g_Settings.bMenuOpened && bIsHeld)
-    {
-        g_pEngine->ExecuteClientCmd("cl_mouseenable 1");
-        bIsHeld = false;
-    }
 }
