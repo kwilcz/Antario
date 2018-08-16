@@ -41,7 +41,7 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 
 
     Vector vecPosition = pEnt->GetEyePosition();
-    vecPosition.z += 30;
+    vecPosition.z += 30.f;
     Vector vecScreenPos;
     if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
         return;
@@ -60,7 +60,7 @@ void ESP::RenderWeaponName(C_BaseEntity* pEnt)
         return;
 
     Vector vecPosition = pEnt->GetEyePosition();
-    vecPosition.z += 20;
+    vecPosition.z += 20.f;
     Vector vecScreenPos;
     if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
         return;

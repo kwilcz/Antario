@@ -292,7 +292,7 @@ enum EntityFlags : int
     FL_FAKECLIENT = (1 << 8)
 };
 
-enum class ItemDefinitionIndex : int 
+enum class ItemDefinitionIndex : short 
 {
 	WEAPON_DEAGLE = 1,
 	WEAPON_ELITE = 2,
@@ -308,6 +308,7 @@ enum class ItemDefinitionIndex : int
 	WEAPON_M4A1 = 16,
 	WEAPON_MAC10 = 17,
 	WEAPON_P90 = 19,
+	WEAPON_MP5 = 23
 	WEAPON_UMP45 = 24,
 	WEAPON_XM1014 = 25,
 	WEAPON_BIZON = 26,

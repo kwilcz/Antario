@@ -3,6 +3,7 @@
 #include "Utils\DrawManager.h"
 #include "Utils\Interfaces.h"
 #include "SDK\IClientMode.h"
+#include "SDK\ISurface.h"
 #include "EventListener.h"
 #include "SDK\CInput.h"
 #include "Menu.h"
@@ -12,6 +13,7 @@ namespace vtable_indexes
 	constexpr auto reset        = 16;
 	constexpr auto present      = 17;
 	constexpr auto createMove   = 24;
+	constexpr auto lockCursor = 67;
 }
 
 class VMTHook;
@@ -27,6 +29,7 @@ public:
     /*---------------------------------------------*/
 
     static bool     __fastcall  CreateMove(IClientMode*, void*, float, CUserCmd*);
+	static void     __fastcall  LockCursor(ISurface*, void*);
     static HRESULT  __stdcall   Reset     (IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
     static HRESULT  __stdcall   Present   (IDirect3DDevice9* pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion);
     static LRESULT  __stdcall   WndProc   (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -38,12 +41,14 @@ private:
 
     std::unique_ptr<VMTHook> pD3DDevice9Hook;
     std::unique_ptr<VMTHook> pClientModeHook;
+	std::unique_ptr<VMTHook> pSurfaceHook;
 
     /*---------------------------------------------*/
     /*-------------Hook prototypes-----------------*/
     /*---------------------------------------------*/
 
     typedef bool (__fastcall* CreateMove_t) (IClientMode*, void*, float, CUserCmd*);
+	typedef void (__fastcall* LockCursor_t) (ISurface*, void*);
     typedef long (__stdcall*  Reset_t)      (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
     typedef long (__stdcall*  Present_t)    (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 
