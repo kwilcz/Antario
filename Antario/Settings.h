@@ -1,8 +1,6 @@
 #pragma once
 #include <filesystem>
 
-#include "Utils\Color.h"
-
 /* forward declarations so i wont have to include these */
 class MenuMain;
 
@@ -34,7 +32,6 @@ public:
     bool  bShowBoxes   = true;
     bool  bShowNames   = true;
     bool  bShowWeapons = true;
-    Color colCursor    = Color(0, 150, 255, 100);
 };
 
 extern Settings g_Settings;

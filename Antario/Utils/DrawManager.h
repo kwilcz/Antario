@@ -2,7 +2,6 @@
 #include <memory>
 #include "SRect.h"      // Includes both SPoint and SRect
 #include "D3DFont.h"
-#include "..\SDK\Vector.h"
 #include "..\Utils\Color.h"
 #include "..\Utils\Utils.h"
 
