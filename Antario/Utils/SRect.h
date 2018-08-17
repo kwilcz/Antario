@@ -29,6 +29,7 @@ public:
 
     constexpr int    Height() const { return this->bottom - this->top; }
     constexpr int    Width()  const { return this->right - this->left; }
+    constexpr SPoint Pos()    const { return SPoint(left, top);        }   
     constexpr SPoint Mid()    const { return SPoint((left + right) / 2, (top + bottom) / 2); }
 
     constexpr bool ContainsPoint(const SPoint& pt) const
