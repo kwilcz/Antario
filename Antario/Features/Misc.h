@@ -20,10 +20,29 @@ private:
 
     void DoBhop() const
     {
-        if (!(this->pLocal->GetFlags() & EntityFlags::FL_ONGROUND) && this->pLocal->GetMoveType() != MoveType_t::
-            MOVETYPE_LADDER)
-            if (this->pCmd->buttons & IN_JUMP)
-                this->pCmd->buttons &= ~IN_JUMP;
+        if (this->pLocal->GetMoveType() == MoveType_t::MOVETYPE_LADDER)
+            return;
+
+        static bool bLastJumped = false;
+        static bool bShouldFake = false;
+
+        if (!bLastJumped && bShouldFake)
+        {
+            bShouldFake = false;
+            pCmd->buttons |= IN_JUMP;
+        }
+        else if (pCmd->buttons & IN_JUMP)
+        {
+            if (pLocal->GetFlags() & FL_ONGROUND)
+                bShouldFake = bLastJumped = true;
+            else 
+            {
+                pCmd->buttons &= ~IN_JUMP;
+                bLastJumped = false;
+            }
+        }
+        else
+            bShouldFake = bLastJumped = false;
     }
 };
 
