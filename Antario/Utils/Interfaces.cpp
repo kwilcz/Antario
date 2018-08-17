@@ -20,7 +20,7 @@ IGameMovement*      g_pMovement     = nullptr;
 IMoveHelper*		g_pMoveHelper	= nullptr;
 CGlobalVarsBase*    g_pGlobalVars   = nullptr;
 IGameEventManager2* g_pEventManager = nullptr;
-ISurface*			g_pSurface		= nullptr;
+ISurface*           g_pSurface		= nullptr;
 
 
 namespace interfaces

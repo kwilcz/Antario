@@ -38,7 +38,8 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
     if (dwReason == DLL_PROCESS_ATTACH) 
     {
         DisableThreadLibraryCalls(hModule);
-        CreateThread(nullptr, NULL, OnDllAttach, hModule, NULL, nullptr);
+        auto h = CreateThread(nullptr, NULL, OnDllAttach, hModule, NULL, nullptr);
+        CloseHandle(h);
     }
     else if (dwReason == DLL_PROCESS_DETACH) 
     {

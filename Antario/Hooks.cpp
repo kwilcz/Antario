@@ -34,13 +34,13 @@ void Hooks::Init()
     // VMTHooks
     g_Hooks.pD3DDevice9Hook = std::make_unique<VMTHook>(reinterpret_cast<void*>(d3dDevice));
     g_Hooks.pClientModeHook = std::make_unique<VMTHook>(g_pClientMode);
-	g_Hooks.pSurfaceHook	= std::make_unique<VMTHook>(g_pSurface);
+    g_Hooks.pSurfaceHook	= std::make_unique<VMTHook>(g_pSurface);
 
     // Hook the table functions
     g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::reset, Hooks::Reset);
     g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::present, Hooks::Present);
     g_Hooks.pClientModeHook->Hook(vtable_indexes::createMove, Hooks::CreateMove);
-	g_Hooks.pSurfaceHook   ->Hook(vtable_indexes::lockCursor, Hooks::LockCursor);
+    g_Hooks.pSurfaceHook   ->Hook(vtable_indexes::lockCursor, Hooks::LockCursor);
 
 
     // Create event listener, no need for it now so it will remain commented.
@@ -58,7 +58,7 @@ void Hooks::Restore()
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::reset);
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::present);
         g_Hooks.pClientModeHook->Unhook(vtable_indexes::createMove);
-		g_Hooks.pSurfaceHook->Unhook(vtable_indexes::lockCursor);
+        g_Hooks.pSurfaceHook->Unhook(vtable_indexes::lockCursor);
         SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.pOriginalWNDProc));
     }
     Utils::Log("Unhooking succeded!");
@@ -82,7 +82,7 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     g::pCmd         = pCmd;
     g::pLocalEntity = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer());
     if (!g::pLocalEntity)
-		return oCreateMove;
+        return oCreateMove;
 
 
     g_Misc.OnCreateMove();
@@ -98,12 +98,12 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 
 void __fastcall Hooks::LockCursor(ISurface* thisptr, void* edx)
 {
-	static auto oLockCursor = g_Hooks.pSurfaceHook->GetOriginal<LockCursor_t>(67);
+    static auto oLockCursor = g_Hooks.pSurfaceHook->GetOriginal<LockCursor_t>(67);
 
-	if (!g_Settings.bMenuOpened)
-		return oLockCursor(thisptr, edx);
+    if (!g_Settings.bMenuOpened)
+        return oLockCursor(thisptr, edx);
 
-	g_pSurface->UnlockCursor();
+    g_pSurface->UnlockCursor();
 }
 
 
@@ -146,7 +146,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
         {
             g_Render.SetupRenderStates(); // Sets up proper render states for our state block
 
-            std::string szWatermark = "Antario";
+            static std::string szWatermark = "Antario";
             g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(),
                             szWatermark.c_str());
 

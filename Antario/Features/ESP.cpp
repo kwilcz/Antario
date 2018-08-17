@@ -7,24 +7,20 @@ ESP g_ESP;
 
 void ESP::RenderBox(C_BaseEntity* pEnt)
 {
-    Vector vecBottom;
-    Vector vecOrigin = vecBottom = pEnt->GetOrigin();
-
-    vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
-
-    Vector vecScreenBottom;
-    if (!Utils::WorldToScreen(vecBottom, vecScreenBottom))
-        return;
-
-    Vector vecScreenOrigin;
+    Vector vecScreenOrigin, vecOrigin = pEnt->GetRenderOrigin();
     if (!Utils::WorldToScreen(vecOrigin, vecScreenOrigin))
         return;
 
+    Vector vecScreenBottom, vecBottom = vecOrigin;
+    vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
+    if (!Utils::WorldToScreen(vecBottom, vecScreenBottom))
+        return;
 
-    float sx = vecScreenOrigin.x;
-    float sy = vecScreenOrigin.y;
-    float h  = vecScreenBottom.y - vecScreenOrigin.y;
-    float w  = h * 0.25f;
+
+    int sx = std::roundf(vecScreenOrigin.x);
+    int sy = std::roundf(vecScreenOrigin.y);
+    int h  = std::roundf(vecScreenBottom.y - vecScreenOrigin.y);
+    int w  = std::roundf(h * 0.25f);
 
     /* Draw rect around the entity */
     g_Render.Rect(sx - w, sy, sx + w, sy + h, (pEnt->GetTeam() == localTeam) ? teamColor : enemyColor);
@@ -36,17 +32,24 @@ void ESP::RenderBox(C_BaseEntity* pEnt)
 
 void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 {
+    Vector vecScreenOrigin, vecOrigin = pEnt->GetRenderOrigin();
+    if (!Utils::WorldToScreen(vecOrigin, vecScreenOrigin))
+        return;
+
+    Vector vecScreenBottom, vecBottom = vecOrigin;
+    vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
+    if (!Utils::WorldToScreen(vecBottom, vecScreenBottom))
+        return;
+
+
     PlayerInfo_t pInfo;
     g_pEngine->GetPlayerInfo(iterator, &pInfo);
 
+    int sx = std::roundf(vecScreenOrigin.x);
+    int sy = std::roundf(vecScreenOrigin.y);
+    int h = std::roundf(vecScreenBottom.y - vecScreenOrigin.y);
 
-    Vector vecPosition = pEnt->GetEyePosition();
-    vecPosition.z += 30.f;
-    Vector vecScreenPos;
-    if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
-        return;
-
-    g_Render.String(vecScreenPos.x, vecScreenPos.y,
+    g_Render.String(sx, sy + h - 16,
                     CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
                     g_Fonts.pFontTahoma10.get(), pInfo.szName);
@@ -54,36 +57,24 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 
 void ESP::RenderWeaponName(C_BaseEntity* pEnt)
 {
+    Vector vecScreenPos;
+    if (!Utils::WorldToScreen(pEnt->GetRenderOrigin(), vecScreenPos))
+        return;
+
     auto weapon = pEnt->GetActiveWeapon();
 
     if (!weapon)
         return;
 
-    Vector vecPosition = pEnt->GetEyePosition();
-    vecPosition.z += 20.f;
-    Vector vecScreenPos;
-    if (!Utils::WorldToScreen(vecPosition, vecScreenPos))
-        return;
+    auto strWeaponName = weapon->GetName();
 
-    std::string strWeaponName = weapon->GetName();
     strWeaponName.erase(0, 7);
-
-    const auto stringToUpper = [](std::string strToConv) -> std::string
-    {
-        std::string tmp{};
-        for (std::string::iterator p = strToConv.begin(); strToConv.end() != p; ++p)
-        {
-            *p = toupper(*p);
-            tmp.push_back(*p);
-        }
-
-        return tmp;
-    };
+    std::transform(strWeaponName.begin(), strWeaponName.end(), strWeaponName.begin(), ::toupper);
 
     g_Render.String(vecScreenPos.x, vecScreenPos.y,
                     CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
-                    g_Fonts.pFontTahoma10.get(), stringToUpper(strWeaponName).c_str());
+                    g_Fonts.pFontTahoma10.get(), strWeaponName.c_str());
 }
 
 

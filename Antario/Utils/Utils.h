@@ -21,11 +21,11 @@ public:
     }
 
 
-	static const char* GetClientModule()
-	{
-		static auto h = GetModuleHandleA("client_panorama.dll");
-		return h ? "client_panorama.dll" : "client.dll";
-	}
+    static const char* GetClientModule()
+    {
+        static auto h = GetModuleHandleA("client_panorama.dll");
+        return (h) ? "client_panorama.dll" : "client.dll";
+    }
 
 
     static uintptr_t FindSignature(const char* szModule, const char* szSignature)
