@@ -17,10 +17,10 @@ IClientEntityList*  g_pEntityList   = nullptr;
 IVEngineClient*     g_pEngine       = nullptr;
 CPrediction*        g_pPrediction   = nullptr;
 IGameMovement*      g_pMovement     = nullptr;
-IMoveHelper*		g_pMoveHelper	= nullptr;
+IMoveHelper*        g_pMoveHelper   = nullptr;
 CGlobalVarsBase*    g_pGlobalVars   = nullptr;
 IGameEventManager2* g_pEventManager = nullptr;
-ISurface*           g_pSurface		= nullptr;
+ISurface*           g_pSurface      = nullptr;
 
 
 namespace interfaces
@@ -48,8 +48,8 @@ namespace interfaces
         g_pEngine       = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient014");						// Get IVEngineClient
         g_pPrediction   = CaptureInterface<CPrediction>(Utils::GetClientModule(), "VClientPrediction001");          // Get CPrediction
         g_pMovement     = CaptureInterface<IGameMovement>(Utils::GetClientModule(), "GameMovement001");             // Get IGameMovement
-		g_pMoveHelper = **reinterpret_cast<IMoveHelper***>((Utils::FindSignature(Utils::GetClientModule(), "8B 0D ? ? ? ? 8B 46 08 68") + 0x2));  // Get IMoveHelper
+        g_pMoveHelper   = **reinterpret_cast<IMoveHelper***>((Utils::FindSignature(Utils::GetClientModule(), "8B 0D ? ? ? ? 8B 46 08 68") + 0x2));  // Get IMoveHelper
         g_pEventManager = CaptureInterface<IGameEventManager2>("engine.dll", "GAMEEVENTSMANAGER002");				// Get IGameEventManager2
-		g_pSurface		= CaptureInterface<ISurface>("vguimatsurface.dll", "VGUI_Surface031");						// Get ISurface
+        g_pSurface      = CaptureInterface<ISurface>("vguimatsurface.dll", "VGUI_Surface031");						// Get ISurface
     }
 }
