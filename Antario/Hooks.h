@@ -6,7 +6,7 @@
 #include "SDK\ISurface.h"
 #include "EventListener.h"
 #include "SDK\CInput.h"
-#include "Menu.h"
+#include "GUI\GUI.h"
 
 namespace vtable_indexes
 {
