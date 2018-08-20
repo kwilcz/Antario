@@ -53,7 +53,7 @@ class MenuMain
 protected:
     using SSize = SPoint;
 public:
-    MenuMain() : type(), bIsHovered(false), bLMBPressedLast(false), pParent(nullptr), flMaxChildWidth(0) {}
+    MenuMain() : type(), bIsHovered(false), bLMBPressedLast(false), pParent(nullptr), iMaxChildWidth(0) {}
     virtual      ~MenuMain() = default;
     virtual void RunThink(UINT uMsg, LPARAM lParam);
     virtual void Initialize();
@@ -66,7 +66,7 @@ public:
     virtual void   SetPos(SPoint ptNewPosition) { this->ptPosition = ptNewPosition; };
     virtual SPoint GetSize() { return this->szSize; };
     virtual void   SetSize(SSize szNewSize) { this->szSize - szNewSize; };
-    virtual int    GetMaxChildWidth() { return this->flMaxChildWidth; };
+    virtual int    GetMaxChildWidth() { return this->iMaxChildWidth; };
 
     /* Parent/child setting functions */
 
@@ -93,7 +93,7 @@ protected:
     bool      bIsHovered;        /* Defines if the selectable is hovered with the mouse cursor.  */
     bool      bLMBPressedLast;
     MenuMain* pParent;
-    int       flMaxChildWidth;   /* Maximum child width. Set mainly for buttons and selectables. */
+    int       iMaxChildWidth;   /* Maximum child width. Set mainly for buttons and selectables. */
     SPoint    ptPosition;        /* Coordinates to top-left corner of the drawed ent.            */
     SSize     szSize;            /* Size of the drawed ent.                                      */
 };

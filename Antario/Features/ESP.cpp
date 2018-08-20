@@ -17,10 +17,10 @@ void ESP::RenderBox(C_BaseEntity* pEnt)
         return;
 
 
-    int sx = std::roundf(vecScreenOrigin.x);
-    int sy = std::roundf(vecScreenOrigin.y);
-    int h  = std::roundf(vecScreenBottom.y - vecScreenOrigin.y);
-    int w  = std::roundf(h * 0.25f);
+    const auto sx = int(std::roundf(vecScreenOrigin.x)),
+               sy = int(std::roundf(vecScreenOrigin.y)),
+               h  = int(std::roundf(vecScreenBottom.y - vecScreenOrigin.y)),
+               w  = int(std::roundf(h * 0.25f));
 
     /* Draw rect around the entity */
     g_Render.Rect(sx - w, sy, sx + w, sy + h, (pEnt->GetTeam() == localTeam) ? teamColor : enemyColor);

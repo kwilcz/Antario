@@ -15,6 +15,7 @@ struct MenuStyle
     Color colCheckbox1    = { 50, 50, 50, 255 };    /*- Color of the first gradient color of the checkbox   -*/
     Color colCheckbox2    = { 35, 35, 35, 255 };    /*- Color of the second gradient color of the checkbox  -*/
     Color colText         = { 160, 160, 160, 255 }; /*- Color of the text inside the main window            -*/
+    Color colHeader       = { 50, 50, 50, 230 };    /*- Color of the header background                      -*/
     Color colHeaderText   = { 200, 200, 215 };      /*- Color of the text inside the header strip           -*/
     Color colComboBoxRect = { 50, 50, 50, 180 };    /*- Color of the combobox rectangle                     -*/
 };
@@ -50,7 +51,7 @@ class MenuMain
 protected:
     using SSize = SPoint;
 public:
-    MenuMain() : type(), bIsHovered(false), bLMBPressedLast(false), pParent(nullptr), flMaxChildWidth(0) {}
+    MenuMain() : type(), pParent(nullptr), bIsHovered(false), iMaxChildWidth(0) {}
     virtual      ~MenuMain() = default;
     virtual void RunThink(UINT uMsg, LPARAM lParam);
     virtual void Initialize();
@@ -59,11 +60,14 @@ public:
 
                                     /* Size and position get/set     */
 
-    virtual SPoint GetPos() { return this->ptPosition; };
-    virtual void   SetPos(SPoint ptNewPosition) { this->ptPosition = ptNewPosition; };
-    virtual SPoint GetSize() { return this->szSize; };
-    virtual void   SetSize(SSize szNewSize) { this->szSize - szNewSize; };
-    virtual int    GetMaxChildWidth() { return this->flMaxChildWidth; };
+    virtual SPoint GetPos()                     { return this->rcBoundingBox.Pos(); }
+    virtual void   SetPos(SPoint ptNewPosition) { this->rcBoundingBox.left = ptNewPosition.x; rcBoundingBox.top = ptNewPosition.y; }
+    virtual SSize  GetSize()                    { return this->szSizeObject;     }
+    virtual void   SetSize(SSize sNewSize)      { this->szSizeObject = sNewSize; }
+    virtual SRect  GetBBox()                    { return this->rcBoundingBox;  }
+    virtual int    GetMaxChildWidth()           { return this->iMaxChildWidth; }
+
+    virtual void   SetupSize();
 
     /* Parent/child setting functions */
 
@@ -87,12 +91,11 @@ protected:
     virtual void AddSlider(std::string strLabel, int* iValue, int iMinValue, int iMaxValue);
 
 protected:
-    bool      bIsHovered;        /* Defines if the selectable is hovered with the mouse cursor.  */
-    bool      bLMBPressedLast;
     MenuMain* pParent;
-    int       flMaxChildWidth;   /* Maximum child width. Set mainly for buttons and selectables. */
-    SPoint    ptPosition;        /* Coordinates to top-left corner of the drawed ent.            */
-    SSize     szSize;            /* Size of the drawed ent.                                      */
+    bool      bIsHovered;     /* Defines if the selectable is hovered with the mouse cursor.  */
+    int       iMaxChildWidth; /* Maximum child width. Set mainly for buttons and selectables. */
+    SSize     szSizeObject;   /* Size of the drawed object                                    */   
+    SRect     rcBoundingBox;  /* Bounding box of the drawed ent.                              */
 };
 
 
@@ -100,17 +103,19 @@ protected:
 class BaseWindow : public MenuMain
 {
 public:
-    BaseWindow() : pHeaderFont(nullptr), iHeaderHeight(0) {};
+    BaseWindow() : bIsDragged(false), bIsInitialized(false), ptOldMousePos(), pHeaderFont(nullptr), iHeaderHeight(0) { }
     BaseWindow(SPoint ptPosition, SPoint szSize, CD3DFont* font, CD3DFont* headerFont, std::string strLabel = "");
     virtual void Render();
     virtual bool UpdateData();
 
-    static bool bIsDragged;         /* Says if the window is currently dragged. Defined as static as its the same for all children */
+    bool      bIsDragged;    /* Says if the window is currently dragged. */
 private:
     virtual int  GetHeaderHeight();
 
-    CD3DFont* pHeaderFont;          /* Header only font         */
-    int       iHeaderHeight;        /* Header height in pixels  */
+    bool      bIsInitialized;
+    SPoint    ptOldMousePos; /* Old mouse position used for dragging     */
+    CD3DFont* pHeaderFont;   /* Header only font                         */
+    int       iHeaderHeight; /* Header height in pixels                  */
 };
 
 
@@ -138,7 +143,7 @@ public:
     virtual void Render();
     virtual bool UpdateData();
 
-    bool*   bCheckboxValue;         /* The value we are changing with the checkbox                  */
+    bool*  bCheckboxValue;         /* The value we are changing with the checkbox                  */
 private:
     SSize  szSelectableSize;
     SPoint ptSelectablePosition;
@@ -189,14 +194,13 @@ public:
     float GetValuePerPixel() const;
     void  SetValue(T flValue);
 private:
-    T * nValue;                /* Slider current value                    */
-    T      nMin;                  /* Minimal slider value                    */
-    T      nMax;                  /* Maximal slider value                    */
-    int    iDragX;                /* Mouse position at the start of the drag */
-    int    iDragOffset;           /* Offset of the mouse position            */
-    int    iButtonPosX;           /* Slider button representing value        */
-    bool   bPressed;
-
+    T*   nValue;      /* Slider current value                    */
+    T    nMin;        /* Minimal slider value                    */
+    T    nMax;        /* Maximal slider value                    */
+    int  iDragX{};      /* Mouse position at the start of the drag */
+    int  iDragOffset{}; /* Offset of the mouse position            */
+    int  iButtonPosX{}; /* Slider button representing value        */
+    bool bPressed{};             
     SPoint szSelectableSize;     /* Size of the internal selectable size of the combo */
     SPoint ptSelectablePosition; /* Position of the selectable                        */
 };
@@ -205,7 +209,7 @@ private:
 class DummySpace : public MenuMain
 {
 public:
-    DummySpace(SPoint size) { this->szSize = size; };
+    DummySpace(SPoint size) { this->szSizeObject = size; };
     void Render()     override { };
     bool UpdateData() override { return false; };
 };
