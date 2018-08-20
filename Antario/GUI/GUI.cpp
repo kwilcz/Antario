@@ -166,10 +166,11 @@ void MenuMain::AddSlider(std::string strLabel, int* iValue, int iMinValue, int i
 
 BaseWindow::BaseWindow(SPoint ptPosition, SPoint szSize, CD3DFont* pUsedFont, CD3DFont* pHeaderFont, std::string strLabel)
 {
-    pFont  = pUsedFont;
-    this->pHeaderFont  = pHeaderFont;
-    this->strLabel     = strLabel;
-    this->szSizeObject = szSize;
+    this->pFont          = pUsedFont;
+    this->bIsInitialized = false;
+    this->pHeaderFont    = pHeaderFont;
+    this->strLabel       = strLabel;
+    this->szSizeObject   = szSize;
 
     this->iHeaderHeight = this->BaseWindow::GetHeaderHeight();
     this->MenuMain::SetPos(ptPosition);
@@ -186,7 +187,8 @@ void BaseWindow::Render()
         Color(35, 35, 35, 230), GradientType::GRADIENT_VERTICAL);
 
     // Draw header string, defined as label.
-    g_Render.String(this->rcBoundingBox.Mid(), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colHeaderText, this->pHeaderFont, this->strLabel.c_str());
+    g_Render.String(this->rcBoundingBox.Mid().x, this->rcBoundingBox.top + int(float(iHeaderHeight) * 0.5f), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y,
+                    style.colHeaderText, this->pHeaderFont, this->strLabel.c_str());
 
     // Render all childrens
     MenuMain::Render();
@@ -223,9 +225,10 @@ bool BaseWindow::UpdateData()
                 iBiggestWidth = it->GetSize().x;
             it->SetupSize();
         }
+        this->bIsInitialized = true;
     };
 
-    if (!bIsInitialized)
+    if (!this->bIsInitialized)
         setChildPos();
 
     /* Area where dragging windows is active */
@@ -249,6 +252,7 @@ bool BaseWindow::UpdateData()
     if (this->bIsDragged)
     {
         this->SetPos(this->GetPos() + (mouseCursor->vecPointPos - ptOldMousePos));
+        this->SetupSize();
         ptOldMousePos = mouseCursor->vecPointPos;
         setChildPos();
     }
@@ -264,13 +268,15 @@ int BaseWindow::GetHeaderHeight()
     return int(pFont->iHeight + 2.f);
 }
 
+
 BaseSection::BaseSection(SPoint szSize, int iNumRows, std::string strLabel)
 {
-    this->iNumRows = iNumRows;
-    this->strLabel = strLabel;
+    this->iNumRows       = iNumRows;
+    this->strLabel       = strLabel;
     this->szSizeObject   = szSize;
     this->iMaxChildWidth = szSize.x / iNumRows - 2 * style.iPaddingX;
-    this->type = MenuSelectableType::TYPE_SECTION;
+    this->type           = MenuSelectableType::TYPE_SECTION;
+    this->bIsInitialized = false;
 }
 
 void BaseSection::Render()
@@ -287,14 +293,15 @@ bool BaseSection::UpdateData()
     return MenuMain::UpdateData();
 }
 
+
 void BaseSection::SetupPositions()
 {
     if (!dynamic_cast<BaseWindow*>(this->pParent)->bIsDragged && this->bIsInitialized)
         return;
 
-    int   flUsedArea = 0;                 /* Specifies used rows in our menu window */
-    int   flColumnShift = 0;              /* Specifies which column we draw in by shifting drawing "cursor" */
-    int   iLeftRows = this->iNumRows - 1; /* Rows we have left to draw in */
+    int flUsedArea    = 0;                  /* Specifies used rows in our menu window */
+    int flColumnShift = 0;                  /* Specifies which column we draw in by shifting drawing "cursor" */
+    int iLeftRows     = this->iNumRows - 1; /* Rows we have left to draw in */
 
     for (std::size_t it = 0; it < this->vecChildren.size(); it++)
     {
@@ -302,7 +309,7 @@ void BaseSection::SetupPositions()
         const int iPosY = this->rcBoundingBox.top + flUsedArea + style.iPaddingY;
 
         /* Check if we will exceed bounds of the section */
-        if ((iPosY + this->vecChildren.at(it)->GetSize().y) >(this->GetPos().y + this->GetSize().y))
+        if ((iPosY + this->vecChildren.at(it)->GetSize().y) > (this->GetPos().y + this->GetSize().y))
         {
             /* Check if we have any left rows to draw in */
             if (iLeftRows > 0)
@@ -315,11 +322,10 @@ void BaseSection::SetupPositions()
                 continue;
             }
             else
-                break;  /* Don't set up positions if there are too many selectables so its easy to spot an error as they will draw in top-left corner. */
+                break; /* Don't set up positions if there are too many selectables so its easy to spot an error as they will draw in top-left corner. */
         }
 
         this->vecChildren.at(it)->SetPos({ iPosX, iPosY });
-
         flUsedArea += this->vecChildren.at(it)->GetSize().y + style.iPaddingY;
     }
 
@@ -327,17 +333,16 @@ void BaseSection::SetupPositions()
 }
 
 
-
-Checkbox::Checkbox(std::string strLabel, bool *bValue, MenuMain* pParent)
+Checkbox::Checkbox(std::string strLabel, bool* bValue, MenuMain* pParent)
 {
-    this->pParent = pParent;
-    this->strLabel = strLabel;
+    this->pParent        = pParent;
+    this->strLabel       = strLabel;
     this->bCheckboxValue = bValue;
-    this->bIsHovered = false;
+    this->bIsHovered     = false;
 
     this->szSizeObject     = { 100, pFont->iHeight };
     this->szSelectableSize = { int(std::roundf(pFont->iHeight * 0.70f)), int(std::roundf(pFont->iHeight * 0.70f)) };
-    this->type = MenuSelectableType::TYPE_CHECKBOX;
+    this->type             = MenuSelectableType::TYPE_CHECKBOX;
 }
 
 void Checkbox::Render()
@@ -346,8 +351,8 @@ void Checkbox::Render()
     if (*this->bCheckboxValue)
     {
         g_Render.RectFilledGradient(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize,
-            style.colCheckbox1, style.colCheckbox2,
-            GradientType::GRADIENT_VERTICAL);
+                                    style.colCheckbox1, style.colCheckbox2,
+                                    GradientType::GRADIENT_VERTICAL);
     }
     else
         g_Render.RectFilled(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, style.colCheckbox1);
@@ -371,7 +376,7 @@ bool Checkbox::UpdateData()
     /* Setup the position of our selectable area */
     this->ptSelectablePosition = this->rcBoundingBox.Pos() + SPoint(iPos, iPos);
 
-    if (mouseCursor->IsInBounds(this->rcBoundingBox.Pos(), (this->rcBoundingBox.Pos() + this->szSelectableSize)))
+    if (mouseCursor->IsInBounds(this->rcBoundingBox))
     {
         if (mouseCursor->bLMBPressed)
             *this->bCheckboxValue = !*this->bCheckboxValue;
@@ -415,6 +420,7 @@ void Button::Render()
         g_Render.RectFilled(this->rcBoundingBox, style.colHover);
 }
 
+
 bool Button::UpdateData()
 {
     if (mouseCursor->IsInBounds(this->rcBoundingBox))
@@ -434,19 +440,19 @@ bool Button::UpdateData()
 ///TODO: Cleanup combo
 ComboBox::ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, MenuMain* pParent)
 {
-    this->bIsActive = false;
-    this->pParent = pParent;
-    this->strLabel = strLabel;
+    this->bIsActive      = false;
+    this->pParent        = pParent;
+    this->strLabel       = strLabel;
     this->vecSelectables = vecBoxOptions;
-    this->iCurrentValue = iCurrentValue;
-    this->bIsHovered = false;
-    this->bIsButtonHeld = false;
-    this->idHovered = -1;
+    this->iCurrentValue  = iCurrentValue;
+    this->bIsHovered     = false;
+    this->bIsButtonHeld  = false;
+    this->idHovered      = -1;
 
-    this->szSizeObject.x = this->pParent->GetMaxChildWidth();
-    this->szSizeObject.y = int(pFont->iHeight + float(style.iPaddingY) * 0.5f) * 2;
+    this->szSizeObject.x   = this->pParent->GetMaxChildWidth();
+    this->szSizeObject.y   = int(pFont->iHeight + float(style.iPaddingY) * 0.5f) * 2;
     this->szSelectableSize = { this->szSizeObject.x, pFont->iHeight + int(float(style.iPaddingY) * 0.5f) };
-    this->type = MenuSelectableType::TYPE_COMBO;
+    this->type             = MenuSelectableType::TYPE_COMBO;
 }
 
 void ComboBox::Render()
@@ -457,8 +463,8 @@ void ComboBox::Render()
     /* Render the selectable with the value in the middle */
     g_Render.RectFilled(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, style.colComboBoxRect);
     g_Render.String(this->ptSelectablePosition + (this->szSelectableSize * 0.5f),
-        CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y | CD3DFONT_DROPSHADOW,
-        style.colText, pFont, this->vecSelectables.at(*this->iCurrentValue).c_str());
+                    CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y | CD3DFONT_DROPSHADOW,
+                    style.colText, pFont, this->vecSelectables.at(*this->iCurrentValue).c_str());
 
     /* Render the small triangle */
     [this]()
@@ -474,12 +480,12 @@ void ComboBox::Render()
         if (!this->bIsActive)
         {
             ptPosRight.y = ptPosLeft.y = this->ptSelectablePosition.y + 4;
-            ptPosMid.y = vecRightBottCorner.y - 4;
+            ptPosMid.y   = vecRightBottCorner.y - 4;
         }
         else
         {
             ptPosRight.y = ptPosLeft.y = vecRightBottCorner.y - 4;
-            ptPosMid.y = this->ptSelectablePosition.y + 4;
+            ptPosMid.y   = this->ptSelectablePosition.y + 4;
         }
 
         g_Render.TriangleFilled(ptPosLeft, ptPosRight, ptPosMid, style.colComboBoxRect * 0.5f);
@@ -505,8 +511,8 @@ void ComboBox::Render()
 
         for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
             g_Render.String(SPoint(vecMid.x, vecMid.y + this->szSelectableSize.y * (it + 1)),
-                CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y | CD3DFONT_DROPSHADOW,
-                style.colText, pFont, this->vecSelectables.at(it).c_str());
+                            CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y | CD3DFONT_DROPSHADOW,
+                            style.colText, pFont, this->vecSelectables.at(it).c_str());
 
         if (this->idHovered != -1)
         {
@@ -588,16 +594,18 @@ SPoint ComboBox::GetSelectableSize()
 template<typename T>
 Slider<T>::Slider(const std::string& strLabel, T* flValue, T flMinValue, T flMaxValue, MenuMain* pParent)
 {
-    this->pParent = pParent;
+    this->pParent  = pParent;
     this->strLabel = strLabel;
-    this->nValue = flValue;
-    this->nMin = flMinValue;
-    this->nMax = flMaxValue;
+    this->nValue   = flValue;
+    this->nMin     = flMinValue;
+    this->nMax     = flMaxValue;
+    this->SetValue(*flValue);   // Since its limited, it should not be any higher - even when set in settings before.
 
-    this->szSizeObject.x = this->pParent->GetMaxChildWidth();
-    this->szSizeObject.y = (pFont->iHeight + int(float(style.iPaddingY) * 0.5f)) * 2;
+
+    this->szSizeObject.x   = this->pParent->GetMaxChildWidth();
+    this->szSizeObject.y   = (pFont->iHeight + int(float(style.iPaddingY) * 0.5f)) * 2;
     this->szSelectableSize = { this->szSizeObject.x, pFont->iHeight + int(float(style.iPaddingY) * 0.5f) };
-    this->type = MenuSelectableType::TYPE_SLIDER;
+    this->type             = MenuSelectableType::TYPE_SLIDER;
 }
 
 
@@ -618,10 +626,9 @@ void Slider<T>::Render()
 
     /* Represented position of the value & its outline */
     g_Render.RectFilled(SPoint(this->iButtonPosX - 1, this->ptSelectablePosition.y),
-        SPoint(this->iButtonPosX + 1, this->ptSelectablePosition.y + this->szSelectableSize.y),
-        Color::White());
+                        SPoint(this->iButtonPosX + 1, this->ptSelectablePosition.y + this->szSelectableSize.y), Color::White());
     g_Render.Rect(SPoint(this->iButtonPosX - 2, this->ptSelectablePosition.y),
-        SPoint(this->iButtonPosX + 1, this->ptSelectablePosition.y + this->szSelectableSize.y), Color::Black());
+                  SPoint(this->iButtonPosX + 1, this->ptSelectablePosition.y + this->szSelectableSize.y), Color::Black());
 
     /* Fill the part of slider before the represented value */
     if (this->iButtonPosX - 2 > this->ptSelectablePosition.x + 1)
