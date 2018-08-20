@@ -15,7 +15,7 @@ void MenuMain::Initialize()
     auto mainWindow = std::make_shared<BaseWindow>(SPoint(450, 450), SPoint(360, 256), g_Fonts.pFontTahoma8.get(), g_Fonts.pFontTahoma10.get(), "Antario - Main");
     {
         /* Create sections for it */
-        auto sectMain = std::make_shared<BaseSection>(SPoint(310, 100), 2, "Test Section 1");
+        auto sectMain = mainWindow->AddSection(SPoint(310, 100), 2, "Test Section 1");
         {
             /* Add controls within section */
             sectMain->AddCheckBox("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
@@ -24,21 +24,14 @@ void MenuMain::Initialize()
             sectMain->AddSlider("TestSlider", &float123, 0, 20);
             sectMain->AddSlider("intslider", &testint3, 0, 10);
             sectMain->AddCombo("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
-
-            /* At the end / beginng set parent of the section */
-            sectMain->SetParent(mainWindow.get());
         }
-        /* And remember about adding the section as a child of the window */
-        mainWindow->AddChild(sectMain);
 
-        auto sectMain2 = std::make_shared<BaseSection>(SPoint(310, 100), 2, "Test Section 2");
+        auto sectMain2 = mainWindow->AddSection(SPoint(310, 100), 2, "Test Section 2");
         {
             sectMain2->AddCombo("TestCombo2", std::vector<std::string>{ "ttest", "ttest2", "ttest3" }, &testint2);
             sectMain2->AddCheckBox("CheckboxSect2_1", &g_Settings.bShowNames);
             sectMain2->AddCheckBox("CheckboxSect2_2", &g_Settings.bShowNames);
-            sectMain->SetParent(mainWindow.get());
         }
-        mainWindow->AddChild(sectMain2);
     }
     this->AddChild(mainWindow);
 

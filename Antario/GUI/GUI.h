@@ -2,6 +2,7 @@
 #include <vector>
 #include "..\Utils\DrawManager.h"
 
+class BaseSection;
 enum class MenuSelectableType;
 
 struct MenuStyle
@@ -9,11 +10,11 @@ struct MenuStyle
     int   iPaddingX       = 20;                     /*- Padding between sections                            -*/
     int   iPaddingY       = 6;                      /*- Padding between selectables                         -*/
     Color colCursor       = { 0, 150, 255, 100 };   /*- Color of the mouse cursor                           -*/
-    Color colHover        = { 100, 100, 100, 50 };  /*- Color applied on the obj when mouse hovers above it -*/
+    Color colHover        = { 100, 100, 100, 30 };  /*- Color applied on the obj when mouse hovers above it -*/
     Color colSectionOutl  = { 15, 15, 15, 200 };    /*- Color of the section outline                        -*/
-    Color colSectionFill  = { 0, 0, 0, 25 };        /*- Color filling the section bounds                    -*/
+    Color colSectionFill  = { 0, 0, 0, 30 };        /*- Color filling the section bounds                    -*/
     Color colCheckbox1    = { 50, 50, 50, 255 };    /*- Color of the first gradient color of the checkbox   -*/
-    Color colCheckbox2    = { 35, 35, 35, 255 };    /*- Color of the second gradient color of the checkbox  -*/
+    Color colMenuStyle    = { 35, 35, 35, 255 };    /*- Color of the menu style controls                    -*/
     Color colText         = { 160, 160, 160, 255 }; /*- Color of the text inside the main window            -*/
     Color colHeader       = { 50, 50, 50, 230 };    /*- Color of the header background                      -*/
     Color colHeaderText   = { 200, 200, 215 };      /*- Color of the text inside the header strip           -*/
@@ -109,6 +110,7 @@ public:
     virtual bool UpdateData();
 
     bool      bIsDragged;    /* Says if the window is currently dragged. */
+    virtual std::shared_ptr<BaseSection> AddSection(SPoint szSize, int iNumRows, const std::string& strLabel);
 private:
     virtual int  GetHeaderHeight();
 
@@ -123,7 +125,7 @@ private:
 class BaseSection : public BaseWindow
 {
 public:
-    BaseSection(SPoint szSize, int iNumRows, std::string strLabel);
+    BaseSection(SPoint szSize, int iNumRows, const std::string& strLabel);
     virtual void Render();
     virtual bool UpdateData();
 
@@ -145,8 +147,7 @@ public:
 
     bool*  bCheckboxValue;         /* The value we are changing with the checkbox                  */
 private:
-    SSize  szSelectableSize;
-    SPoint ptSelectablePosition;
+    SRect rcBox;
 };
 
 

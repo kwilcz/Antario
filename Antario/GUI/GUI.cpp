@@ -269,7 +269,16 @@ int BaseWindow::GetHeaderHeight()
 }
 
 
-BaseSection::BaseSection(SPoint szSize, int iNumRows, std::string strLabel)
+std::shared_ptr<BaseSection> BaseWindow::AddSection(SPoint szSize, int iNumRows, const std::string& strLabel)
+{
+    auto tmp = std::make_shared<BaseSection>(szSize, iNumRows, strLabel);
+    this->AddChild(tmp);
+    tmp->SetParent(this);
+    return tmp;
+}
+
+
+BaseSection::BaseSection(SPoint szSize, int iNumRows, const std::string& strLabel)
 {
     this->iNumRows       = iNumRows;
     this->strLabel       = strLabel;
@@ -339,42 +348,47 @@ Checkbox::Checkbox(std::string strLabel, bool* bValue, MenuMain* pParent)
     this->strLabel       = strLabel;
     this->bCheckboxValue = bValue;
     this->bIsHovered     = false;
-
-    this->szSizeObject     = { 100, pFont->iHeight };
-    this->szSelectableSize = { int(std::roundf(pFont->iHeight * 0.70f)), int(std::roundf(pFont->iHeight * 0.70f)) };
-    this->type             = MenuSelectableType::TYPE_CHECKBOX;
+    this->szSizeObject   = { 100, int(float(pFont->iHeight) * 1.5) };
+    this->type           = MenuSelectableType::TYPE_CHECKBOX;
 }
 
 void Checkbox::Render()
 {
+
+    /* Checkbox background */
+    g_Render.RectFilled(this->rcBox, style.colCheckbox1);
+
+
     /* Fill the inside of the button depending on activation */
     if (*this->bCheckboxValue)
-    {
-        g_Render.RectFilledGradient(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize,
-                                    style.colCheckbox1, style.colCheckbox2,
-                                    GradientType::GRADIENT_VERTICAL);
-    }
-    else
-        g_Render.RectFilled(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, style.colCheckbox1);
+        g_Render.RectFilled(this->rcBox, style.colMenuStyle);
+
+    /* If the button is hovered, make it lighter */
+    if (this->bIsHovered)
+        g_Render.RectFilled(rcBox, style.colHover);
 
     /* Render the outline */
-    g_Render.Rect(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, Color(15, 15, 15, 220));
+    g_Render.Rect(this->rcBox, Color(15, 15, 15, 220));
 
     /* Render button label as its name */
-    g_Render.String(this->ptSelectablePosition.x + this->szSelectableSize.x + int(float(style.iPaddingX) * 0.5f), this->rcBoundingBox.top,
-                    CD3DFONT_DROPSHADOW, style.colText, pFont, this->strLabel.c_str());
+    g_Render.String(this->rcBox.right + int(float(style.iPaddingX) * 0.5f), this->rcBoundingBox.Mid().y,
+                    CD3DFONT_DROPSHADOW | CD3DFONT_CENTERED_Y, style.colText, pFont, this->strLabel.c_str());
 
-
-    if (this->bIsHovered)
-        g_Render.RectFilled(this->ptSelectablePosition + 1, this->ptSelectablePosition + this->szSelectableSize, style.colHover);
 }
 
 bool Checkbox::UpdateData()
 {
-    const auto iPos = int(std::roundf((pFont->iHeight - this->szSelectableSize.y) * 0.5f));
+    /* ------ this will be moved to other function not called all the time ------- */
+    this->rcBoundingBox.right = this->rcBoundingBox.left + this->szSizeObject.x;
+    this->rcBoundingBox.bottom = this->rcBoundingBox.top + this->szSizeObject.y;
 
-    /* Setup the position of our selectable area */
-    this->ptSelectablePosition = this->rcBoundingBox.Pos() + SPoint(iPos, iPos);
+    this->rcBox = [this]()
+    {
+        auto size = int(float(rcBoundingBox.Height()) * 0.50f);
+        auto diff = (this->rcBoundingBox.Height() - size) / 2;
+        return SRect(rcBoundingBox.left + diff, rcBoundingBox.top + diff, rcBoundingBox.left + diff + size, rcBoundingBox.bottom - diff);
+    }();
+    /* ------ ----------------- --------------------- -------------------- ------- */
 
     if (mouseCursor->IsInBounds(this->rcBoundingBox))
     {
@@ -407,7 +421,7 @@ Button::Button(std::string strLabel, void(&fnPointer)(), MenuMain* pParent, SPoi
 void Button::Render()
 {
     /* Fill the body of the button */
-    g_Render.RectFilledGradient(this->rcBoundingBox, style.colCheckbox1, style.colCheckbox2, GradientType::GRADIENT_VERTICAL);
+    g_Render.RectFilled(this->rcBoundingBox, style.colMenuStyle);
 
     /* Button outline */
     g_Render.Rect(this->rcBoundingBox, style.colSectionOutl);
@@ -634,7 +648,7 @@ void Slider<T>::Render()
     if (this->iButtonPosX - 2 > this->ptSelectablePosition.x + 1)
         g_Render.RectFilledGradient(this->ptSelectablePosition + 1,
                                     SPoint(this->iButtonPosX - 2, this->ptSelectablePosition.y + this->szSelectableSize.y),
-                                    Color(200, 0, 100), Color(255, 0, 100), GradientType::GRADIENT_HORIZONTAL);
+                                    style.colMenuStyle, style.colMenuStyle * 0.8f, GradientType::GRADIENT_HORIZONTAL);
     ///TODO: Make colors not hardcoded + smaller slider.
 }
 
