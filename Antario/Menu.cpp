@@ -29,8 +29,9 @@ void MenuMain::Initialize()
         auto sectMain2 = mainWindow->AddSection(SPoint(310, 100), 2, "Test Section 2");
         {
             sectMain2->AddCombo("TestCombo2", std::vector<std::string>{ "ttest", "ttest2", "ttest3" }, &testint2);
-            sectMain2->AddCheckBox("CheckboxSect2_1", &g_Settings.bShowNames);
-            sectMain2->AddCheckBox("CheckboxSect2_2", &g_Settings.bShowNames);
+            sectMain2->AddCheckBox("CheckboxSect2_1", &g_Settings.bShowBoxes);
+            sectMain2->AddCheckBox("Show Player Boxes", &g_Settings.bShowBoxes);
+            sectMain2->AddCheckBox("Show Player Weapons", &g_Settings.bShowWeapons);        
         }
     }
     this->AddChild(mainWindow);

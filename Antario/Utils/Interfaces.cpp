@@ -41,14 +41,14 @@ namespace interfaces
 
     void Init()
     {
-        g_pClientDll    = CaptureInterface<IBaseClientDLL>(Utils::GetClientModule(), "VClient018");					// Get IBaseClientDLL
+        g_pClientDll    = CaptureInterface<IBaseClientDLL>("client_panorama.dll", "VClient018");					// Get IBaseClientDLL
         g_pClientMode   = **reinterpret_cast<IClientMode***>    ((*reinterpret_cast<uintptr_t**>(g_pClientDll))[10] + 0x5u);  // Get IClientMode
         g_pGlobalVars   = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(g_pClientDll))[0]  + 0x1Bu); // Get CGlobalVarsBase
-        g_pEntityList   = CaptureInterface<IClientEntityList>(Utils::GetClientModule(), "VClientEntityList003");    // Get IClientEntityList
+        g_pEntityList   = CaptureInterface<IClientEntityList>("client_panorama.dll", "VClientEntityList003");    // Get IClientEntityList
         g_pEngine       = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient014");						// Get IVEngineClient
-        g_pPrediction   = CaptureInterface<CPrediction>(Utils::GetClientModule(), "VClientPrediction001");          // Get CPrediction
-        g_pMovement     = CaptureInterface<IGameMovement>(Utils::GetClientModule(), "GameMovement001");             // Get IGameMovement
-        g_pMoveHelper   = **reinterpret_cast<IMoveHelper***>((Utils::FindSignature(Utils::GetClientModule(), "8B 0D ? ? ? ? 8B 46 08 68") + 0x2));  // Get IMoveHelper
+        g_pPrediction   = CaptureInterface<CPrediction>("client_panorama.dll", "VClientPrediction001");          // Get CPrediction
+        g_pMovement     = CaptureInterface<IGameMovement>("client_panorama.dll", "GameMovement001");             // Get IGameMovement
+        g_pMoveHelper   = **reinterpret_cast<IMoveHelper***>((Utils::FindSignature("client_panorama.dll", "8B 0D ? ? ? ? 8B 46 08 68") + 0x2));  // Get IMoveHelper
         g_pEventManager = CaptureInterface<IGameEventManager2>("engine.dll", "GAMEEVENTSMANAGER002");				// Get IGameEventManager2
         g_pSurface      = CaptureInterface<ISurface>("vguimatsurface.dll", "VGUI_Surface031");						// Get ISurface
     }
