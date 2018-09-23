@@ -130,7 +130,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
                                  HWND              hDestWindowOverride, const RGNDATA* pDirtyRegion)
 {
     IDirect3DStateBlock9* stateBlock = nullptr;
-    pDevice->CreateStateBlock(D3DSBT_ALL, &stateBlock);
+    pDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &stateBlock);
 
     [pDevice]()
     {
