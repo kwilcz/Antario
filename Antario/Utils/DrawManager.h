@@ -107,8 +107,8 @@ public:
     };
 
     // Fonts
-    std::unique_ptr<CD3DFont> pFontTahoma8;
-    std::unique_ptr<CD3DFont> pFontTahoma10;
+    std::shared_ptr<CD3DFont> pFontTahoma8;
+    std::shared_ptr<CD3DFont> pFontTahoma10;
 };
 extern Fonts g_Fonts;
 

@@ -1,9 +1,8 @@
 #pragma once
+#include "GUI\GUI.h"
 #include <filesystem>
 
-/* forward declarations so i wont have to include these */
-class MenuMain;
-
+using namespace ui;
 namespace fs = std::experimental::filesystem;
 
 class Settings

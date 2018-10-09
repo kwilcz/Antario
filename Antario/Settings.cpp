@@ -58,41 +58,41 @@ void Settings::SaveSettings(const std::string& strFileName, MenuMain* pMenuObj)
                     * Just create a new `MenuSelectableType` for it
                     * and loop like in TYPE_SECTION to create sub-settings.
                     */
-                case MenuSelectableType::TYPE_MAIN:
-                case MenuSelectableType::TYPE_WINDOW:
-                    {
-                        /* Recurrent call so we save settings for all of the child objects. */
-                        loopChildSettings(it.get()/*, parentElement*/);
-                        break;
-                    }
-                case MenuSelectableType::TYPE_SECTION:
-                    {
-                        /*
-                        * Create section inside your file to which you will assign child objects (child elements, w/e)
-                        * Then loop through child objects and save them. You can use it->strLabel to get section name.
-                        */
-                        loopChildSettings(it.get()/*, SectionElement*/);
-                        break;
-                    }
-                case MenuSelectableType::TYPE_CHECKBOX:
-                    {
-                        auto tmpChkbx = dynamic_cast<Checkbox*>(it.get());
-                        /*
-                        * Save checkbox value into your settings. Setting parent should be transfered in lambda call
-                        * You can use tmpChkbx->strLabel to get the name and tmpChkbx->bCheckboxValue to get true/false.
-                        */
-                        break;
-                    }
-                case MenuSelectableType::TYPE_COMBO:
-                    {
-                        auto tmpCombo = dynamic_cast<ComboBox*>(it.get());
-                        /*
-                        * Save combo index into your settings. Setting parent should be transfered in lambda call
-                        * You can use tmpCombo->strLabel to get the name and tmpCombo->iCurrentValue to get the index.
-                        */
-                        break;
-                    }
-                default: break;
+            case MST::TYPE_INCORR:
+            case MST::TYPE_WINDOW:
+                {
+                    /* Recurrent call so we save settings for all of the child objects. */
+                    loopChildSettings(it.get()/*, parentElement*/);
+                    break;
+                }
+            case MST::TYPE_SECTION:
+                {
+                    /*
+                    * Create section inside your file to which you will assign child objects (child elements, w/e)
+                    * Then loop through child objects and save them. You can use it->strLabel to get section name.
+                    */
+                    loopChildSettings(it.get()/*, SectionElement*/);
+                    break;
+                }
+            case MST::TYPE_CHECKBOX:
+                {
+                    auto tmpChkbx = dynamic_cast<Checkbox*>(it.get());
+                    /*
+                    * Save checkbox value into your settings. Setting parent should be transfered in lambda call
+                    * You can use tmpChkbx->strLabel to get the name and tmpChkbx->bCheckboxValue to get true/false.
+                    */
+                    break;
+                }
+            case MST::TYPE_COMBO:
+                {
+                    //auto tmpCombo = dynamic_cast<ComboBox*>(it.get());
+                    /*
+                    * Save combo index into your settings. Setting parent should be transfered in lambda call
+                    * You can use tmpCombo->strLabel to get the name and tmpCombo->iCurrentValue to get the index.
+                    */
+                    break;
+                }
+            default: break;
             }
         }
     };

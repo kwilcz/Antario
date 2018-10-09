@@ -199,7 +199,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         // our wndproc capture fn
         if (g_Settings.bMenuOpened)
         {
-            g_Hooks.nMenu.RunThink(uMsg, lParam);
+            g_Hooks.nMenu.MsgProc(uMsg, wParam, lParam);
             return true;
         }
     }

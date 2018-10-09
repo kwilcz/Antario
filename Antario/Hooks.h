@@ -53,7 +53,7 @@ private:
     typedef long (__stdcall*  Present_t)    (IDirect3DDevice9*, const RECT*, const RECT*, HWND, const RGNDATA*);
 
 private:
-    MenuMain                       nMenu;
+    ui::MenuMain                   nMenu;
     HWND                           hCSGOWindow             = nullptr; // CSGO window handle
     bool                           bInitializedDrawManager = false;   // Check if we initialized our draw manager
     WNDPROC                        pOriginalWNDProc        = nullptr; // Original CSGO window proc
