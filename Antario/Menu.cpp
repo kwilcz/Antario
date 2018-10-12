@@ -23,9 +23,9 @@ void MenuMain::Initialize()
                 /* Add controls within section */
                 sectMain->AddCheckBox("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
                 sectMain->AddCheckBox("Show Player Names", &g_Settings.bShowNames);
-                //sectMain->AddButton("Shutdown", Detach);
-                //sectMain->AddSlider("TestSlider", &float123, 0, 20);
-                //sectMain->AddSlider("intslider", &testint3, 0, 10);
+                sectMain->AddButton("Shutdown", Detach);
+                sectMain->AddSlider("TestSlider", &float123, 0, 20);
+                sectMain->AddSlider("intslider", &testint3, 0, 10);
                 //sectMain->AddCombo("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
             }
 
@@ -46,9 +46,9 @@ void MenuMain::Initialize()
                 sectMain->AddCheckBox("CheckboxSect2_1", &g_Settings.bShowBoxes);
                 sectMain->AddCheckBox("Show Player Boxes", &g_Settings.bShowBoxes);
                 sectMain->AddCheckBox("Show Player Weapons", &g_Settings.bShowWeapons);
-                //sectMain->AddButton("Shutdown", Detach);
-                //sectMain->AddSlider("TestSlider", &float123, 0, 20);
-                //sectMain->AddSlider("intslider", &testint3, 0, 10);
+                sectMain->AddButton("Shutdown", Detach);
+                sectMain->AddSlider("TestSlider", &float123, 0, 20);
+                sectMain->AddSlider("intslider", &testint3, 0, 10);
                 //sectMain->AddCombo("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
             }
 

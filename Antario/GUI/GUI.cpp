@@ -139,36 +139,36 @@ bool MenuMain::MsgProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     return false;
 }
-//
-//void Section::AddDummy()
-//{
-//    this->AddChild(std::make_shared<DummySpace>(SPoint(this->GetMaxChildWidth(), pFont->iHeight + style.iPaddingY)));
-//}
-//
+
+void Section::AddDummy()
+{
+    this->AddChild(std::make_shared<DummySpace>(SPoint(this->GetMaxChildWidth(), pFont->iHeight + style.iPaddingY)));
+}
+
 void Section::AddCheckBox(const std::string& strSelectableLabel, bool* bValue)
 {
     this->AddChild(std::make_shared<Checkbox>(strSelectableLabel, bValue, GetThis()));
 }
-//
-//void Section::AddButton(const std::string& strSelectableLabel, void(&fnPointer)(), SPoint vecButtonSize)
-//{
-//    this->AddChild(std::make_shared<Button>(strSelectableLabel, fnPointer, this, vecButtonSize));
-//}
-//
+
+void Section::AddButton(const std::string& strSelectableLabel, void(&fnPointer)(), SPoint vecButtonSize)
+{
+    this->AddChild(std::make_shared<Button>(strSelectableLabel, fnPointer, GetThis(), vecButtonSize));
+}
+
 //void Section::AddCombo(const std::string& strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex)
 //{
-//    this->AddChild(std::make_shared<ComboBox>(strSelectableLabel, vecBoxOptions, iVecIndex, this));
+//    this->AddChild(std::make_shared<ComboBox>(strSelectableLabel, vecBoxOptions, iVecIndex, GetThis()));
 //}
-//
-//void Section::AddSlider(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue)
-//{
-//    this->AddChild(std::make_shared<Slider<float>>(strLabel, flValue, flMinValue, flMaxValue, this));
-//}
-//
-//void Section::AddSlider(const std::string& strLabel, int* iValue, int iMinValue, int iMaxValue)
-//{
-//    this->AddChild(std::make_shared<Slider<int>>(strLabel, iValue, iMinValue, iMaxValue, this));
-//}
+
+void Section::AddSlider(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue)
+{
+    this->AddChild(std::make_shared<Slider<float>>(strLabel, flValue, flMinValue, flMaxValue, GetThis()));
+}
+
+void Section::AddSlider(const std::string& strLabel, int* iValue, int iMinValue, int iMaxValue)
+{
+    this->AddChild(std::make_shared<Slider<int>>(strLabel, iValue, iMinValue, iMaxValue, GetThis()));
+}
 
 
 ObjectPtr ControlManager::GetObjectAtPoint(SPoint ptPoint)
@@ -185,6 +185,14 @@ ObjectPtr ControlManager::GetObjectAtPoint(SPoint ptPoint)
         else object->SetHovered(false);
     });
     return returnObject;
+}
+
+
+void ControlManager::RenderChildObjects()
+{
+    for (auto& it : this->vecChildren)
+        if (it.get() != pFocusedObject)
+            it->Render();
 }
 
 
@@ -232,7 +240,7 @@ void Window::Render()
                     style.colHeaderText, this->pHeaderFont.get(), this->strLabel.c_str());
 
     // Render all childrens
-    MenuMain::Render();
+    this->RenderChildObjects();
 }
 
 
@@ -379,8 +387,7 @@ void Tab::Render()
 
     /* Render sections */
     if (this->bIsActive)
-        for (auto& it : vecChildren)
-            it->Render();
+        this->RenderChildObjects();
 }
 
 
@@ -440,8 +447,20 @@ void Section::Render()
     g_Render.RectFilled(this->rcBoundingBox, style.colSectionFill);
     g_Render.Rect(this->rcBoundingBox, style.colSectionOutl);
 
-    MenuMain::Render();
+    this->RenderChildObjects();
 }
+
+
+void Section::RenderChildObjects()
+{
+    for (auto& it : this->vecChildren)
+    {
+        auto control = std::dynamic_pointer_cast<Control>(it);
+        if (control.get() != pFocusedObject && control->GetVisible())
+            control->Render();
+    }
+}
+
 
 void Section::Initialize()
 {
@@ -639,52 +658,58 @@ void Checkbox::SetupPositions()
 
 
 
-//Button::Button(std::string strLabel, void(&fnPointer)(), MenuMain* pParent, SPoint vecButtonSize)
-//{
-//    this->pParent      = pParent;
-//    this->strLabel     = strLabel;
-//    this->fnActionPlay = fnPointer;
-//    this->bIsActivated = false;
-//    this->bIsHovered   = false;
-//
-//    this->szSizeObject.x = vecButtonSize == SPoint(0, 0) ? this->pParent->GetMaxChildWidth() : vecButtonSize.x;
-//    this->szSizeObject.y = pFont->iHeight + style.iPaddingY;
-//    this->type = MenuSelectableType::TYPE_BUTTON;
-//}
-//
-//void Button::Render()
-//{
-//    /* Fill the body of the button */
-//    g_Render.RectFilled(this->rcBoundingBox, style.colMenuStyle);
-//
-//    /* Button outline */
-//    g_Render.Rect(this->rcBoundingBox, style.colSectionOutl);
-//
-//    /* Text inside the button */
-//    g_Render.String(this->rcBoundingBox.Mid(), CD3DFONT_DROPSHADOW | CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colText, pFont, this->strLabel.c_str());
-//
-//
-//    if (this->bIsHovered)
-//        g_Render.RectFilled(this->rcBoundingBox, style.colHover);
-//}
-//
-//
-//bool Button::UpdateData()
-//{
-//    if (mouseCursor->IsInBounds(this->rcBoundingBox))
-//    {
-//        if (mouseCursor->bLMBPressed)
-//            this->fnActionPlay(); /* Run the function passed as an arg. */
-//
-//        this->bIsHovered = true;
-//    }
-//    else
-//        this->bIsHovered = false;
-//
-//    return this->bIsHovered && mouseCursor->bLMBPressed;
-//}
-//
-//
+Button::Button(const std::string& strLabel, void(&fnPointer)(), ObjectPtr pParent, SPoint ptButtonSize)
+{
+    this->pParent      = pParent;
+    this->strLabel     = strLabel;
+    this->fnActionPlay = fnPointer;
+    this->bIsActivated = false;
+    this->type         = TYPE_BUTTON;
+
+    /* Will be overriden on the init if == 0, 0 */
+    this->szSizeObject = ptButtonSize;
+}
+
+void Button::Render()
+{
+    /* Fill the body of the button */
+    g_Render.RectFilled(this->rcBoundingBox, style.colMenuStyle);
+
+    /* Button outline */
+    g_Render.Rect(this->rcBoundingBox, style.colSectionOutl);
+
+    /* Text inside the button */
+    g_Render.String(this->rcBoundingBox.Mid(), CD3DFONT_DROPSHADOW | CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colText, pFont.get(), this->strLabel.c_str());
+    
+    if (this->bIsHovered)
+        g_Render.RectFilled(this->rcBoundingBox, style.colHover);
+}
+
+
+void Button::Initialize()
+{
+    /* Basically override if the size was not specified, its run only once anyway */
+    if (this->szSizeObject == SSize(0, 0))
+        szSizeObject = { this->pParent->GetMaxChildWidth(),  pFont->iHeight + style.iPaddingY };
+}
+
+
+bool Button::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONDBLCLK:
+        if (mouseCursor->bLMBPressed)
+        {
+            this->fnActionPlay(); /* Run the function passed as an arg. */
+            return true;
+        }
+    }
+    return false;
+}
+
+
 /////TODO: Cleanup combo
 //ComboBox::ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, MenuMain* pParent)
 //{
@@ -837,100 +862,184 @@ void Checkbox::SetupPositions()
 //    vecTmpSize.x = this->GetSize().x;
 //    return vecTmpSize;
 //}
-//
-//
-//template<typename T>
-//Slider<T>::Slider(const std::string& strLabel, T* flValue, T flMinValue, T flMaxValue, MenuMain* pParent)
-//{
-//    this->pParent  = pParent;
-//    this->strLabel = strLabel;
-//    this->nValue   = flValue;
-//    this->nMin     = flMinValue;
-//    this->nMax     = flMaxValue;
-//    this->SetValue(*flValue);   // Since its limited, it should not be any higher - even when set in settings before.
-//
-//
-//    this->szSizeObject.x   = this->pParent->GetMaxChildWidth();
-//    this->szSizeObject.y   = (pFont->iHeight + int(float(style.iPaddingY) * 0.5f)) * 2;
-//    this->szSelectableSize = { this->szSizeObject.x, pFont->iHeight + int(float(style.iPaddingY) * 0.5f) };
-//    this->type             = MenuSelectableType::TYPE_SLIDER;
-//}
-//
-//
-//template<typename T>
-//void Slider<T>::Render()
-//{
-//    std::stringstream ssToRender;
-//    ssToRender << strLabel << ": " << *this->nValue;
-//
-//    /* Render the label (name) above the combo */
-//    g_Render.String(this->rcBoundingBox.Pos(), CD3DFONT_DROPSHADOW, style.colText, pFont, ssToRender.str().c_str());
-//
-//    /* Render the selectable with the value in the middle */
-//    g_Render.RectFilled(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, style.colComboBoxRect);
-//
-//    /* Render outline */
-//    g_Render.Rect(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, style.colSectionOutl);
-//
-//    /* Represented position of the value & its outline */
-//    g_Render.RectFilled(SPoint(this->iButtonPosX - 1, this->ptSelectablePosition.y),
-//                        SPoint(this->iButtonPosX + 1, this->ptSelectablePosition.y + this->szSelectableSize.y), Color::White());
-//    g_Render.Rect(SPoint(this->iButtonPosX - 2, this->ptSelectablePosition.y),
-//                  SPoint(this->iButtonPosX + 1, this->ptSelectablePosition.y + this->szSelectableSize.y), Color::Black());
-//
-//    /* Fill the part of slider before the represented value */
-//    if (this->iButtonPosX - 2 > this->ptSelectablePosition.x + 1)
-//        g_Render.RectFilledGradient(this->ptSelectablePosition + 1,
-//                                    SPoint(this->iButtonPosX - 2, this->ptSelectablePosition.y + this->szSelectableSize.y),
-//                                    style.colMenuStyle, style.colMenuStyle * 0.8f, GradientType::GRADIENT_HORIZONTAL);
-//    ///TODO: Make colors not hardcoded + smaller slider.
-//}
-//
-//
-//template<typename T>
-//bool Slider<T>::UpdateData()
-//{
-//    this->ptSelectablePosition = SPoint(this->rcBoundingBox.left, this->rcBoundingBox.top + pFont->iHeight + int(float(style.iPaddingY) * 0.5f));
-//    this->iButtonPosX = int(this->ptSelectablePosition.x + ((*this->nValue - this->nMin) * this->szSizeObject.x / (this->nMax - this->nMin)));
-//
-//    if (mouseCursor->IsInBounds(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize))
-//    {
-//        this->bIsHovered = true;
-//        if (mouseCursor->bLMBPressed)
-//            this->bPressed = true;
-//    }
-//    if (!mouseCursor->bLMBHeld)
-//        this->bPressed = false;
-//
-//
-//    if (this->bPressed)
-//    {
-//        if (!iDragX)
-//            this->iDragX = mouseCursor->GetPos().x;
-//
-//        this->iDragOffset = this->iDragX - this->iButtonPosX;
-//        this->iDragX = mouseCursor->GetPos().x;
-//
-//        this->SetValue(static_cast<T>((this->iDragOffset * this->GetValuePerPixel()) + *this->nValue));
-//        return true;
-//    }
-//
-//    return false;
-//}
-//
-//
-//template<typename T>
-//float Slider<T>::GetValuePerPixel() const
-//{
-//    return float(this->nMax - this->nMin) / this->szSizeObject.x;
-//}
-//
-//
-//template<typename T>
-//void Slider<T>::SetValue(T flValue)
-//{
-//    flValue = max(flValue, this->nMin);
-//    flValue = min(flValue, this->nMax);
-//
-//    *this->nValue = flValue;
-//}
+
+
+template<typename T>
+Slider<T>::Slider(const std::string& strLabel, T* tValue, T tMinValue, T tMaxValue, ObjectPtr pParent)
+{
+    this->pParent  = pParent;
+    this->strLabel = strLabel;
+    this->nValue   = tValue;
+    this->nMin     = tMinValue;
+    this->nMax     = tMaxValue;
+    this->type     = TYPE_SLIDER;
+
+}
+
+
+template <typename T>
+void Slider<T>::Initialize()
+{
+    this->szSizeObject.x = this->pParent->GetMaxChildWidth();
+    this->szSizeObject.y = (pFont->iHeight + int(float(style.iPaddingY) * 0.5f)) * 1.75f;
+    const SSize szSelectableSize = { this->szSizeObject.x, pFont->iHeight + int(float(style.iPaddingY) * 0.5f) };
+
+    this->SetValue(*nValue);   // Since its limited, it should not be any higher - even when set in settings before.
+}
+
+
+template<typename T>
+void Slider<T>::Render()
+{
+    std::stringstream ssToRender;
+    ssToRender << strLabel << ": " << std::fixed << std::setprecision(2) << *this->nValue;
+
+    /* Render the label (name) above the combo */
+    g_Render.String(this->rcBoundingBox.Pos(), CD3DFONT_DROPSHADOW, style.colText, pFont.get(), ssToRender.str().c_str());
+
+    /* Render the selectable with the value in the middle */
+    g_Render.RectFilled(this->rcSelectable, style.colComboBoxRect);
+
+    /* Render outline */
+    g_Render.Rect(this->rcSelectable, style.colSectionOutl);
+
+
+    /* Fill the part of slider before the represented value */
+    g_Render.RectFilled({ this->GetZeroPos(), this->rcSelectable.top + 1, this->iButtonPosX, this->rcSelectable.bottom - 1 },
+                        style.colMenuStyle);
+
+    /* Represented position of the value & its outline */
+    g_Render.RectFilled(this->iButtonPosX - 1, this->rcSelectable.top - 1, this->iButtonPosX + 1, this->rcSelectable.bottom + 1, Color::White());
+    g_Render.RectFilled(this->iButtonPosX + 1, this->rcSelectable.top - 1, this->iButtonPosX + 1, this->rcSelectable.bottom + 1, Color::Grey());
+}
+
+
+template <typename T>
+void Slider<T>::SetupPositions()
+{
+    this->SetupBaseSize();
+
+    this->rcSelectable =
+    {
+        rcBoundingBox.left,
+        rcBoundingBox.top + pFont->iHeight,
+        rcBoundingBox.right,
+        rcBoundingBox.bottom
+    };
+
+    /* Update button position */
+    this->iButtonPosX = (this->rcSelectable.left +
+        static_cast<int>((*this->nValue - this->nMin) * float(this->rcBoundingBox.Width()) / (this->nMax - this->nMin)));
+}
+
+
+template <typename T>
+bool Slider<T>::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_MOUSEMOVE:
+    {
+        /* Make sure we correct our hover state */
+        this->bIsHovered = mouseCursor->IsInBounds(this->rcSelectable);
+
+        if (uMsg != WM_LBUTTONDOWN)
+            this->iDragX = mouseCursor->GetPos().x;
+    }
+    case WM_LBUTTONDOWN:
+    {
+        /* Make sure we correct our hover state */
+        this->bIsHovered = mouseCursor->IsInBounds(this->rcSelectable);
+
+        if (mouseCursor->bLMBPressed && bIsHovered)
+            bPressed = true;
+        else if (!mouseCursor->bLMBHeld && bPressed)
+            bPressed = false;
+
+
+        if (this->bPressed)
+        {
+            if (iDragX == 0)
+                this->iDragX = mouseCursor->GetPos().x;
+
+            this->iDragOffset = this->iDragX - this->iButtonPosX;
+            this->iDragX = mouseCursor->GetPos().x;
+
+            if (this->iDragOffset != 0)
+            {
+                this->RequestFocus();
+                this->SetValue(static_cast<T>((this->iDragOffset * this->GetValuePerPixel()) + *this->nValue));
+                return true;
+            }
+        }
+        break;
+
+    }
+    }
+
+    return false;
+}
+
+
+template <typename T>
+bool Slider<T>::HandleKeyboardInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_KEYDOWN:
+    {
+        switch (wParam)
+        {
+        case VK_HOME:
+            this->SetValue(nMin);
+            return true;
+        case VK_END:
+            this->SetValue(nMax);
+        case VK_LEFT:
+        case VK_DOWN:
+            this->SetValue(*this->nValue - static_cast<T>(this->GetValuePerPixel()));
+            return true;
+        case VK_RIGHT:
+        case VK_UP:
+            this->SetValue(*this->nValue + static_cast<T>(this->GetValuePerPixel()));
+            return true;
+        case VK_NEXT:
+            this->SetValue(*this->nValue - static_cast<T>(10.f * this->GetValuePerPixel()));
+            return true;
+        case VK_PRIOR:
+            this->SetValue(*this->nValue + static_cast<T>(10.f * this->GetValuePerPixel()));
+            return true;
+        }
+    }
+    }
+
+    return false;
+}
+
+
+template<typename T>
+float Slider<T>::GetValuePerPixel() const
+{
+    return float(this->nMax - this->nMin) / this->szSizeObject.x;
+}
+
+
+template<typename T>
+void Slider<T>::SetValue(T flValue)
+{
+    flValue = max(flValue, this->nMin);
+    flValue = min(flValue, this->nMax);
+
+    *this->nValue = flValue;
+    this->SetupPositions();
+}
+
+
+template <typename T>
+int Slider<T>::GetZeroPos()
+{
+    if (this->nMin < 0)
+        return this->rcSelectable.left + static_cast<int>((0 - this->nMin) * float(this->rcBoundingBox.Width()) / float(this->nMax - this->nMin));
+
+    return this->rcSelectable.left + 1;
+}

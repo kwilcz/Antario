@@ -32,7 +32,7 @@ namespace ui
 
     struct MenuStyle
     {
-        int   iPaddingX       = 10;                     /*- Padding between sections                            -*/
+        int   iPaddingX       = 20;                     /*- Padding between sections                            -*/
         int   iPaddingY       = 6;                      /*- Padding between selectables                         -*/
         Color colCursor       = { 0, 150, 255, 100 };   /*- Color of the mouse cursor                           -*/
         Color colHover        = { 100, 100, 100, 30 };  /*- Color applied on the obj when mouse hovers above it -*/
@@ -114,8 +114,8 @@ namespace ui
 
         /* Position setups */
         void Initialize() override    { }
-        virtual void SetupBaseSize();     /* Sets the object rect bounds using object size       */
-        virtual void SetupPositions() { } /* Internal position setup                             */ 
+        virtual void SetupBaseSize();                            /* Sets the object rect bounds using object size       */
+        virtual void SetupPositions() { this->SetupBaseSize(); } /* Internal position setup                             */
         
         /* Parent/child setting functions */
 
@@ -172,8 +172,9 @@ namespace ui
         ControlManager() = default;
 
         void SetupPositions() override;
-        virtual void SetupChildPositions();
-        virtual ObjectPtr GetObjectAtPoint(SPoint ptPoint);
+        virtual void SetupChildPositions();                 /* SetupPositions but for child objects.                                    */
+        virtual void RenderChildObjects();                  /* Renders all of the child objects, without the focused one.               */
+        virtual ObjectPtr GetObjectAtPoint(SPoint ptPoint); /* Gets the object that is on the specified point. Used for "hover check".  */
     };
 
 
@@ -205,11 +206,10 @@ namespace ui
     public:
         Tab(const std::string& strTabName, int iNumColumns, ObjectPtr parentWindow);
         void Initialize() override;
-        void Render() override;
+        void Render()     override;
         bool MsgProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-        void SetupChildPositions() override;
-
+        void SetupChildPositions()  override;
         void SetActive(bool bNewActive) { this->bIsActive  = bNewActive; }
 
         std::shared_ptr<Section> AddSection(const std::string& strLabel, float flPercSize);
@@ -223,18 +223,19 @@ namespace ui
     {
     public:
         Section(const std::string& strLabel, float flPercSize, ObjectPtr parentTab);
-        void Render() override;
-        void Initialize() override;
+        void Render()               override;
+        void RenderChildObjects()   override;
+        void Initialize()           override;
         bool MsgProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-        void SetupChildPositions() override;
+        void SetupChildPositions()  override;
 
-        //virtual void AddDummy();
+        virtual void AddDummy();
         virtual void AddCheckBox(const std::string& strSelectableLabel, bool * bValue);
-        //virtual void AddButton(const std::string& strSelectableLabel, void(&fnPointer)(), SPoint ptButtonSize = SPoint(0, 0));
+        virtual void AddButton(const std::string& strSelectableLabel, void(&fnPointer)(), SPoint ptButtonSize = SPoint(0, 0));
         //virtual void AddCombo(const std::string& strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
-        //virtual void AddSlider(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue);
-        //virtual void AddSlider(const std::string& strLabel, int* iValue, int iMinValue, int iMaxValue);
+        virtual void AddSlider(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue);
+        virtual void AddSlider(const std::string& strLabel, int* iValue, int iMinValue, int iMaxValue);
     protected:
         float flSizeScale;  /* Scale of the window space taken by section */
         SSize sizeSect;     /* Size of the section      */
@@ -257,19 +258,20 @@ namespace ui
 
 
 
-    //class Button : public Control
-    //{
-    //public:
-    //    Button(std::string strLabel, void(&fnPointer)(), UIObject* pParent, SPoint ptButtonSize = SPoint(0, 0));
-    //    void Render() override;
-    //    void SetupPositions() override;
-    //private:
-    //    bool    bIsActivated;       /* Defines if we activated the button                            */
-    //    void(*fnActionPlay)();      /* Pointer to the function that will be run at the button press. */
-    //};
-    //
-    //
-    //
+    class Button : public Control
+    {
+    public:
+        Button(const std::string& strLabel, void(&fnPointer)(), ObjectPtr pParent, SPoint ptButtonSize = SPoint(0, 0));
+        void Render() override;
+        void Initialize() override;
+        bool HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    private:
+        bool    bIsActivated;       /* Defines if we activated the button                            */
+        void(*fnActionPlay)();      /* Pointer to the function that will be run at the button press. */
+    };
+    
+    
+    
     //class ComboBox : public Control
     //{
     //public:
@@ -287,38 +289,42 @@ namespace ui
     //    SPoint ptSelectablePosition; /* Position of the selectable                                       */
     //    std::vector<std::string> vecSelectables;  /* Vector of strings that will appear as diff settings. */
     //};
-    //
-    //
-    //template <typename T>
-    //class Slider : public Control
-    //{
-    //public:
-    //    Slider(const std::string& strLabel, T* tValue, T tMinValue, T tMaxValue, UIObject* pParent);
-    //    void Render() override;
-    //    void SetupPositions() override;
-    //
-    //    float GetValuePerPixel() const;
-    //    void  SetValue(T flValue);
-    //private:
-    //    T*   nValue;      /* Slider current value                    */
-    //    T    nMin;        /* Minimal slider value                    */
-    //    T    nMax;        /* Maximal slider value                    */
-    //    int  iDragX{};      /* Mouse position at the start of the drag */
-    //    int  iDragOffset{}; /* Offset of the mouse position            */
-    //    int  iButtonPosX{}; /* Slider button representing value        */
-    //    bool bPressed{};             
-    //    SPoint szSelectableSize;     /* Size of the internal selectable size of the combo */
-    //    SPoint ptSelectablePosition; /* Position of the selectable                        */
-    //};
-    //
-    //
-    //class DummySpace : public Control
-    //{
-    //public:
-    //    DummySpace(SPoint size) { this->szSizeObject = size; };
-    //    void Render()                                         override { };
-    //    bool MsgProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override { return false; }
-    //};
+    
+    
+    template <typename T>
+    class Slider : public Control
+    {
+    public:
+        Slider(const std::string& strLabel, T* tValue, T tMinValue, T tMaxValue, ObjectPtr pParent);
 
+        void Initialize()           override;
+        void Render()               override;
+        void SetupPositions()       override;
+        bool HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)    override;
+        bool HandleKeyboardInput(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
+        bool CanHaveFocus() const   override { return true; }   /* Override so we specify that slider can have focus */
+
+    private:
+        float GetValuePerPixel() const; /* Get value change if we move slider 1 pixel wide */
+        void  SetValue(T flValue);      /* Set slider value to desired one                 */
+        int   GetZeroPos();             /* Get the "beginning" of our slider fill value    */
+            
+        T*   nValue;        /* Slider current value                    */
+        T    nMin;          /* Minimal slider value                    */
+        T    nMax;          /* Maximal slider value                    */
+        int  iDragX{};      /* Mouse position at the start of the drag */
+        int  iDragOffset{}; /* Offset of the mouse position            */
+        int  iButtonPosX{}; /* Slider button representing value        */
+        bool bPressed{};             
+        SRect rcSelectable; /* Size of the internal selectable size of the combo */
+    };
+    
+    
+    class DummySpace : public Control
+    {
+    public:
+        DummySpace(SSize size) { this->szSizeObject = size; }
+        void Render() override { }
+    };
 }
