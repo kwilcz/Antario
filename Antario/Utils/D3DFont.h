@@ -51,10 +51,8 @@ class CD3DFont
 
 public:
     // 2D text drawing functions
-    HRESULT DrawString(FLOAT x, FLOAT y, DWORD dwColor,
-            const char* strText, DWORD dwFlags = 0L);
-    HRESULT DrawStringScaled(FLOAT x, FLOAT y, FLOAT fXScale, FLOAT fYScale, 
-            DWORD dwColor, const char* strText, DWORD dwFlags = 0L);
+    HRESULT DrawString(FLOAT x, FLOAT y, DWORD dwColor, const char* strText, DWORD dwFlags = 0L);
+    HRESULT DrawStringScaled(FLOAT x, FLOAT y, FLOAT fXScale, FLOAT fYScale,  DWORD dwColor, const char* strText, DWORD dwFlags = 0L);
 
     // Function to get extent of text
     HRESULT GetTextExtent(const char* strText, SIZE* pSize);

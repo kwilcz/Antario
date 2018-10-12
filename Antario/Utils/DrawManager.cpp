@@ -88,6 +88,10 @@ void DrawManager::Rect(SPoint vecPos1, SPoint vecPos2, Color color) const
 void DrawManager::Rect(int posx1, int posy1, int posx2, int posy2, Color color) const
 {
     D3DCOLOR dwColor = COL2DWORD(color);
+
+    /* Fix that fuckin offset of the rectangles */
+    posx2 -= 1; posy2 -= 1;
+
     Vertex vert[5] =
     {   // Draw lines between declared points, needs primitive count as number of lines (4 here)
         { float(posx1), float(posy1), 1.0f, 1.0f, dwColor }, // Top left corner

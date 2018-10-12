@@ -60,6 +60,8 @@ void Hooks::Restore()
         g_Hooks.pClientModeHook->Unhook(vtable_indexes::createMove);
         g_Hooks.pSurfaceHook->Unhook(vtable_indexes::lockCursor);
         SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.pOriginalWNDProc));
+
+        g_pNetvars.release();   /* Need to release by-hand, global pointer so doesnt go out-of-scope */
     }
     Utils::Log("Unhooking succeded!");
 
@@ -199,7 +201,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         // our wndproc capture fn
         if (g_Settings.bMenuOpened)
         {
-            g_Hooks.nMenu.RunThink(uMsg, lParam);
+            g_Hooks.nMenu.MsgProc(uMsg, wParam, lParam);
             return true;
         }
     }
