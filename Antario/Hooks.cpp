@@ -100,7 +100,7 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 
 void __fastcall Hooks::LockCursor(ISurface* thisptr, void* edx)
 {
-    static auto oLockCursor = g_Hooks.pSurfaceHook->GetOriginal<LockCursor_t>(67);
+    static auto oLockCursor = g_Hooks.pSurfaceHook->GetOriginal<LockCursor_t>(vtable_indexes::lockCursor);
 
     if (!g_Settings.bMenuOpened)
         return oLockCursor(thisptr, edx);
