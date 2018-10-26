@@ -61,15 +61,30 @@ namespace interfaces
 			if (pfnFactory)
 			{
 				auto i = GetInterfaceListFromFunction(pfnFactory);
+				
+				GameInterface* shortest = nullptr;
+				std::size_t shortestLength = SIZE_MAX;
+
 				do
 				{
 					if (StartsWith(i->name, szInterfaceVersion))
 					{
-						return static_cast<T*>(i->func());
+						auto length = std::strlen(i->name);
+						if (length < shortestLength)
+						{
+							shortestLength = length;
+							shortest = i;
+						}
 					}
 				} while (i = i->next);
+
+				if (shortest)
+				{
+					return static_cast<T*>(shortest->func());
+				}
 			}
 		}
+
 		Utils::Log(std::string("Error getting interface ") + szInterfaceVersion);
 		return nullptr;
 	}
@@ -77,11 +92,11 @@ namespace interfaces
 
 	void Init()
 	{
-		g_pClientDll = CaptureInterface<IBaseClientDLL>("client_panorama.dll", "VClient0");					// Get IBaseClientDLL
+		g_pClientDll = CaptureInterface<IBaseClientDLL>("client_panorama.dll", "VClient");					// Get IBaseClientDLL
 		g_pClientMode = **reinterpret_cast<IClientMode***>    ((*reinterpret_cast<std::uintptr_t**>(g_pClientDll))[10] + 0x5u);  // Get IClientMode
 		g_pGlobalVars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<std::uintptr_t**>(g_pClientDll))[0] + 0x1Bu); // Get CGlobalVarsBase
 		g_pEntityList = CaptureInterface<IClientEntityList>("client_panorama.dll", "VClientEntityList");    // Get IClientEntityList
-		g_pEngine = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient0");					  // Get IVEngineClient
+		g_pEngine = CaptureInterface<IVEngineClient>("engine.dll", "VEngineClient");					  // Get IVEngineClient
 		g_pPrediction = CaptureInterface<CPrediction>("client_panorama.dll", "VClientPrediction");          // Get CPrediction
 		g_pMovement = CaptureInterface<IGameMovement>("client_panorama.dll", "GameMovement");             // Get IGameMovement
 		g_pMoveHelper = **reinterpret_cast<IMoveHelper***>((Utils::FindSignature("client_panorama.dll", "8B 0D ? ? ? ? 8B 46 08 68") + 0x2));  // Get IMoveHelper
