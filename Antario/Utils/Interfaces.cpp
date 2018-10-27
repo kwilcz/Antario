@@ -85,7 +85,7 @@ namespace interfaces
 			}
 		}
 
-		Utils::Log(std::string("Error getting interface ") + szInterfaceVersion);
+		Utils::Log("Error getting interface %", szInterfaceVersion);
 		return nullptr;
 	}
 
