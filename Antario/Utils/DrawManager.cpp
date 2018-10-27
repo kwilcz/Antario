@@ -269,7 +269,7 @@ void DrawManager::String(SPoint vecPos, DWORD dwFlags, Color color, CD3DFont* pF
 
 void DrawManager::String(int posx, int posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText) const
 {
-    pFont->DrawString(posx, posy, COL2DWORD(color), szText, dwFlags);
+    pFont->DrawString(FLOAT(posx), FLOAT(posy), COL2DWORD(color), szText, dwFlags);
 }
 
 
@@ -329,4 +329,17 @@ void DrawManager::SetCustomViewport(const SRect& vpRect)
 void DrawManager::RestoreOriginalViewport()
 {
     this->pDevice->SetViewport(&this->pViewPort);
+}
+
+void DrawManager::SetCustomScissorRect(const SRect& rcRect)
+{
+    auto rcTempRect = rcRect;
+    this->pDevice->GetScissorRect(&this->pScissorRect);
+    rcTempRect.Scissor(*reinterpret_cast<SRect*>(&pScissorRect));   /* Cut the new rect so its in-bounds with the old one (wont fuck up old scissor settings) */
+    this->pDevice->SetScissorRect(reinterpret_cast<const RECT*>(&rcTempRect));
+}
+
+void DrawManager::RestoreOriginalScissorRect() const
+{
+    this->pDevice->SetScissorRect(&this->pScissorRect);
 }

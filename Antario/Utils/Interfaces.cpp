@@ -34,7 +34,7 @@ namespace interfaces
             CreateInterfaceFn pfnFactory = reinterpret_cast<CreateInterfaceFn>(GetProcAddress(moduleHandle, "CreateInterface"));
             return reinterpret_cast<T*>(pfnFactory(szInterfaceVersion, nullptr));
         }
-        Utils::Log(std::string("Error getting interface ") + std::string(szInterfaceVersion));
+        Utils::Log("Error getting interface %", szInterfaceVersion);
         return nullptr;
     }
 

@@ -41,4 +41,13 @@ public:
         if (tmp.right  < pt.x) return false;
         return true;
     }
+
+    constexpr void Scissor(const SRect& rc) 
+    {
+        const auto tmp = this; /* same with the fix */
+        if (tmp->top    < rc.top)    tmp->top    = rc.top;
+        if (tmp->bottom > rc.bottom) tmp->bottom = rc.bottom;
+        if (tmp->left   < rc.left)   tmp->left   = rc.left;
+        if (tmp->right  > rc.right)  tmp->right  = rc.right;
+    }
 };

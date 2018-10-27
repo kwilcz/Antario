@@ -27,8 +27,7 @@ void Hooks::Init()
     const uintptr_t d3dDevice = **reinterpret_cast<uintptr_t**>(Utils::FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
 
     if (g_Hooks.hCSGOWindow)        // Hook WNDProc to capture mouse / keyboard input
-        g_Hooks.pOriginalWNDProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC,
-                                                                              reinterpret_cast<LONG_PTR>(g_Hooks.WndProc)));
+        g_Hooks.pOriginalWNDProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(Hooks::WndProc)));
 
 
     // VMTHooks
@@ -37,8 +36,8 @@ void Hooks::Init()
     g_Hooks.pSurfaceHook	= std::make_unique<VMTHook>(g_pSurface);
 
     // Hook the table functions
-    g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::reset, Hooks::Reset);
-    g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::present, Hooks::Present);
+    g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::reset,      Hooks::Reset);
+    g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::present,    Hooks::Present);
     g_Hooks.pClientModeHook->Hook(vtable_indexes::createMove, Hooks::CreateMove);
     g_Hooks.pSurfaceHook   ->Hook(vtable_indexes::lockCursor, Hooks::LockCursor);
 
@@ -127,9 +126,8 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 }
 
 
-HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceRect,
-                                 const RECT*       pDestRect,
-                                 HWND              hDestWindowOverride, const RGNDATA* pDirtyRegion)
+HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceRect, const RECT* pDestRect, 
+                                 HWND hDestWindowOverride,  const RGNDATA* pDirtyRegion)
 {
     IDirect3DStateBlock9* stateBlock = nullptr;
     pDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &stateBlock);
@@ -149,8 +147,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
             g_Render.SetupRenderStates(); // Sets up proper render states for our state block
 
             static std::string szWatermark = "Antario";
-            g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(),
-                            szWatermark.c_str());
+            g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
 
             if (g_Settings.bMenuOpened)
             {
