@@ -233,7 +233,7 @@ namespace ui
         virtual void AddDummy();
         virtual void AddCheckBox(const std::string& strSelectableLabel, bool * bValue);
         virtual void AddButton(const std::string& strSelectableLabel, void(&fnPointer)(), SPoint ptButtonSize = SPoint(0, 0));
-        //virtual void AddCombo(const std::string& strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex);
+        virtual void AddCombo(const std::string& strSelectableLabel, int* iVecIndex, std::vector<std::string> vecBoxOptions);
         virtual void AddSlider(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue);
         virtual void AddSlider(const std::string& strLabel, int* iValue, int iMinValue, int iMaxValue);
     protected:
@@ -272,23 +272,26 @@ namespace ui
     
     
     
-    //class ComboBox : public Control
-    //{
-    //public:
-    //    ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, UIObject* pParent);
-    //    void Render() override;
-    //    void SetupPositions() override;
-    //
-    //    virtual SPoint GetSelectableSize();
-    //private:
-    //    bool   bIsActive;            /* Boolean defining if we are supposed to draw our list or not.     */
-    //    bool   bIsButtonHeld;
-    //    int    idHovered;
-    //    int*   iCurrentValue;        /* Current selected option. Defined as a vector index.              */
-    //    SPoint szSelectableSize;     /* Size of the internal selectable size of the combo                */
-    //    SPoint ptSelectablePosition; /* Position of the selectable                                       */
-    //    std::vector<std::string> vecSelectables;  /* Vector of strings that will appear as diff settings. */
-    //};
+    class ComboBox : public Control
+    {
+    public:
+        ComboBox(const std::string& strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, ObjectPtr pParent);
+        void Initialize()         override;
+        void Render()             override;
+        bool HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+        void SetupPositions()     override;
+        bool CanHaveFocus() const override { return true; }
+        void OnFocusOut()         override { this->bIsActive = false; };
+    
+        virtual SPoint GetSelectableSize();
+        void RenderSelectables();
+
+        int*  iCurrentValue;                        /* Current selected option. Defined as a pttor index.          */
+    private:
+        int   idHovered;
+        SRect rcSelectable;                         /* Selectable bounding box */
+        std::vector<std::string> vecSelectables;    /* Vector of strings that will appear as diff settings.         */
+    };
     
     
     template <typename T>

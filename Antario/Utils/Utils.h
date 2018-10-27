@@ -57,6 +57,33 @@ public:
         return 0u;
     }
 
+    // basefunct
+    static std::string SetupStringParams(std::string szBasicString)
+    {
+        return szBasicString;
+    }
+
+    // Replace % with a desired string / value represented after semicolons. Works kinda like printf.
+    template <typename T, typename... Targs>
+    static std::string SetupStringParams(std::string szBasicString, T arg, Targs&& ...args)
+    {
+        const auto found = szBasicString.find_first_of('%');
+        if (found != std::string::npos)
+        {
+            std::stringstream tmp;
+            tmp << arg;
+            szBasicString.replace(found, 1, tmp.str());
+            szBasicString = SetupStringParams(szBasicString, args...);
+        }
+        return szBasicString;
+    }
+
+
+    template <typename ... Args>
+    static void Log(const std::string& str, Args ...arguments)
+    {
+        Utils::Log(Utils::SetupStringParams(str.c_str(), arguments...));
+    }
 
 
     /**
@@ -76,7 +103,7 @@ public:
     *   Format: [HH:MM:SS] str
     *   @str: Debug message to be shown.
     */
-    static void Log(const std::string& str, ...)
+    static void Log(const std::string& str)
     {
 #ifdef _DEBUG
         tm timeInfo { };

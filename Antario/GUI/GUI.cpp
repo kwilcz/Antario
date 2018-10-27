@@ -155,10 +155,10 @@ void Section::AddButton(const std::string& strSelectableLabel, void(&fnPointer)(
     this->AddChild(std::make_shared<Button>(strSelectableLabel, fnPointer, GetThis(), vecButtonSize));
 }
 
-//void Section::AddCombo(const std::string& strSelectableLabel, std::vector<std::string> vecBoxOptions, int* iVecIndex)
-//{
-//    this->AddChild(std::make_shared<ComboBox>(strSelectableLabel, vecBoxOptions, iVecIndex, GetThis()));
-//}
+void Section::AddCombo(const std::string& strSelectableLabel, int* iVecIndex, std::vector<std::string> vecBoxOptions)
+{
+    this->AddChild(std::make_shared<ComboBox>(strSelectableLabel, vecBoxOptions, iVecIndex, GetThis()));
+}
 
 void Section::AddSlider(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue)
 {
@@ -710,158 +710,199 @@ bool Button::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-/////TODO: Cleanup combo
-//ComboBox::ComboBox(std::string strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, MenuMain* pParent)
-//{
-//    this->bIsActive      = false;
-//    this->pParent        = pParent;
-//    this->strLabel       = strLabel;
-//    this->vecSelectables = vecBoxOptions;
-//    this->iCurrentValue  = iCurrentValue;
-//    this->bIsHovered     = false;
-//    this->bIsButtonHeld  = false;
-//    this->idHovered      = -1;
-//
-//    this->szSizeObject.x   = this->pParent->GetMaxChildWidth();
-//    this->szSizeObject.y   = int(pFont->iHeight + float(style.iPaddingY) * 0.5f) * 2;
-//    this->szSelectableSize = { this->szSizeObject.x, pFont->iHeight + int(float(style.iPaddingY) * 0.5f) };
-//    this->type             = MenuSelectableType::TYPE_COMBO;
-//}
-//
-//void ComboBox::Render()
-//{
-//    /* Render the label (name) above the combo */
-//    g_Render.String(this->rcBoundingBox.Pos(), CD3DFONT_DROPSHADOW, style.colText, pFont, this->strLabel.c_str());
-//
-//    /* Render the selectable with the value in the middle */
-//    g_Render.RectFilled(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, style.colComboBoxRect);
-//    g_Render.String(this->ptSelectablePosition + (this->szSelectableSize * 0.5f),
-//                    CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y | CD3DFONT_DROPSHADOW,
-//                    style.colText, pFont, this->vecSelectables.at(*this->iCurrentValue).c_str());
-//
-//    /* Render the small triangle */
-//    [this]()
-//    {
-//        SPoint ptPosMid, ptPosLeft, ptPosRight;
-//        SPoint vecRightBottCorner = this->ptSelectablePosition + this->szSelectableSize;
-//
-//        ptPosMid.x   = vecRightBottCorner.x - 10;
-//        ptPosRight.x = vecRightBottCorner.x - 4;
-//        ptPosLeft.x  = vecRightBottCorner.x - 16;
-//
-//        /* Draw two different versions (top-down, down-top) depending on activation */
-//        if (!this->bIsActive)
-//        {
-//            ptPosRight.y = ptPosLeft.y = this->ptSelectablePosition.y + 4;
-//            ptPosMid.y   = vecRightBottCorner.y - 4;
-//        }
-//        else
-//        {
-//            ptPosRight.y = ptPosLeft.y = vecRightBottCorner.y - 4;
-//            ptPosMid.y   = this->ptSelectablePosition.y + 4;
-//        }
-//
-//        g_Render.TriangleFilled(ptPosLeft, ptPosRight, ptPosMid, style.colComboBoxRect * 0.5f);
-//        g_Render.Triangle(ptPosLeft, ptPosRight, ptPosMid, style.colSectionOutl);
-//    }();
-//
-//    /* Highlight combo if hovered */
-//    if (this->bIsHovered)
-//        g_Render.RectFilled(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, Color(100, 100, 100, 50));
-//
-//    g_Render.Rect(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize, style.colSectionOutl);
-//
-//
-//    if (this->bIsActive)
-//    {
-//        /* Background square for the list */
-//        g_Render.RectFilledGradient(SPoint(this->ptSelectablePosition.x, this->ptSelectablePosition.y + this->szSelectableSize.y),
-//                                    SPoint(this->ptSelectablePosition.x + this->szSelectableSize.x,
-//                                           this->ptSelectablePosition.y + this->szSelectableSize.y * (this->vecSelectables.size() + 1)),
-//                                    Color(40, 40, 40), Color(30, 30, 30), GRADIENT_VERTICAL);
-//
-//        const auto vecMid = this->ptSelectablePosition + (this->szSelectableSize * 0.5f);
-//
-//        for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
-//            g_Render.String(SPoint(vecMid.x, vecMid.y + this->szSelectableSize.y * (it + 1)),
-//                            CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y | CD3DFONT_DROPSHADOW,
-//                            style.colText, pFont, this->vecSelectables.at(it).c_str());
-//
-//        if (this->idHovered != -1)
-//        {
-//            /* Highlights hovered position */
-//            const SPoint vecElementPos = { this->ptSelectablePosition.x, this->ptSelectablePosition.y + this->szSelectableSize.y * (this->idHovered + 1) };
-//            g_Render.RectFilled(vecElementPos, vecElementPos + this->szSelectableSize, Color(100, 100, 100, 50));
-//        }
-//    }
-//}
-//
-//
-//bool ComboBox::UpdateData()
-//{
-//    this->ptSelectablePosition = 
-//    { 
-//        this->rcBoundingBox.left, 
-//        this->rcBoundingBox.top + pFont->iHeight + int(float(style.iPaddingY) * 0.5f) 
-//    };
-//
-//    if (mouseCursor->IsInBounds(this->ptSelectablePosition, this->ptSelectablePosition + this->szSelectableSize))
-//    {
-//        this->bIsHovered = true;
-//
-//        if (mouseCursor->bLMBPressed)
-//        {
-//            this->bIsActive = !bIsActive;
-//            return true;
-//        }
-//    }
-//    else
-//    {
-//        this->bIsHovered = false;
-//
-//        if (this->bIsActive)
-//        {
-//            if (mouseCursor->IsInBounds(SPoint(this->ptSelectablePosition.x, this->ptSelectablePosition.y + this->szSelectableSize.y),
-//                                        SPoint(this->ptSelectablePosition.x + this->szSelectableSize.x,
-//                                               this->ptSelectablePosition.y + this->szSelectableSize.y * (this->vecSelectables.size() + 1))))
-//            {
-//                for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
-//                {
-//                    const auto ptElementPos = SPoint(this->ptSelectablePosition.x, this->ptSelectablePosition.y + this->szSelectableSize.y * (it + 1));
-//
-//                    if (mouseCursor->IsInBounds(ptElementPos, { ptElementPos.x + this->szSelectableSize.x, ptElementPos.y + this->szSelectableSize.y + 1 }))
-//                    {
-//                        this->idHovered = it;
-//                        if (mouseCursor->bLMBPressed)
-//                        {
-//                            *this->iCurrentValue = it;
-//                            this->idHovered = -1;
-//                            this->bIsActive = false;
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//            else
-//            {
-//                this->idHovered = -1;
-//                if (mouseCursor->bLMBPressed)
-//                    this->bIsActive = false;
-//            }
-//        }
-//    }
-//
-//    return false;
-//}
-//
-//
-//SPoint ComboBox::GetSelectableSize()
-//{
-//    SPoint vecTmpSize;
-//    vecTmpSize.y = pFont->iHeight + int(float(style.iPaddingY) * 0.5f);
-//    vecTmpSize.x = this->GetSize().x;
-//    return vecTmpSize;
-//}
+
+
+
+ComboBox::ComboBox(const std::string& strLabel, std::vector<std::string> vecBoxOptions, int* iCurrentValue, ObjectPtr pParent)
+{
+    this->type      = TYPE_COMBO;
+    this->pParent   = pParent;
+    this->strLabel  = strLabel;
+    this->idHovered = -1;
+    this->iCurrentValue  = iCurrentValue;
+    this->vecSelectables = vecBoxOptions;
+}
+
+
+void ComboBox::Initialize()
+{
+    this->szSizeObject.x = this->pParent->GetMaxChildWidth();
+    this->szSizeObject.y = int(pFont->iHeight + float(style.iPaddingY) * 0.5f) * 2;    
+}
+
+
+void ComboBox::Render()
+{
+    /* Render the label (name) above the combo */
+    g_Render.String(this->rcBoundingBox.Pos(), CD3DFONT_DROPSHADOW, style.colText, pFont.get(), this->strLabel.c_str());
+
+
+    /* Render the selectable with the value in the middle and highlight if hovered */
+    if (this->bIsHovered)
+        g_Render.RectFilled(this->rcSelectable, style.colHover);
+    else
+        g_Render.RectFilled(this->rcSelectable, style.colComboBoxRect);
+
+    /* Render the selectable with the value in the middle */
+    g_Render.String(this->rcSelectable.Mid(), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colText, pFont.get(),
+                    this->vecSelectables[*this->iCurrentValue].c_str());
+
+    /* Render the small triangle */
+    {
+        SPoint ptPosMid, ptPosLeft, ptPosRight;
+
+        /* I know, hardcode. You should change this anyway */
+        ptPosMid.x   = this->rcSelectable.right - 8;
+        ptPosRight.x = this->rcSelectable.right - 5;
+        ptPosLeft.x  = this->rcSelectable.right - 11;
+
+        /* Draw two different versions (top-down, down-top) depending on activation */
+        if (!this->bIsActive)
+        {
+            ptPosRight.y = ptPosLeft.y = this->rcSelectable.top + 6;
+            ptPosMid.y   = this->rcSelectable.bottom - 6;
+        }
+        else
+        {
+            ptPosRight.y = ptPosLeft.y = this->rcSelectable.bottom - 6;
+            ptPosMid.y   = this->rcSelectable.top + 6;
+        }
+
+        g_Render.TriangleFilled(ptPosLeft, ptPosRight, ptPosMid, style.colText);
+        g_Render.Triangle(ptPosLeft, ptPosRight, ptPosMid, style.colText);
+    }/*-------------------------*/
+
+    /* Rectangle of the combo selectables, for scissorrect */
+    const SRect vpCombo = 
+    {
+        rcBoundingBox.left,
+        rcBoundingBox.bottom,
+        rcBoundingBox.right,
+        rcSelectable.bottom + rcSelectable.Height() * int(vecSelectables.size())
+    };
+
+    /* Render selectables only within the rect, useful for scroll usage (if implemented later on) */
+    g_Render.SetCustomScissorRect(vpCombo);
+        if (this->bIsActive)
+            RenderSelectables();
+    g_Render.RestoreOriginalScissorRect();
+
+}
+
+
+bool ComboBox::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        case WM_MOUSEMOVE:
+        case WM_LBUTTONDOWN:
+        {
+            /* If the main selectabled is hovered, handle only its input */
+            if (this->bIsHovered)
+            {
+                this->idHovered = -1;
+                if (mouseCursor->bLMBPressed)
+                {
+                    this->bIsActive = !bIsActive;
+                    /* If active, request focus so its rendered on top of every other selectable */
+                    if (this->bIsActive)
+                        this->RequestFocus();
+                    return true;
+                }
+            }
+            else if (this->bIsActive &&
+                     mouseCursor->IsInBounds({ this->rcSelectable.left, this->rcSelectable.bottom, this->rcSelectable.right,
+                                               this->rcSelectable.bottom + this->rcSelectable.Height() * int(this->vecSelectables.size()) }))
+            {
+                for (std::size_t it = 0; it < this->vecSelectables.size(); ++it)
+                {
+                    /* Bounds of the looped element. */
+                    const auto rcElementBounds = [this, it]()
+                    {
+                        int posy = this->rcSelectable.bottom + this->rcSelectable.Height() * it;
+                        return SRect(this->rcSelectable.left, posy, this->rcSelectable.right, posy + this->rcSelectable.Height());
+                    };
+
+                    /* If we don't hover the element - ignore */
+                    if (!mouseCursor->IsInBounds(rcElementBounds()))
+                        continue;
+
+                    this->idHovered = it;
+                    if (mouseCursor->bLMBPressed)
+                    {
+                        *this->iCurrentValue = it;
+                        this->idHovered      = -1;
+                        this->bIsActive      = false;
+                        return true;
+                    }
+                }
+            }
+            else
+                this->idHovered = -1;
+        }
+    }
+
+    return false;
+}
+
+
+void ComboBox::SetupPositions()
+{
+    this->SetupBaseSize();
+
+    this->rcSelectable = [this]()
+    {
+        int posy = this->rcBoundingBox.top + pFont->iHeight + int(float(style.iPaddingY) * 0.5f);
+        return SRect(this->rcBoundingBox.left, posy, this->rcBoundingBox.right, posy + pFont->iHeight + int(float(style.iPaddingY) * 0.5f));
+    }();
+}
+
+
+SPoint ComboBox::GetSelectableSize()
+{
+    SPoint vecTmpSize;
+    vecTmpSize.y = pFont->iHeight + int(float(style.iPaddingY) * 0.5f);
+    vecTmpSize.x = this->GetSize().x;
+    return vecTmpSize;
+}
+
+
+void ComboBox::RenderSelectables()
+{
+     /* Background square for the list */
+    g_Render.RectFilled({ this->rcSelectable.left, this->rcSelectable.bottom }, 
+                        { this->rcSelectable.right, this->rcSelectable.bottom + this->rcSelectable.Height() * int(this->vecSelectables.size()) }, 
+                          style.colCheckboxFill);
+
+
+    /* Distinction line at top for seperation for dropdown */
+    g_Render.Line({ this->rcSelectable.left, this->rcSelectable.bottom },
+                  { this->rcSelectable.right, this->rcSelectable.bottom }, style.colSectionFill);
+
+    /* Highlight selectable if its selected (-1 = no hovered one) */
+    if (this->idHovered != -1)
+    {
+        const auto rcElementBounds = [this]() -> SRect
+        {
+            int posy = this->rcSelectable.bottom + this->rcSelectable.Height() * this->idHovered;
+            return {
+                this->rcSelectable.left + 1,
+                posy + 1,
+                this->rcSelectable.right - 1,
+                posy + this->rcSelectable.Height() - 1
+            };
+        };
+
+        g_Render.RectFilled(rcElementBounds(), style.colHover);
+    }
+
+    /* Render all of the selectable labels (names) in the middle */
+    auto index = 0;
+    const auto ptMid = this->rcSelectable.Mid();
+    for (const auto& it : vecSelectables)
+        g_Render.String({ ptMid.x, ptMid.y + this->rcSelectable.Height() * (index++ + 1) },
+                        CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colText, pFont.get(), it.c_str());
+}
 
 
 template<typename T>

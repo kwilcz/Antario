@@ -60,11 +60,15 @@ public: // Function members
     LPDIRECT3DDEVICE9 GetRenderDevice() const { return pDevice; }
     void SetCustomViewport(const D3DVIEWPORT9& pNewViewport);
     void SetCustomViewport(const SRect& vpRect);
+
+    void SetCustomScissorRect(const SRect& rcRect);
+    void RestoreOriginalScissorRect() const;
     void RestoreOriginalViewport();
 
 private: // Variable members
     LPDIRECT3DDEVICE9 pDevice;
     D3DVIEWPORT9      pViewPort;
+    RECT              pScissorRect;
 };
 extern DrawManager g_Render;
 

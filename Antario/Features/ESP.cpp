@@ -49,8 +49,7 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
     int sy = std::roundf(vecScreenOrigin.y);
     int h = std::roundf(vecScreenBottom.y - vecScreenOrigin.y);
 
-    g_Render.String(sx, sy + h - 16,
-                    CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+    g_Render.String(sx, sy + h - 16, CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
                     g_Fonts.pFontTahoma10.get(), pInfo.szName);
 }
@@ -71,8 +70,7 @@ void ESP::RenderWeaponName(C_BaseEntity* pEnt)
     strWeaponName.erase(0, 7);
     std::transform(strWeaponName.begin(), strWeaponName.end(), strWeaponName.begin(), ::toupper);
 
-    g_Render.String(vecScreenPos.x, vecScreenPos.y,
-                    CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+    g_Render.String(vecScreenPos.x, vecScreenPos.y, CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
                     g_Fonts.pFontTahoma10.get(), strWeaponName.c_str());
 }
