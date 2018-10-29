@@ -73,7 +73,7 @@ public:
             std::stringstream tmp;
             tmp << arg;
             szBasicString.replace(found, 1, tmp.str());
-            szBasicString = SetupStringParams(szBasicString, args...);
+            szBasicString = SetupStringParams(szBasicString, std::forward<Targs>(args)...);
         }
         return szBasicString;
     }
