@@ -32,7 +32,7 @@ public:
         return reinterpret_cast<C_BaseCombatWeapon*>(g_pEntityList->GetClientEntityFromHandle(weaponData));
     }
 
-    int GetTeam() //DT_BaseAttributableItem"), charenc("m_iItemDefinitionIndex
+    int GetTeam()
     {
         static int m_iTeamNum = g_pNetvars->GetOffset("DT_BaseEntity", "m_iTeamNum");
         return GetValue<int>(m_iTeamNum);
@@ -128,7 +128,7 @@ public:
 
     WeaponInfo_t* GetCSWpnData()
     {
-        return Utils::CallVFunc<444, WeaponInfo_t*>(this);
+        return Utils::CallVFunc<448, WeaponInfo_t*>(this);
     }
 
     std::string GetName()
