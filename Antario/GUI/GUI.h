@@ -110,7 +110,8 @@ namespace ui
         virtual void   SetSize(SSize sNewSize)      { this->szSizeObject = sNewSize; }
         virtual SRect  GetBBox()                    { return this->rcBoundingBox; }
 
-        virtual void SetHovered(bool hov) { this->bIsHovered = hov; }
+        virtual void SetHovered(bool hov)		{ this->bIsHovered = hov; }
+        virtual int GetScrollableHeight() const { return 0; }
 
         /* Position setups */
         void Initialize() override    { }
@@ -218,6 +219,51 @@ namespace ui
         bool bIsActive;
     };
 
+	class ScrollBar : public Control
+	{
+	public:
+		ScrollBar(ObjectPtr pParentObject);
+		void Initialize() override;
+		void Render()	  override;
+		bool HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+		void SetupPositions()	  override;
+		bool CanHaveFocus() const override { return true; }
+
+		void UpdateThumbRect();
+		int  GetScrollAmmount() const { return this->iScrollAmmount; };
+	private:
+		void HandleArrowHeldMode();
+		int  iScrollAmmount; /* The offset of the initial position            */
+		int  iPageSize;      /* How much pixels are rendered in page (height) */
+		bool bIsThumbUsed;   /* Defines if the tumb is grabbed                */
+
+		enum ButtonState
+		{
+			CLEAR,
+			CLICKED_UP,
+			CLICKED_DOWN,
+			HELD_UP,
+			HELD_DOWN
+		};
+		enum HoveredButton
+		{
+			NONE,
+			UP,
+			DOWN,
+			THUMB,
+			SHAFT
+		};
+		SPoint ptOldMousePos;
+		SSize  sizeThumb;
+
+		SRect rcUpButton;
+		SRect rcDownButton;
+		SRect rcDragThumb;
+
+		ButtonState eState;
+		HoveredButton eHoveredButton;
+	};
 
     class Section : public ControlManager
     {
@@ -228,7 +274,8 @@ namespace ui
         void Initialize()           override;
         bool MsgProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-        void SetupChildPositions()  override;
+        void SetupChildPositions()      override;
+        int GetScrollableHeight() const override { return iTotalPixelHeight - this->rcBoundingBox.Height(); }
 
         virtual void AddDummy();
         virtual void AddCheckBox(const std::string& strSelectableLabel, bool * bValue);
@@ -237,8 +284,10 @@ namespace ui
         virtual void AddSlider(const std::string& strLabel, float* flValue, float flMinValue, float flMaxValue);
         virtual void AddSlider(const std::string& strLabel, int* iValue, int iMinValue, int iMaxValue);
     protected:
+		int   iTotalPixelHeight;
         float flSizeScale;  /* Scale of the window space taken by section */
         SSize sizeSect;     /* Size of the section      */
+		std::unique_ptr<ScrollBar> scrollBar;   /* Scrollbar of the section */
     };
 
 

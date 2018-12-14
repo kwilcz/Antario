@@ -4,6 +4,7 @@
 #include "D3DFont.h"
 #include "..\Utils\Color.h"
 #include "..\Utils\Utils.h"
+#include <queue>
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
 #define COL2DWORD(x) (D3DCOLOR_ARGB(x.alpha, x.red, x.green, x.blue))
@@ -62,13 +63,13 @@ public: // Function members
     void SetCustomViewport(const SRect& vpRect);
 
     void SetCustomScissorRect(const SRect& rcRect);
-    void RestoreOriginalScissorRect() const;
+    void RestoreOriginalScissorRect();
     void RestoreOriginalViewport();
 
 private: // Variable members
     LPDIRECT3DDEVICE9 pDevice;
     D3DVIEWPORT9      pViewPort;
-    RECT              pScissorRect;
+    std::queue<RECT>  pScissorRect{};
 };
 extern DrawManager g_Render;
 

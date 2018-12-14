@@ -344,6 +344,226 @@ std::shared_ptr<Section> Tab::AddSection(const std::string& strLabel, float flPe
     return tmp;
 }
 
+ScrollBar::ScrollBar(ObjectPtr pParentObject)
+{
+	this->pParent = pParentObject;
+	this->szSizeObject.x = 8;
+	this->iPageSize = 0;
+	this->iScrollAmmount = 0;
+	this->eState = CLEAR;
+	this->bIsVisible = true;/* For initials checks */
+}
+
+
+void ScrollBar::Initialize()
+{
+	this->szSizeObject.y = pParent->GetSize().y - 2;
+	this->SetupPositions();
+}
+
+
+void ScrollBar::Render()
+{
+	if (!this->bIsVisible)
+		return;
+
+	/* Up/down button */
+	g_Render.RectFilled(this->rcUpButton, style.colCheckboxFill);
+	g_Render.RectFilled(this->rcDownButton, style.colCheckboxFill);
+
+	/* Drag thumb */
+	g_Render.RectFilled(this->rcDragThumb, style.colCheckboxFill);
+
+	/* Has to be here as wndproc is not called when you hold lmb and not do anything else */
+	this->HandleArrowHeldMode();
+}
+
+
+bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (!this->bIsVisible)
+		return false;
+	switch (uMsg)
+	{
+	case WM_MOUSEMOVE:
+	{
+		if (mouseCursor->IsInBounds(rcDragThumb))
+			eHoveredButton = THUMB;
+		else if (mouseCursor->IsInBounds(rcUpButton))
+			eHoveredButton = UP;
+		else if (mouseCursor->IsInBounds(rcDownButton))
+			eHoveredButton = DOWN;
+		else if (mouseCursor->IsInBounds(rcBoundingBox))
+			eHoveredButton = SHAFT;
+		else
+			eHoveredButton = NONE;
+
+		bIsHovered = eHoveredButton != NONE;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		if (!mouseCursor->bLMBHeld)
+			bIsThumbUsed = false;
+
+		if (bIsHovered && uMsg == WM_LBUTTONDOWN)
+		{
+			/* Handle button behaviour */
+			switch (eHoveredButton)
+			{
+			case THUMB:
+			{
+				if (mouseCursor->bLMBPressed)
+				{
+					this->RequestFocus();
+					bIsThumbUsed = true;
+				}
+				break;
+			}
+			case UP:
+			{
+				if (mouseCursor->bLMBPressed)
+				{
+					this->RequestFocus();
+
+					this->eState = CLICKED_UP;
+					this->iScrollAmmount -= 1;
+					UpdateThumbRect();
+					this->pParent->SetupPositions();
+					return true;
+				}
+				break;
+			}
+			case DOWN:
+			{
+				if (mouseCursor->bLMBPressed)
+				{
+					this->RequestFocus();
+
+					this->eState = CLICKED_DOWN;
+					this->iScrollAmmount += 1;
+					UpdateThumbRect();
+					this->pParent->SetupPositions();
+					return true;
+				}
+				break;
+			}
+			case SHAFT:
+			{
+				if (mouseCursor->bLMBPressed)
+				{
+					this->RequestFocus();
+					this->eState = CLEAR;
+					this->iScrollAmmount += mouseCursor->GetPos().y > rcDragThumb.top ? rcDragThumb.Height() : -rcDragThumb.Height();
+					UpdateThumbRect();
+					this->pParent->SetupPositions();
+					return true;
+				}
+			}
+			case NONE:
+				this->eState = CLEAR;
+				break;
+			}
+		}
+		if (bIsThumbUsed)
+		{
+			if (ptOldMousePos == SPoint(0, 0))
+				ptOldMousePos = mouseCursor->GetPos();
+
+			/* Change the scroll ammount by difference in pixels of the old and new mousepos */
+			iScrollAmmount += mouseCursor->GetPos().y - ptOldMousePos.y;
+			UpdateThumbRect();
+			this->pParent->SetupPositions();
+
+			return true;
+		}
+	}
+	break;
+	case WM_MOUSEWHEEL:
+	{
+		if (mouseCursor->IsInBounds(pParent->GetBBox()))
+		{
+			this->RequestFocus();
+			this->iScrollAmmount -= 10 * int(float(GET_WHEEL_DELTA_WPARAM(wParam)) / float(WHEEL_DELTA));
+			UpdateThumbRect();
+			this->pParent->SetupPositions();
+			return true;
+		}
+	}
+	}
+
+	ptOldMousePos = mouseCursor->GetPos();
+	return false;
+}
+
+
+void ScrollBar::SetupPositions()
+{
+	if (!this->bIsVisible)
+		return;
+
+	this->iPageSize = pParent->GetSize().y - style.iPaddingY * 2;
+	this->rcBoundingBox.left = pParent->GetBBox().right - szSizeObject.x - 2;
+	this->rcBoundingBox.right = rcBoundingBox.left + szSizeObject.x;
+	this->rcBoundingBox.top = pParent->GetBBox().top + 1;
+	this->rcBoundingBox.bottom = rcBoundingBox.top + szSizeObject.y;
+
+	this->rcUpButton = { rcBoundingBox.left, rcBoundingBox.top, rcBoundingBox.right, rcBoundingBox.top + szSizeObject.x };
+	this->rcDownButton = { rcBoundingBox.left, rcBoundingBox.bottom - szSizeObject.x, rcBoundingBox.right, rcBoundingBox.bottom };
+	this->rcDragThumb.left = rcUpButton.left;
+	this->rcDragThumb.right = rcUpButton.right;
+
+	/* Thumb size, -4 cus of space between top and the bottom button */
+	this->sizeThumb = { szSizeObject.x, rcDownButton.top - rcUpButton.bottom - pParent->GetScrollableHeight() - 4 };
+	UpdateThumbRect();
+}
+
+
+void ScrollBar::UpdateThumbRect()
+{
+	const auto iScrollableHeight = pParent->GetScrollableHeight();
+
+	if (iScrollableHeight <= 0)
+	{
+		/* Nothing to scroll through */
+		rcDragThumb.top = rcUpButton.bottom + 2;
+		rcDragThumb.bottom = rcDownButton.top - 2;
+		iScrollAmmount = 0;
+	}
+	else
+	{
+		iScrollAmmount = std::clamp(iScrollAmmount, 0, iScrollableHeight);
+		rcDragThumb.top = rcUpButton.bottom + 2 + iScrollAmmount;
+		rcDragThumb.bottom = rcDragThumb.top + sizeThumb.y;
+	}
+}
+
+
+void ScrollBar::HandleArrowHeldMode()
+{
+	if (mouseCursor->bLMBHeld)
+	{
+		switch (eHoveredButton)
+		{
+		case UP:
+		{
+			this->eState = HELD_UP;
+			this->iScrollAmmount -= 1;
+			UpdateThumbRect();
+			this->pParent->SetupPositions();
+			break;
+		}
+		case DOWN:
+		{
+			this->eState = HELD_DOWN;
+			this->iScrollAmmount += 1;
+			UpdateThumbRect();
+			this->pParent->SetupPositions();
+			break;
+		}
+		}
+	}
+}
+
 
 Tab::Tab(const std::string& strTabName, int iNumColumns, ObjectPtr parentWindow)
 {
@@ -447,7 +667,12 @@ void Section::Render()
     g_Render.RectFilled(this->rcBoundingBox, style.colSectionFill);
     g_Render.Rect(this->rcBoundingBox, style.colSectionOutl);
 
-    this->RenderChildObjects();
+    g_Render.SetCustomScissorRect(this->rcBoundingBox);
+    {
+        scrollBar->Render();
+        this->RenderChildObjects();
+    }
+    g_Render.RestoreOriginalScissorRect();
 }
 
 
@@ -471,17 +696,27 @@ void Section::Initialize()
         int(float(pParent->GetParent()->GetBBox().Height() - pParent->GetBBox().Height() - std::dynamic_pointer_cast<Window>(pParent->GetParent())->GetHeaderHeight()) * flSizeScale) - 2 * style.iPaddingY
     };
 
-    this->iMaxChildWidth = this->szSizeObject.x - 2 * style.iPaddingX;
+    scrollBar->Initialize();
+    this->iMaxChildWidth = this->szSizeObject.x - 2 * style.iPaddingX - scrollBar->GetBBox().Width();
     for (auto& it : vecChildren)
         it->Initialize();
 
     SetupPositions();
+
+    /* If there are not enough controls for scrollbar to be useful - disable it */
+    if (this->GetScrollableHeight() <= 0)
+        this->scrollBar->SetVisible(false);
 }
 
 
 bool Section::MsgProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    /* Let the focused control handle full msgproc if defined (could happen) */
+    /* Let the scrollbar handle input first */
+    if (this->scrollBar->HandleMouseInput(uMsg, wParam, lParam))
+        return true;
+
+
+    /* Then let the focused control handle full msgproc if defined (colorpickers / any other popup windows) */
     if (pFocusedObject && GetThis() == pFocusedObject->GetParent())
         if (pFocusedObject->MsgProc(uMsg, wParam, lParam))
             return true;
@@ -561,15 +796,23 @@ bool Section::MsgProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void Section::SetupChildPositions()
 {
-    int iPosY = this->rcBoundingBox.top + style.iPaddingY;
+    /* Create scrollbar object, this function is called first at init - thats why here */
+    if (!scrollBar)
+        this->scrollBar = std::make_unique<ScrollBar>(GetThis());
+
+    /* Setup positions of out scrollbar */
+    this->scrollBar->SetupPositions(); 
+
+    /* Saved used area of section. Used for control alignment. */
+    int iUsedArea = 0 - this->scrollBar->GetScrollAmmount();
     for (auto& it : vecChildren)
     {
         /* useful cast for later use */
         auto control = std::dynamic_pointer_cast<Control>(it);
 
-        const int iPosX = this->rcBoundingBox.left + style.iPaddingX;
-        
-        ///TODO: After adding scrollbars finish the code
+        const int iPosX = this->rcBoundingBox.left + style.iPaddingX,
+                  iPosY = this->rcBoundingBox.top  + style.iPaddingY + iUsedArea;
+
 
         /* Check if we will exceed bounds of the section and do not render the selectable */
         if (iPosY > this->GetBBox().bottom || iPosY + control->GetSize().y < this->GetPos().y)
@@ -591,8 +834,10 @@ void Section::SetupChildPositions()
         it->SetPos({ iPosX, iPosY });
         it->SetupPositions();
 
-        iPosY += it->GetSize().y + style.iPaddingY;
+        iUsedArea += it->GetSize().y + style.iPaddingY;
     }
+    /* Save full section height - all controls etc. */
+    this->iTotalPixelHeight = iUsedArea + this->scrollBar->GetScrollAmmount() + style.iPaddingY;
 }
 
 
@@ -636,6 +881,7 @@ bool Checkbox::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_LBUTTONDBLCLK:
         if (mouseCursor->bLMBPressed)
         {
+            /* Flip the checkbox value on LMButton press */
             *this->bCheckboxValue = !*this->bCheckboxValue;
             return true;
         }

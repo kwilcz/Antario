@@ -333,13 +333,14 @@ void DrawManager::RestoreOriginalViewport()
 
 void DrawManager::SetCustomScissorRect(const SRect& rcRect)
 {
-    auto rcTempRect = rcRect;
-    this->pDevice->GetScissorRect(&this->pScissorRect);
-    rcTempRect.Scissor(*reinterpret_cast<SRect*>(&pScissorRect));   /* Cut the new rect so its in-bounds with the old one (wont fuck up old scissor settings) */
-    this->pDevice->SetScissorRect(reinterpret_cast<const RECT*>(&rcTempRect));
+    RECT rc{};
+    pScissorRect.push(rc);
+    this->pDevice->GetScissorRect(&pScissorRect.back());
+    this->pDevice->SetScissorRect(reinterpret_cast<const RECT*>(&rcRect));
 }
 
-void DrawManager::RestoreOriginalScissorRect() const
+void DrawManager::RestoreOriginalScissorRect()
 {
-    this->pDevice->SetScissorRect(&this->pScissorRect);
+    this->pDevice->SetScissorRect(&pScissorRect.back());
+    pScissorRect.pop();
 }
