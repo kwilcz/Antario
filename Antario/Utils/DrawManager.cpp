@@ -334,7 +334,7 @@ void DrawManager::RestoreOriginalViewport()
 void DrawManager::SetCustomScissorRect(const SRect& rcRect)
 {
     RECT rc{};
-    pScissorRect.push(rc);
+    pScissorRect.push_back(rc);
     this->pDevice->GetScissorRect(&pScissorRect.back());
     this->pDevice->SetScissorRect(reinterpret_cast<const RECT*>(&rcRect));
 }
@@ -342,5 +342,5 @@ void DrawManager::SetCustomScissorRect(const SRect& rcRect)
 void DrawManager::RestoreOriginalScissorRect()
 {
     this->pDevice->SetScissorRect(&pScissorRect.back());
-    pScissorRect.pop();
+    pScissorRect.pop_back();
 }

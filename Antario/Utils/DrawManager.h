@@ -69,7 +69,7 @@ public: // Function members
 private: // Variable members
     LPDIRECT3DDEVICE9 pDevice;
     D3DVIEWPORT9      pViewPort;
-    std::queue<RECT>  pScissorRect{};
+    std::deque<RECT>  pScissorRect{};
 };
 extern DrawManager g_Render;
 
