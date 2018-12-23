@@ -26,12 +26,12 @@ void MenuMain::Initialize()
                 sectMain->AddButton("Shutdown", Detach);
                 sectMain->AddSlider("TestSlider", &float123, 0, 20);
                 sectMain->AddSlider("intslider", &testint3, 0, 10);
-                //sectMain->AddCombo("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
+                sectMain->AddCombo("TestCombo", &testint, std::vector<std::string>{ "Value1", "Value2", "Value3" });
             }
 
             auto sectMain2 = tab1->AddSection("TestSect2", 1.f);
             {
-                //sectMain2->AddCombo("TestCombo2", std::vector<std::string>{ "ttest", "ttest2", "ttest3" }, &testint2);
+                sectMain2->AddCombo("TestCombo2", &testint2, std::vector<std::string>{ "ttest", "ttest2", "ttest3" });
                 sectMain2->AddCheckBox("CheckboxSect2_1", &g_Settings.bShowBoxes);
                 sectMain2->AddCheckBox("Show Player Boxes", &g_Settings.bShowBoxes);
                 sectMain2->AddCheckBox("Show Player Weapons", &g_Settings.bShowWeapons);
@@ -49,12 +49,12 @@ void MenuMain::Initialize()
                 sectMain->AddButton("Shutdown", Detach);
                 sectMain->AddSlider("TestSlider", &float123, 0, 20);
                 sectMain->AddSlider("intslider", &testint3, 0, 10);
-                //sectMain->AddCombo("TestCombo", std::vector<std::string>{ "Value1", "Value2", "Value3" }, &testint);
+				sectMain->AddCombo("TestCombo", &testint, std::vector<std::string>{ "Value1", "Value2", "Value3" });
             }
 
             auto sectMain2 = tab2->AddSection("TestSect2", .5f);
             {
-                //sectMain2->AddCombo("TestCombo2", std::vector<std::string>{ "ttest", "ttest2", "ttest3" }, &testint2);
+				sectMain2->AddCombo("TestCombo2", &testint2, std::vector<std::string>{ "ttest", "ttest2", "ttest3" });
                 sectMain2->AddCheckBox("Bunnyhop Enabled", &g_Settings.bBhopEnabled);
                 sectMain2->AddCheckBox("Show Player Names", &g_Settings.bShowNames);
             }
