@@ -531,9 +531,13 @@ void ScrollBar::UpdateThumbRect()
 	}
 	else
 	{
-		iScrollAmmount = std::clamp(iScrollAmmount, 0, iScrollableHeight);
-		rcDragThumb.top = rcUpButton.bottom + 2 + iScrollAmmount;
-		rcDragThumb.bottom = rcDragThumb.top + sizeThumb.y;
+		this->iScrollAmmount = std::clamp(iScrollAmmount, 0, iScrollableHeight);
+		
+		auto min_y = this->rcUpButton.bottom + 2 + abs(sizeThumb.y);
+		float delta = static_cast<float>((this->rcDownButton.top - 2) - min_y) / static_cast<float>(iScrollableHeight);
+
+		this->rcDragThumb.top = min_y + std::clamp(static_cast<int>(static_cast<float>(iScrollAmmount * delta)), 0, INT_MAX);
+		this->rcDragThumb.bottom = (rcDragThumb.top + sizeThumb.y);
 	}
 }
 
