@@ -239,7 +239,7 @@ void Window::Render()
     g_Render.String(this->rcBoundingBox.Mid().x, this->rcBoundingBox.top + int(float(iHeaderHeight) * 0.5f), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y,
                     style.colHeaderText, this->pHeaderFont.get(), this->strLabel.c_str());
 
-    // Render all childrens
+    // Render all children
     this->RenderChildObjects();
 }
 

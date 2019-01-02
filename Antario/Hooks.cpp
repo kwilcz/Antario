@@ -129,7 +129,10 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
 HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceRect, const RECT* pDestRect, 
                                  HWND hDestWindowOverride,  const RGNDATA* pDirtyRegion)
 {
-    IDirect3DStateBlock9* stateBlock = nullptr;
+    IDirect3DStateBlock9* stateBlock     = nullptr;
+    IDirect3DVertexDeclaration9* vertDec = nullptr;
+
+    pDevice->GetVertexDeclaration(&vertDec);
     pDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &stateBlock);
 
     [pDevice]()
@@ -162,6 +165,7 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
 
     stateBlock->Apply();
     stateBlock->Release();
+    pDevice   ->SetVertexDeclaration(vertDec);
 
     static auto oPresent = g_Hooks.pD3DDevice9Hook->GetOriginal<Present_t>(17);
     return oPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);

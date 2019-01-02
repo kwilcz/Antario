@@ -47,7 +47,7 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 
     int sx = std::roundf(vecScreenOrigin.x);
     int sy = std::roundf(vecScreenOrigin.y);
-    int h = std::roundf(vecScreenBottom.y - vecScreenOrigin.y);
+    int h  = std::roundf(vecScreenBottom.y - vecScreenOrigin.y);
 
     g_Render.String(sx, sy + h - 16, CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
@@ -56,12 +56,12 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 
 void ESP::RenderWeaponName(C_BaseEntity* pEnt)
 {
-    Vector vecScreenPos;
-    if (!Utils::WorldToScreen(pEnt->GetRenderOrigin(), vecScreenPos))
+    Vector vecScreenOrigin, vecOrigin = pEnt->GetRenderOrigin();
+    if (!Utils::WorldToScreen(vecOrigin, vecScreenOrigin))
         return;
 
-    auto weapon = pEnt->GetActiveWeapon();
 
+    auto weapon = pEnt->GetActiveWeapon();
     if (!weapon)
         return;
 
@@ -70,7 +70,7 @@ void ESP::RenderWeaponName(C_BaseEntity* pEnt)
     strWeaponName.erase(0, 7);
     std::transform(strWeaponName.begin(), strWeaponName.end(), strWeaponName.begin(), ::toupper);
 
-    g_Render.String(vecScreenPos.x, vecScreenPos.y, CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+    g_Render.String(vecScreenOrigin.x, vecScreenOrigin.y, CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
                     g_Fonts.pFontTahoma10.get(), strWeaponName.c_str());
 }
@@ -89,9 +89,9 @@ void ESP::Render()
 
 
         if (!pPlayerEntity
-            || !pPlayerEntity->IsAlive()
+            || pPlayerEntity == g::pLocalEntity
             || pPlayerEntity->IsDormant()
-            || pPlayerEntity == g::pLocalEntity)
+            || !pPlayerEntity->IsAlive())
             continue;
 
 
