@@ -14,7 +14,7 @@ struct Vertex
 DrawManager::DrawManager()
 {
     this->pDevice = nullptr;
-	g_Fonts.pFontTahoma8 = nullptr;
+    g_Fonts.pFontTahoma8 = nullptr;
     g_Fonts.pFontTahoma10 = nullptr;
 }
 

@@ -495,7 +495,7 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y, FLOAT fXScale, FLOAT fYScal
         {
             if (dwFlags & CD3DFONT_DROPSHADOW)
             {
-				DWORD shadow = (dwColor & 0x00ffffff) | ((int)((float)((dwColor >> 24) & 255) * 0.6f) << 24); //big brain code 100% tested
+                auto shadow = (DWORD)((dwColor >> 24 & 255) * 0.6f) << 24;
                 *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), shadow, tx1, ty2);
                 *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), shadow, tx1, ty1);
                 *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), shadow, tx2, ty2);
@@ -614,12 +614,13 @@ HRESULT CD3DFont::DrawString(FLOAT sx, FLOAT sy, DWORD dwColor, const char* strT
         {
             if (dwFlags & CD3DFONT_DROPSHADOW)
             {
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty1);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), 0x9a000000, tx2, ty2);
-                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), 0x9a000000, tx1, ty1);
+                auto shadow = (DWORD)((dwColor >> 24 & 255) * 0.6f) << 24;
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), shadow, tx1, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), shadow, tx1, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), shadow, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), shadow, tx2, ty1);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + w + 0.5f, sy + h + 0.5f, 1.0f, 1.0f), shadow, tx2, ty2);
+                *pVertices++ = InitFont2DVertex(D3DXVECTOR4(sx + 0 + 0.5f, sy + 0 + 0.5f, 1.0f, 1.0f), shadow, tx1, ty1);
                 dwNumTriangles += 2;
             }
 
