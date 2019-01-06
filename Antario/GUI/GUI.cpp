@@ -1333,4 +1333,5 @@ int Slider<T>::GetZeroPos()
         return this->rcSelectable.left + static_cast<int>((0 - this->nMin) * float(this->rcBoundingBox.Width()) / float(this->nMax - this->nMin));
 
     return this->rcSelectable.left + 1;
+
 }
