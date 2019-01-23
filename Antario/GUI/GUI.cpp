@@ -174,16 +174,17 @@ void Section::AddSlider(const std::string& strLabel, int* iValue, int iMinValue,
 ObjectPtr ControlManager::GetObjectAtPoint(SPoint ptPoint)
 {
     ObjectPtr returnObject = nullptr;
-    std::for_each(std::execution::par, vecChildren.begin(), vecChildren.end(), 
-                [&ptPoint, &returnObject](ObjectPtr& object)
-    {
-        if (object->GetBBox().ContainsPoint(ptPoint))
-        {
-            object->SetHovered(true);
-            returnObject = object;
-        }
-        else object->SetHovered(false);
-    });
+    std::for_each(std::execution::par, vecChildren.begin(), vecChildren.end(),
+                  [&ptPoint, &returnObject](ObjectPtr& object)
+      {
+          const auto control = std::dynamic_pointer_cast<Control>(object);
+          if (object->GetBBox().ContainsPoint(ptPoint) && (!control || control->GetUsable()))
+          {
+              object->SetHovered(true);
+              returnObject = object;
+          }
+          else object->SetHovered(false);
+      });
     return returnObject;
 }
 
