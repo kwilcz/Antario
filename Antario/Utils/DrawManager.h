@@ -69,6 +69,7 @@ public: // Function members
 private: // Variable members
     LPDIRECT3DDEVICE9 pDevice;
     D3DVIEWPORT9      pViewPort;
+    SPoint            szScreenSize;
     std::deque<RECT>  pScissorRect{};
 };
 extern DrawManager g_Render;
@@ -81,34 +82,48 @@ public:
     void DeleteDeviceObjects()
     {
         Utils::Log("Deleting device objects...");
-        HRESULT hr;
-        hr = pFontTahoma8->DeleteDeviceObjects();
-        if (FAILED(hr)) { Utils::Log("Deleting proceture failed for font Tahoma 8"); }
-        hr = pFontTahoma10->DeleteDeviceObjects();
-        if (FAILED(hr)) { Utils::Log("Deleting proceture failed for font Tahoma 10"); }
+        try
+        {
+            pFontTahoma8->DeleteDeviceObjects();
+            pFontTahoma10->DeleteDeviceObjects();
+        }
+        catch (const HRESULT& hr)
+        {
+            Utils::Log("Deleting device objects failed.");
+            Utils::Log(hr);
+        }
     };
 
     void InvalidateDeviceObjects()
     {
-        HRESULT hr;
-        hr = pFontTahoma8->InvalidateDeviceObjects();
-        if (FAILED(hr)) { Utils::Log("Invalidating failed for font Tahoma 8"); }
-        hr = pFontTahoma10->InvalidateDeviceObjects();
-        if (FAILED(hr)) { Utils::Log("Invalidating failed for font Tahoma 10"); }
+        Utils::Log("Invalidating device objects...");
+        try
+        {
+            pFontTahoma8->InvalidateDeviceObjects();
+            pFontTahoma10->InvalidateDeviceObjects();
+        }
+        catch (const HRESULT& hr)
+        {
+            Utils::Log("Invalidation of the device objects failed.");
+            Utils::Log(hr);
+        }
     };
 
     void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     {
-        HRESULT hr;
-        hr = pFontTahoma8->InitDeviceObjects(pDevice);
-        if (FAILED(hr)) { Utils::Log(hr); }
-        hr = pFontTahoma8->RestoreDeviceObjects();
-        if (FAILED(hr)) { Utils::Log(hr); }
-
-        hr = pFontTahoma10->InitDeviceObjects(pDevice);
-        if (FAILED(hr)) { Utils::Log(hr); }
-        hr = pFontTahoma10->RestoreDeviceObjects();
-        if (FAILED(hr)) { Utils::Log(hr); }
+        Utils::Log("Initalizing device objects.");
+        try
+        {
+            pFontTahoma8 ->InitDeviceObjects(pDevice);
+            pFontTahoma10->InitDeviceObjects(pDevice);
+            pFontTahoma8 ->RestoreDeviceObjects();
+            pFontTahoma10->RestoreDeviceObjects();
+        }
+        catch (const HRESULT& hr)
+        {
+            Utils::Log("Initialization of the device objects failed.");
+            Utils::Log(hr);
+        }
     };
 
     // Fonts

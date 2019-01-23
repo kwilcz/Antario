@@ -16,7 +16,8 @@ DrawManager::DrawManager()
     this->pDevice = nullptr;
     g_Fonts.pFontTahoma8  = nullptr;
     g_Fonts.pFontTahoma10 = nullptr;
-    this->pViewPort = { 0, 0 };
+
+    this->pViewPort = { 0 };
 }
 
 
@@ -25,8 +26,21 @@ void DrawManager::InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     // Save the device internally
     this->pDevice = pDevice;
 
-    // Get viewport for our center coords
+    // Get render viewport
     this->pDevice->GetViewport(&pViewPort);
+
+    /* Get screen size */
+    IDirect3DSurface9* pSurface;
+    pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurface);
+
+    D3DSURFACE_DESC SurfaceDesc;
+    pSurface->GetDesc(&SurfaceDesc);
+
+    this->szScreenSize.x = SurfaceDesc.Width;
+    this->szScreenSize.y = SurfaceDesc.Height;
+
+    SAFE_RELEASE(pSurface);
+    /* ---------------- */
 
     // Create new fonts
     g_Fonts.pFontTahoma8  = std::make_unique<CD3DFont>(L"Tahoma", 8,  FW_NORMAL);
@@ -91,7 +105,7 @@ void DrawManager::Rect(int posx1, int posy1, int posx2, int posy2, Color color) 
 {
     D3DCOLOR dwColor = COL2DWORD(color);
 
-    /* Fix that fuckin offset of the rectangles */
+    /* DIFFERENT WITH/WITHOUT MULTISAMPLING */
     posx2 -= 1; posy2 -= 1;
 
     Vertex vert[5] =
@@ -313,7 +327,7 @@ void DrawManager::SetupRenderStates() const
 
 SPoint DrawManager::GetScreenCenter() const
 {
-    return SPoint(static_cast<int>(static_cast<int>(this->pViewPort.Width) * 0.5f), static_cast<int>(static_cast<int>(this->pViewPort.Height) * 0.5f));
+    return SPoint(static_cast<int>(static_cast<int>(this->szScreenSize.x) * 0.5f), static_cast<int>(static_cast<int>(this->szScreenSize.y) * 0.5f));
 }
 
 
