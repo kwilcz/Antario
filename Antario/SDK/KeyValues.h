@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "Color.h"
+#include "../Utils/Color.h"
 
 typedef void* FileHandle_t;
 typedef void* GetSymbolProc_t;

@@ -72,6 +72,7 @@ CD3DFont::CD3DFont(const TCHAR* strFontName, DWORD dwHeight, DWORD dwWeight, DWO
     this->dwFontFlags       = dwFlags;
     this->dwSpacing         = 0;
 
+
     this->pd3dDevice = NULL;
     this->pTexture   = NULL;
     this->pVB        = NULL;
@@ -246,7 +247,7 @@ HRESULT CD3DFont::InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice)
     DeleteObject(hFont);
     DeleteDC(hDC);
 
-    this->iHeight = static_cast<float>([this]()
+    this->iHeight = static_cast<int>([this]()
     {
         SIZE size;
         this->GetTextExtent("WJ", &size);
@@ -537,6 +538,10 @@ HRESULT CD3DFont::DrawStringScaled(FLOAT x, FLOAT y, FLOAT fXScale, FLOAT fYScal
     return S_OK;
 }
 
+HRESULT CD3DFont::DrawString(int sx, int sy, DWORD dwColor, const char* strText, DWORD dwFlags)
+{
+    return DrawString(FLOAT(sx), FLOAT(sy), dwColor, strText, dwFlags);
+}
 
 
 

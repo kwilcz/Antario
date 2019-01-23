@@ -3,6 +3,7 @@
 #include "Utils\Utils.h"
 #include "Settings.h"
 #include "Utils\DrawManager.h"
+
 DWORD WINAPI OnDllAttach(PVOID base)
 {
 #ifdef _DEBUG       // Create console only in debug mode
@@ -42,6 +43,9 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
     {
         DisableThreadLibraryCalls(hModule);
         auto h = CreateThread(nullptr, NULL, OnDllAttach, hModule, NULL, nullptr);
+        if (!h)
+            throw std::exception("Error while creating thread.");
+
         CloseHandle(h);
     }
     else if (dwReason == DLL_PROCESS_DETACH) 

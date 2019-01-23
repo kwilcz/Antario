@@ -114,7 +114,7 @@ inline Vector::Vector(float X, float Y, float Z)
     CHECK_VALID(*this);
 }
 //===============================================
-inline Vector::Vector(void) { }
+inline Vector::Vector(void) { x = 0; y = 0; z = 0; }
 //===============================================
 inline void Vector::Zero()
 {
@@ -494,7 +494,7 @@ inline void VectorMA(const float * start, float scale, const float *direction, f
 class ALIGN16 VectorAligned : public Vector
 {
 public:
-    inline VectorAligned(void) {};
+    inline VectorAligned(void) { x = 0, y = 0; z = 0; };
     inline VectorAligned(float X, float Y, float Z)
     {
         Init(X, Y, Z);
@@ -715,6 +715,7 @@ inline Vector2D::Vector2D(void)
     // Initialize to NAN to catch errors
     //x = y = float_NAN;
 #endif
+    x = 0; y = 0;
 }
 
 inline Vector2D::Vector2D(float X, float Y)
@@ -1283,6 +1284,7 @@ private:
 //-----------------------------------------------------------------------------
 inline QAngle::QAngle(void)
 {
+    x = 0; y = 0; z = 0;
 #ifdef _DEBUG
 #ifdef VECTOR_PARANOIA
     // Initialize to NAN to catch errors

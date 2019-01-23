@@ -346,12 +346,14 @@ std::shared_ptr<Section> Tab::AddSection(const std::string& strLabel, float flPe
 
 ScrollBar::ScrollBar(ObjectPtr pParentObject)
 {
-	this->pParent = pParentObject;
+	this->pParent   = pParentObject;
+    this->iPageSize = 0;
 	this->szSizeObject.x = 8;
-	this->iPageSize = 0;
 	this->iScrollAmmount = 0;
-	this->eState = CLEAR;
-	this->bIsVisible = true;/* For initials checks */
+    this->bIsThumbUsed   = false;
+	this->bIsVisible     = true; /* For initials checks */
+    this->eState         = CLEAR;
+    this->eHoveredButton = HoveredButton::NONE;
 }
 
 
@@ -658,8 +660,9 @@ void Tab::SetupChildPositions()
 
 Section::Section(const std::string& strLabel, float flPercSize, ObjectPtr parentTab)
 {
-    this->pParent = parentTab;
+    this->pParent  = parentTab;
     this->strLabel = strLabel;
+    this->iTotalPixelHeight = 0;
     this->type = TYPE_SECTION;
 
     flPercSize = std::clamp(flPercSize, 0.f, 1.f);
@@ -1172,7 +1175,7 @@ template <typename T>
 void Slider<T>::Initialize()
 {
     this->szSizeObject.x = this->pParent->GetMaxChildWidth();
-    this->szSizeObject.y = (pFont->iHeight + int(float(style.iPaddingY) * 0.5f)) * 1.75f;
+    this->szSizeObject.y = int((pFont->iHeight + int(float(style.iPaddingY) * 0.5f)) * 1.75f);
     const SSize szSelectableSize = { this->szSizeObject.x, pFont->iHeight + int(float(style.iPaddingY) * 0.5f) };
 
     this->SetValue(*nValue);   // Since its limited, it should not be any higher - even when set in settings before.

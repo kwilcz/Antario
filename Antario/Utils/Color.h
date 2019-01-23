@@ -49,7 +49,7 @@ struct Color
             return *this;
         }
 
-        h = std::fmodf(h, 1.0f) / (60.0f / 360.0f);
+        h = fmodf(h, 1.0f) / (60.0f / 360.0f);
         int   i = static_cast<int>(h);
         float f = h - static_cast<float>(i);
         float p = v * (1.0f - s);
