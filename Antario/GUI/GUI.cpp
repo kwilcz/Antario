@@ -347,13 +347,13 @@ std::shared_ptr<Section> Tab::AddSection(const std::string& strLabel, float flPe
 
 ScrollBar::ScrollBar(ObjectPtr pParentObject)
 {
-	this->pParent   = pParentObject;
+    this->pParent   = pParentObject;
     this->iPageSize = 0;
-	this->szSizeObject.x = 8;
-	this->iScrollAmmount = 0;
+    this->szSizeObject.x = 8;
+    this->flScrollAmmount = 0;
+    this->bIsVisible     = true; /* For initials checks */
     this->bIsThumbUsed   = false;
-	this->bIsVisible     = true; /* For initials checks */
-    this->eState         = CLEAR;
+
     this->eHoveredButton = HoveredButton::NONE;
 }
 
@@ -386,6 +386,7 @@ bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (!this->bIsVisible)
 		return false;
+
 	switch (uMsg)
 	{
 	case WM_MOUSEMOVE:
@@ -428,8 +429,7 @@ bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					this->RequestFocus();
 
-					this->eState = CLICKED_UP;
-					this->iScrollAmmount -= 1;
+					this->flScrollAmmount -= 1;
 					UpdateThumbRect();
 					this->pParent->SetupPositions();
 					return true;
@@ -442,8 +442,7 @@ bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					this->RequestFocus();
 
-					this->eState = CLICKED_DOWN;
-					this->iScrollAmmount += 1;
+					this->flScrollAmmount += 1;
 					UpdateThumbRect();
 					this->pParent->SetupPositions();
 					return true;
@@ -455,16 +454,12 @@ bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (mouseCursor->bLMBPressed)
 				{
 					this->RequestFocus();
-					this->eState = CLEAR;
-					this->iScrollAmmount += mouseCursor->GetPos().y > rcDragThumb.top ? rcDragThumb.Height() : -rcDragThumb.Height();
+                    this->flScrollAmmount += mouseCursor->GetPos().y > rcDragThumb.top ? iPageSize : -iPageSize;
 					UpdateThumbRect();
 					this->pParent->SetupPositions();
 					return true;
 				}
 			}
-			case NONE:
-				this->eState = CLEAR;
-				break;
 			}
 		}
 		if (bIsThumbUsed)
@@ -472,8 +467,14 @@ bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (ptOldMousePos == SPoint(0, 0))
 				ptOldMousePos = mouseCursor->GetPos();
 
-			/* Change the scroll ammount by difference in pixels of the old and new mousepos */
-			iScrollAmmount += mouseCursor->GetPos().y - ptOldMousePos.y;
+            /* Scale the mouse movement accordingly */
+            auto diff = mouseCursor->GetPos().y - ptOldMousePos.y;
+            const auto scale = [](int in, int bmin, int bmax, int lmin, int lmax) {
+                return (float((lmax - lmin) * (in - bmin)) / float((bmax - bmin))) + lmin;
+            };
+
+			/* Change the scroll ammount by difference in pixels of the old and new mousepos scaled accordingly */
+			flScrollAmmount += scale(diff, 0, rcDownButton.top - rcUpButton.bottom - 4 - rcDragThumb.Height(), 0, pParent->GetScrollableHeight());
 			UpdateThumbRect();
 			this->pParent->SetupPositions();
 
@@ -486,7 +487,7 @@ bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (mouseCursor->IsInBounds(pParent->GetBBox()))
 		{
 			this->RequestFocus();
-			this->iScrollAmmount -= 10 * int(float(GET_WHEEL_DELTA_WPARAM(wParam)) / float(WHEEL_DELTA));
+			this->flScrollAmmount -= 10 * int(float(GET_WHEEL_DELTA_WPARAM(wParam)) / float(WHEEL_DELTA));
 			UpdateThumbRect();
 			this->pParent->SetupPositions();
 			return true;
@@ -504,19 +505,19 @@ void ScrollBar::SetupPositions()
 	if (!this->bIsVisible)
 		return;
 
-	this->iPageSize = pParent->GetSize().y - style.iPaddingY * 2;
-	this->rcBoundingBox.left = pParent->GetBBox().right - szSizeObject.x - 2;
-	this->rcBoundingBox.right = rcBoundingBox.left + szSizeObject.x;
-	this->rcBoundingBox.top = pParent->GetBBox().top + 1;
-	this->rcBoundingBox.bottom = rcBoundingBox.top + szSizeObject.y;
+    this->iPageSize = pParent->GetSize().y - style.iPaddingY * 2;
+    this->rcBoundingBox.left   = pParent->GetBBox().right - szSizeObject.x - 2;
+    this->rcBoundingBox.right  = rcBoundingBox.left + szSizeObject.x;
+    this->rcBoundingBox.top    = pParent->GetBBox().top + 1;
+    this->rcBoundingBox.bottom = rcBoundingBox.top + szSizeObject.y;
 
-	this->rcUpButton = { rcBoundingBox.left, rcBoundingBox.top, rcBoundingBox.right, rcBoundingBox.top + szSizeObject.x };
-	this->rcDownButton = { rcBoundingBox.left, rcBoundingBox.bottom - szSizeObject.x, rcBoundingBox.right, rcBoundingBox.bottom };
-	this->rcDragThumb.left = rcUpButton.left;
+	this->rcUpButton        = { rcBoundingBox.left, rcBoundingBox.top, rcBoundingBox.right, rcBoundingBox.top + szSizeObject.x };
+	this->rcDownButton      = { rcBoundingBox.left, rcBoundingBox.bottom - szSizeObject.x, rcBoundingBox.right, rcBoundingBox.bottom };
+	this->rcDragThumb.left  = rcUpButton.left;
 	this->rcDragThumb.right = rcUpButton.right;
 
 	/* Thumb size, -4 cus of space between top and the bottom button */
-	this->sizeThumb = { szSizeObject.x, rcDownButton.top - rcUpButton.bottom - pParent->GetScrollableHeight() - 4 };
+	this->sizeThumb = { szSizeObject.x, max(int(float((rcDownButton.top - rcUpButton.bottom) * iPageSize) / float(pParent->GetScrollableHeight() + iPageSize - 4)), style.iMinThumbSize) };
 	UpdateThumbRect();
 }
 
@@ -528,19 +529,18 @@ void ScrollBar::UpdateThumbRect()
 	if (iScrollableHeight <= 0)
 	{
 		/* Nothing to scroll through */
-		rcDragThumb.top = rcUpButton.bottom + 2;
+		rcDragThumb.top    = rcUpButton.bottom + 2;
 		rcDragThumb.bottom = rcDownButton.top - 2;
-		iScrollAmmount = 0;
+		flScrollAmmount = 0;
 	}
 	else
 	{
-		this->iScrollAmmount = std::clamp(iScrollAmmount, 0, iScrollableHeight);
-		
-		auto min_y = this->rcUpButton.bottom + 2 + abs(sizeThumb.y);
-		float delta = static_cast<float>((this->rcDownButton.top - 2) - min_y) / static_cast<float>(iScrollableHeight);
+        /* Make sure we won't exceed out of bounds */
+		this->flScrollAmmount = std::clamp(flScrollAmmount, 0.f, float(iScrollableHeight));
 
-		this->rcDragThumb.top = min_y + std::clamp(static_cast<int>(static_cast<float>(iScrollAmmount * delta)), 0, INT_MAX);
-		this->rcDragThumb.bottom = (rcDragThumb.top + sizeThumb.y);
+        /* 2 offset from buttons(so +2), and the position is scaled with the scrollable height (size of the aviable area for thumb / scrHeight) */
+        rcDragThumb.top    = rcUpButton.bottom + 2 + (flScrollAmmount * (rcBoundingBox.Height() - (szSizeObject.x + 2) * 2 - sizeThumb.y) / iScrollableHeight);
+        rcDragThumb.bottom = rcDragThumb.top + sizeThumb.y;
 	}
 }
 
@@ -553,16 +553,14 @@ void ScrollBar::HandleArrowHeldMode()
 		{
 		case UP:
 		{
-			this->eState = HELD_UP;
-			this->iScrollAmmount -= 1;
+			this->flScrollAmmount -= 1;
 			UpdateThumbRect();
 			this->pParent->SetupPositions();
 			break;
 		}
 		case DOWN:
 		{
-			this->eState = HELD_DOWN;
-			this->iScrollAmmount += 1;
+			this->flScrollAmmount += 1;
 			UpdateThumbRect();
 			this->pParent->SetupPositions();
 			break;
@@ -1238,8 +1236,7 @@ bool Slider<T>::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
         /* Make sure we correct our hover state */
         this->bIsHovered = mouseCursor->IsInBounds(this->rcSelectable);
 
-        if (uMsg != WM_LBUTTONDOWN)
-            this->iDragX = mouseCursor->GetPos().x;
+        this->iDragX = mouseCursor->GetPos().x;
     }
     case WM_LBUTTONDOWN:
     {
@@ -1279,17 +1276,17 @@ bool Slider<T>::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 template <typename T>
 bool Slider<T>::HandleKeyboardInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    switch (uMsg)
+
+    if ( uMsg == WM_KEYDOWN )
     {
-    case WM_KEYDOWN:
-    {
-        switch (wParam)
+        switch ( wParam )
         {
         case VK_HOME:
             this->SetValue(nMin);
             return true;
         case VK_END:
             this->SetValue(nMax);
+            return true;
         case VK_LEFT:
         case VK_DOWN:
             this->SetValue(*this->nValue - static_cast<T>(this->GetValuePerPixel()));
@@ -1305,7 +1302,6 @@ bool Slider<T>::HandleKeyboardInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
             this->SetValue(*this->nValue + static_cast<T>(10.f * this->GetValuePerPixel()));
             return true;
         }
-    }
     }
 
     return false;

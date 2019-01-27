@@ -34,6 +34,7 @@ namespace ui
     {
         int   iPaddingX       = 20;                     /*- Padding between sections                            -*/
         int   iPaddingY       = 6;                      /*- Padding between selectables                         -*/
+        int   iMinThumbSize   = 10;
         Color colCursor       = { 0, 150, 255, 100 };   /*- Color of the mouse cursor                           -*/
         Color colHover        = { 100, 100, 100, 30 };  /*- Color applied on the obj when mouse hovers above it -*/
         Color colSectionOutl  = { 15, 15, 15, 200 };    /*- Color of the section outline                        -*/
@@ -231,10 +232,10 @@ namespace ui
 		bool CanHaveFocus() const override { return true; }
 
 		void UpdateThumbRect();
-		int  GetScrollAmmount() const { return this->iScrollAmmount; };
+		int  GetScrollAmmount() const { return this->flScrollAmmount; };
 	private:
 		void HandleArrowHeldMode();
-		int  iScrollAmmount; /* The offset of the initial position            */
+		float flScrollAmmount; /* The offset of the initial position            */
 		int  iPageSize;      /* How much pixels are rendered in page (height) */
 		bool bIsThumbUsed;   /* Defines if the tumb is grabbed                */
 
