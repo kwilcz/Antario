@@ -8,7 +8,7 @@ Hooks    g_Hooks;
 Settings g_Settings;
 
 
-WeaponInfo_t g_WeaponInfoCopy[64];
+WeaponInfo_t g_WeaponInfoCopy[255];
 
 void Hooks::Init()
 {
@@ -87,14 +87,13 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
         return oCreateMove;
 
 	// Create a copy of CSWpnData for every live player in game as it's not always accessable in the present hook
-	if (g::pLocalEntity && g_pEngine->IsInGame())
+	if (g_pEngine->IsInGame())
 	{
 		for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
 		{
 			C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
 
 			if (!pPlayerEntity
-				|| pPlayerEntity == g::pLocalEntity
 				|| pPlayerEntity->IsDormant()
 				|| !pPlayerEntity->IsAlive())
 				continue;

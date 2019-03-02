@@ -5,7 +5,7 @@
 #include "..\Utils\Utils.h"
 #include "..\Utils\NetvarManager.h"
 
-extern WeaponInfo_t g_WeaponInfoCopy[64];
+extern WeaponInfo_t g_WeaponInfoCopy[255];
 
 // class predefinition
 class C_BaseCombatWeapon;
