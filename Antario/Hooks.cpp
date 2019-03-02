@@ -8,6 +8,8 @@ Hooks    g_Hooks;
 Settings g_Settings;
 
 
+WeaponInfo_t g_WeaponInfoCopy[64];
+
 void Hooks::Init()
 {
     // Get window handle
@@ -21,7 +23,6 @@ void Hooks::Init()
     g_pNetvars = std::make_unique<NetvarTree>();// Get netvars after getting interfaces as we use them
 
     Utils::Log("Hooking in progress...");
-
 
     // D3D Device pointer
     const uintptr_t d3dDevice = **reinterpret_cast<uintptr_t**>(Utils::FindSignature("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
@@ -85,6 +86,26 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     if (!g::pLocalEntity)
         return oCreateMove;
 
+	// Create a copy of CSWpnData for every live player in game as it's not always accessable in the present hook
+	if (g::pLocalEntity && g_pEngine->IsInGame())
+	{
+		for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
+		{
+			C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
+
+			if (!pPlayerEntity
+				|| pPlayerEntity == g::pLocalEntity
+				|| pPlayerEntity->IsDormant()
+				|| !pPlayerEntity->IsAlive())
+				continue;
+
+			auto weapon = pPlayerEntity->GetActiveWeapon();
+			if (!weapon)
+				continue;
+
+			g_WeaponInfoCopy[it] = *weapon->GetCSWpnData();
+		}
+	}
 
     g_Misc.OnCreateMove();
     // run shit outside enginepred
