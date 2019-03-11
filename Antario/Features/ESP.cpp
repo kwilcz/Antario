@@ -54,21 +54,21 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
                     g_Fonts.pFontTahoma10.get(), pInfo.szName);
 }
 
-void ESP::RenderWeaponName(C_BaseEntity* pEnt)
+void ESP::RenderWeaponName(C_BaseEntity* pEnt, int pEntIndex)
 {
     Vector vecScreenOrigin, vecOrigin = pEnt->GetRenderOrigin();
     if (!Utils::WorldToScreen(vecOrigin, vecScreenOrigin))
         return;
 
-
-    auto weapon = pEnt->GetActiveWeapon();
-    if (!weapon)
+    WeaponInfo_t weapon = g_WeaponInfoCopy[pEntIndex];
+    if (!weapon.szWeaponName)
         return;
 
-    auto strWeaponName = weapon->GetName();
+    std::string strWeaponName = std::string(weapon.szWeaponName);
 
+    /* Remove "weapon_" prefix */
+    strWeaponName.erase(0, 7); 
     /* All uppercase */
-    strWeaponName.erase(0, 7);
     std::transform(strWeaponName.begin(), strWeaponName.end(), strWeaponName.begin(), ::toupper);
 
     g_Render.String(int(vecScreenOrigin.x), int(vecScreenOrigin.y), CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
@@ -103,6 +103,6 @@ void ESP::Render()
             this->RenderName(pPlayerEntity, it);
 
         if (g_Settings.bShowWeapons)
-            this->RenderWeaponName(pPlayerEntity);
+            this->RenderWeaponName(pPlayerEntity, it);
     }
 }
