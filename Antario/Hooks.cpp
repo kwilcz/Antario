@@ -1,4 +1,4 @@
-﻿#include <thread>
+#include <thread>
 #include "Hooks.h"
 #include "Utils\Utils.h"
 #include "Features\Features.h"
@@ -128,7 +128,7 @@ void __fastcall Hooks::LockCursor(ISurface* thisptr, void* edx)
 
 HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
-    static auto oReset = g_Hooks.pD3DDevice9Hook->GetOriginal<Reset_t>(16);
+    static auto oReset = g_Hooks.pD3DDevice9Hook->GetOriginal<Reset_t>(vtable_indexes::reset);
 
     if (g_Hooks.bInitializedDrawManager)
     {
