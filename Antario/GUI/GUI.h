@@ -2,6 +2,7 @@
 #include <vector>
 #include "..\Utils\DrawManager.h"
 
+#pragma warning(disable : 4244) // disable data loss warning
 
 namespace ui
 {
