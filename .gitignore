@@ -25,9 +25,11 @@
 *.la
 *.a
 *.lib
+!freetype.lib
 
 # Executables
 *.dll
+!freetype.dll
 *.exe
 *.out
 *.app
