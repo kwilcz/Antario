@@ -8,8 +8,6 @@ Hooks    g_Hooks;
 Settings g_Settings;
 
 
-WeaponInfo_t g_WeaponInfoCopy[255];
-
 void Hooks::Init()
 {
     // Get window handle
@@ -34,7 +32,7 @@ void Hooks::Init()
     // VMTHooks
     g_Hooks.pD3DDevice9Hook = std::make_unique<VMTHook>(reinterpret_cast<void*>(d3dDevice));
     g_Hooks.pClientModeHook = std::make_unique<VMTHook>(g_pClientMode);
-    g_Hooks.pSurfaceHook	= std::make_unique<VMTHook>(g_pSurface);
+    g_Hooks.pSurfaceHook    = std::make_unique<VMTHook>(g_pSurface);
 
     // Hook the table functions
     g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::reset,      Hooks::Reset);
@@ -58,7 +56,7 @@ void Hooks::Restore()
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::reset);
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::present);
         g_Hooks.pClientModeHook->Unhook(vtable_indexes::createMove);
-        g_Hooks.pSurfaceHook->Unhook(vtable_indexes::lockCursor);
+        g_Hooks.pSurfaceHook   ->Unhook(vtable_indexes::lockCursor);
         SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.pOriginalWNDProc));
 
         g_pNetvars.reset();   /* Need to reset by-hand, global pointer so doesnt go out-of-scope */
@@ -100,7 +98,7 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 	    if (!weapon)
 	        continue;
 
-        g_WeaponInfoCopy[it] = *weapon->GetCSWpnData();
+        g::pWeaponInfo[it] = *weapon->GetCSWpnData();
     }
 	
 
@@ -197,7 +195,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     // Working when you HOLD th button, not when you press it.
     const auto getButtonHeld = [uMsg, wParam](bool& bButton, int vKey)
     {
-		if (wParam != vKey) return;
+        if (wParam != vKey) return;
 
         if (uMsg == WM_KEYDOWN)
             bButton = true;
@@ -205,15 +203,15 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             bButton = false;
     };
 
-	const auto getButtonToggle = [uMsg, wParam](bool& bButton, int vKey)
-	{
-		if (wParam != vKey) return;
+    const auto getButtonToggle = [uMsg, wParam](bool& bButton, int vKey)
+    {
+        if (wParam != vKey) return;
 
-		if (uMsg == WM_KEYUP)
-			bButton = !bButton;
-	};
+        if (uMsg == WM_KEYUP)
+            bButton = !bButton;
+    };
 
-	getButtonToggle(g_Settings.bMenuOpened, VK_INSERT);
+    getButtonToggle(g_Settings.bMenuOpened, VK_INSERT);
 
     if (g_Hooks.bInitializedDrawManager)
     {

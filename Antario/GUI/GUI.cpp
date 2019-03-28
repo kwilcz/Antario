@@ -63,16 +63,15 @@ void MouseCursor::RunThink(const UINT uMsg, const LPARAM lParam)
         this->bRMBHeld = false;
         this->bRMBPressed = false;
         break;
-    default:
-        break;
     }
+
     if (this->bLMBPressed)
     {
         if (this->bLMBHeld)
             this->bLMBPressed = false;
-
         this->bLMBHeld = true;
     }
+
     if (this->bRMBPressed)
     {
         if (this->bRMBHeld)
@@ -347,12 +346,12 @@ std::shared_ptr<Section> Tab::AddSection(const std::string& strLabel, float flPe
 
 ScrollBar::ScrollBar(ObjectPtr pParentObject)
 {
-    this->pParent   = pParentObject;
-    this->iPageSize = 0;
-    this->szSizeObject.x = 8;
+    this->pParent =         pParentObject;
+    this->iPageSize =       0;
+    this->szSizeObject.x =  8;
     this->flScrollAmmount = 0;
-    this->bIsVisible     = true; /* For initials checks */
-    this->bIsThumbUsed   = false;
+    this->bIsVisible =      true; /* For initials checks */
+    this->bIsThumbUsed =    false;
 
     this->eHoveredButton = HoveredButton::NONE;
 }
@@ -360,112 +359,112 @@ ScrollBar::ScrollBar(ObjectPtr pParentObject)
 
 void ScrollBar::Initialize()
 {
-	this->szSizeObject.y = pParent->GetSize().y - 2;
-	this->SetupPositions();
+    this->szSizeObject.y = pParent->GetSize().y - 2;
+    this->SetupPositions();
 }
 
 
 void ScrollBar::Render()
 {
-	if (!this->bIsVisible)
-		return;
+    if (!this->bIsVisible)
+        return;
 
-	/* Up/down button */
-	g_Render.RectFilled(this->rcUpButton, style.colCheckboxFill);
-	g_Render.RectFilled(this->rcDownButton, style.colCheckboxFill);
+    /* Up/down button */
+    g_Render.RectFilled(this->rcUpButton,   style.colCheckboxFill);
+    g_Render.RectFilled(this->rcDownButton, style.colCheckboxFill);
 
-	/* Drag thumb */
-	g_Render.RectFilled(this->rcDragThumb, style.colCheckboxFill);
+    /* Drag thumb */
+    g_Render.RectFilled(this->rcDragThumb,  style.colCheckboxFill);
 
-	/* Has to be here as wndproc is not called when you hold lmb and not do anything else */
-	this->HandleArrowHeldMode();
+    /* Has to be here as wndproc is not called when you hold lmb and not do anything else */
+    this->HandleArrowHeldMode();
 }
 
 
 bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (!this->bIsVisible)
-		return false;
+    if (!this->bIsVisible)
+        return false;
 
-	switch (uMsg)
-	{
-	case WM_MOUSEMOVE:
-	{
-		if (mouseCursor->IsInBounds(rcDragThumb))
-			eHoveredButton = THUMB;
-		else if (mouseCursor->IsInBounds(rcUpButton))
-			eHoveredButton = UP;
-		else if (mouseCursor->IsInBounds(rcDownButton))
-			eHoveredButton = DOWN;
-		else if (mouseCursor->IsInBounds(rcBoundingBox))
-			eHoveredButton = SHAFT;
-		else
-			eHoveredButton = NONE;
+    switch (uMsg)
+    {
+    case WM_MOUSEMOVE:
+    {
+        if (mouseCursor->IsInBounds(rcDragThumb))
+            eHoveredButton = THUMB;
+        else if (mouseCursor->IsInBounds(rcUpButton))
+            eHoveredButton = UP;
+        else if (mouseCursor->IsInBounds(rcDownButton))
+            eHoveredButton = DOWN;
+        else if (mouseCursor->IsInBounds(rcBoundingBox))
+            eHoveredButton = SHAFT;
+        else
+            eHoveredButton = NONE;
 
-		bIsHovered = eHoveredButton != NONE;
-	}
-	case WM_LBUTTONDOWN:
-	{
-		if (!mouseCursor->bLMBHeld)
-			bIsThumbUsed = false;
+        bIsHovered = eHoveredButton != NONE;
+    }
+    case WM_LBUTTONDOWN:
+    {
+        if (!mouseCursor->bLMBHeld)
+            bIsThumbUsed = false;
 
-		if (bIsHovered && uMsg == WM_LBUTTONDOWN)
-		{
-			/* Handle button behaviour */
-			switch (eHoveredButton)
-			{
-			case THUMB:
-			{
-				if (mouseCursor->bLMBPressed)
-				{
-					this->RequestFocus();
-					bIsThumbUsed = true;
-				}
-				break;
-			}
-			case UP:
-			{
-				if (mouseCursor->bLMBPressed)
-				{
-					this->RequestFocus();
+        /* Handle pressed button behaviour */
+        if (bIsHovered && uMsg == WM_LBUTTONDOWN)
+        {
+            switch (eHoveredButton)
+            {
+            case THUMB:
+            {
+                if (mouseCursor->bLMBPressed)
+                {
+                    this->RequestFocus();
+                    bIsThumbUsed = true;
+                }
+                break;
+            }
+            case UP:
+            {
+                if (mouseCursor->bLMBPressed)
+                {
+                    this->RequestFocus();
 
-					this->flScrollAmmount -= 1;
-					UpdateThumbRect();
-					this->pParent->SetupPositions();
-					return true;
-				}
-				break;
-			}
-			case DOWN:
-			{
-				if (mouseCursor->bLMBPressed)
-				{
-					this->RequestFocus();
+                    this->flScrollAmmount -= 1;
+                    UpdateThumbRect();
+                    this->pParent->SetupPositions();
+                    return true;
+                }
+                break;
+            }
+            case DOWN:
+                if (mouseCursor->bLMBPressed)
+                {
+                    this->RequestFocus();
 
-					this->flScrollAmmount += 1;
-					UpdateThumbRect();
-					this->pParent->SetupPositions();
-					return true;
-				}
-				break;
-			}
-			case SHAFT:
-			{
-				if (mouseCursor->bLMBPressed)
-				{
-					this->RequestFocus();
+                    this->flScrollAmmount += 1;
+                    UpdateThumbRect();
+                    this->pParent->SetupPositions();
+                    return true;
+                }
+                break;
+            case SHAFT:
+            {
+                if (mouseCursor->bLMBPressed)
+                {
+                    this->RequestFocus();
                     this->flScrollAmmount += mouseCursor->GetPos().y > rcDragThumb.top ? iPageSize : -iPageSize;
-					UpdateThumbRect();
-					this->pParent->SetupPositions();
-					return true;
-				}
-			}
-			}
-		}
-		if (bIsThumbUsed)
-		{
-			if (ptOldMousePos == SPoint(0, 0))
-				ptOldMousePos = mouseCursor->GetPos();
+                    UpdateThumbRect();
+                    this->pParent->SetupPositions();
+                    return true;
+                }
+            }
+            }
+        }
+
+        /* If thumb is dragged */
+        if (bIsThumbUsed)
+        {
+            if (ptOldMousePos == SPoint(0, 0))
+                ptOldMousePos = mouseCursor->GetPos();
 
             /* Scale the mouse movement accordingly */
             auto diff = mouseCursor->GetPos().y - ptOldMousePos.y;
@@ -473,37 +472,37 @@ bool ScrollBar::HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 return (float((lmax - lmin) * (in - bmin)) / float((bmax - bmin))) + lmin;
             };
 
-			/* Change the scroll ammount by difference in pixels of the old and new mousepos scaled accordingly */
-			flScrollAmmount += scale(diff, 0, rcDownButton.top - rcUpButton.bottom - 4 - rcDragThumb.Height(), 0, pParent->GetScrollableHeight());
-			UpdateThumbRect();
-			this->pParent->SetupPositions();
+            /* Change the scroll ammount by difference in pixels of the old and new mousepos scaled accordingly */
+            flScrollAmmount += scale(diff, 0, rcDownButton.top - rcUpButton.bottom - 4 - rcDragThumb.Height(), 0, pParent->GetScrollableHeight());
+            UpdateThumbRect();
+            this->pParent->SetupPositions();
 
-			return true;
-		}
-	}
-	break;
-	case WM_MOUSEWHEEL:
-	{
-		if (mouseCursor->IsInBounds(pParent->GetBBox()))
-		{
-			this->RequestFocus();
-			this->flScrollAmmount -= 10 * int(float(GET_WHEEL_DELTA_WPARAM(wParam)) / float(WHEEL_DELTA));
-			UpdateThumbRect();
-			this->pParent->SetupPositions();
-			return true;
-		}
-	}
-	}
+            return true;
+        }
+    }
+    break;
+    case WM_MOUSEWHEEL:
+    {
+        if (mouseCursor->IsInBounds(pParent->GetBBox()))
+        {
+            this->RequestFocus();
+            this->flScrollAmmount -= 10 * int(float(GET_WHEEL_DELTA_WPARAM(wParam)) / float(WHEEL_DELTA));
+            UpdateThumbRect();
+            this->pParent->SetupPositions();
+            return true;
+        }
+    }
+    }
 
-	ptOldMousePos = mouseCursor->GetPos();
-	return false;
+    ptOldMousePos = mouseCursor->GetPos();
+    return false;
 }
 
 
 void ScrollBar::SetupPositions()
 {
-	if (!this->bIsVisible)
-		return;
+    if (!this->bIsVisible)
+        return;
 
     this->iPageSize = pParent->GetSize().y - style.iPaddingY * 2;
     this->rcBoundingBox.left   = pParent->GetBBox().right - szSizeObject.x - 2;
@@ -511,62 +510,62 @@ void ScrollBar::SetupPositions()
     this->rcBoundingBox.top    = pParent->GetBBox().top + 1;
     this->rcBoundingBox.bottom = rcBoundingBox.top + szSizeObject.y;
 
-	this->rcUpButton        = { rcBoundingBox.left, rcBoundingBox.top, rcBoundingBox.right, rcBoundingBox.top + szSizeObject.x };
-	this->rcDownButton      = { rcBoundingBox.left, rcBoundingBox.bottom - szSizeObject.x, rcBoundingBox.right, rcBoundingBox.bottom };
-	this->rcDragThumb.left  = rcUpButton.left;
-	this->rcDragThumb.right = rcUpButton.right;
+    this->rcUpButton   = { rcBoundingBox.left, rcBoundingBox.top, rcBoundingBox.right, rcBoundingBox.top + szSizeObject.x };
+    this->rcDownButton = { rcBoundingBox.left, rcBoundingBox.bottom - szSizeObject.x, rcBoundingBox.right, rcBoundingBox.bottom };
+    this->rcDragThumb.left  = rcUpButton.left;
+    this->rcDragThumb.right = rcUpButton.right;
 
-	/* Thumb size, -4 cus of space between top and the bottom button */
-	this->sizeThumb = { szSizeObject.x, max(int(float((rcDownButton.top - rcUpButton.bottom) * iPageSize) / float(pParent->GetScrollableHeight() + iPageSize - 4)), style.iMinThumbSize) };
-	UpdateThumbRect();
+    /* Thumb size, -4 cus of space between top and the bottom button */
+    this->sizeThumb = { szSizeObject.x, max(int(float((rcDownButton.top - rcUpButton.bottom) * iPageSize) / float(pParent->GetScrollableHeight() + iPageSize - 4)), style.iMinThumbSize) };
+    UpdateThumbRect();
 }
 
 
 void ScrollBar::UpdateThumbRect()
 {
-	const auto iScrollableHeight = pParent->GetScrollableHeight();
+    const auto iScrollableHeight = pParent->GetScrollableHeight();
 
-	if (iScrollableHeight <= 0)
-	{
-		/* Nothing to scroll through */
-		rcDragThumb.top    = rcUpButton.bottom + 2;
-		rcDragThumb.bottom = rcDownButton.top - 2;
-		flScrollAmmount = 0;
-	}
-	else
-	{
+    if (iScrollableHeight <= 0)
+    {
+        /* Nothing to scroll through */
+        rcDragThumb.top    = rcUpButton.bottom + 2;
+        rcDragThumb.bottom = rcDownButton.top - 2;
+        flScrollAmmount = 0;
+    }
+    else
+    {
         /* Make sure we won't exceed out of bounds */
-		this->flScrollAmmount = std::clamp(flScrollAmmount, 0.f, float(iScrollableHeight));
+        this->flScrollAmmount = std::clamp(flScrollAmmount, 0.f, float(iScrollableHeight));
 
         /* 2 offset from buttons(so +2), and the position is scaled with the scrollable height (size of the aviable area for thumb / scrHeight) */
         rcDragThumb.top    = rcUpButton.bottom + 2 + (flScrollAmmount * (rcBoundingBox.Height() - (szSizeObject.x + 2) * 2 - sizeThumb.y) / iScrollableHeight);
-        rcDragThumb.bottom = rcDragThumb.top + sizeThumb.y;
-	}
+        rcDragThumb.bottom = rcDragThumb.top   + sizeThumb.y;
+    }
 }
 
 
 void ScrollBar::HandleArrowHeldMode()
 {
-	if (mouseCursor->bLMBHeld)
-	{
-		switch (eHoveredButton)
-		{
-		case UP:
-		{
-			this->flScrollAmmount -= 1;
-			UpdateThumbRect();
-			this->pParent->SetupPositions();
-			break;
-		}
-		case DOWN:
-		{
-			this->flScrollAmmount += 1;
-			UpdateThumbRect();
-			this->pParent->SetupPositions();
-			break;
-		}
-		}
-	}
+    if (mouseCursor->bLMBHeld)
+    {
+        switch (eHoveredButton)
+        {
+        case UP:
+        {
+            this->flScrollAmmount -= 1;
+            UpdateThumbRect();
+            this->pParent->SetupPositions();
+            break;
+        }
+        case DOWN:
+        {
+            this->flScrollAmmount += 1;
+            UpdateThumbRect();
+            this->pParent->SetupPositions();
+            break;
+        }
+        }
+    }
 }
 
 

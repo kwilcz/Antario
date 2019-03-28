@@ -221,51 +221,51 @@ namespace ui
         bool bIsActive;
     };
 
-	class ScrollBar : public Control
-	{
-	public:
-		ScrollBar(ObjectPtr pParentObject);
-		void Initialize() override;
-		void Render()	  override;
-		bool HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    class ScrollBar : public Control
+    {
+    public:
+        ScrollBar(ObjectPtr pParentObject);
+        void Initialize() override;
+        void Render()	  override;
+        bool HandleMouseInput(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-		void SetupPositions()	  override;
-		bool CanHaveFocus() const override { return true; }
+        void SetupPositions()	  override;
+        bool CanHaveFocus() const override { return true; }
 
-		void UpdateThumbRect();
-		int  GetScrollAmmount() const { return this->flScrollAmmount; };
-	private:
-		void HandleArrowHeldMode();
-		float flScrollAmmount; /* The offset of the initial position            */
-		int  iPageSize;      /* How much pixels are rendered in page (height) */
-		bool bIsThumbUsed;   /* Defines if the tumb is grabbed                */
+        void UpdateThumbRect();
+        int  GetScrollAmmount() const { return this->flScrollAmmount; };
+    private:
+        void HandleArrowHeldMode();
+        float flScrollAmmount; /* The offset of the initial position            */
+        int  iPageSize;        /* How much pixels are rendered in page (height) */
+        bool bIsThumbUsed;     /* Defines if the tumb is grabbed                */
 
-		enum ButtonState
-		{
-			CLEAR,
-			CLICKED_UP,
-			CLICKED_DOWN,
-			HELD_UP,
-			HELD_DOWN
-		};
-		enum HoveredButton
-		{
-			NONE,
-			UP,
-			DOWN,
-			THUMB,
-			SHAFT
-		};
-		SPoint ptOldMousePos;
-		SSize  sizeThumb;
+        enum ButtonState
+        {
+            CLEAR,
+            CLICKED_UP,
+            CLICKED_DOWN,
+            HELD_UP,
+            HELD_DOWN
+        };
+        enum HoveredButton
+        {
+            NONE,
+            UP,
+            DOWN,
+            THUMB,
+            SHAFT
+        };
+        SPoint ptOldMousePos;
+        SSize  sizeThumb;
 
-		SRect rcUpButton;
-		SRect rcDownButton;
-		SRect rcDragThumb;
+        SRect rcUpButton;
+        SRect rcDownButton;
+        SRect rcDragThumb;
 
-		ButtonState eState;
-		HoveredButton eHoveredButton;
-	};
+        ButtonState eState;
+        HoveredButton eHoveredButton;
+    };
 
     class Section : public ControlManager
     {
