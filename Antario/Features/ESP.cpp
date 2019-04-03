@@ -1,4 +1,5 @@
 #include "ESP.h"
+#include "..\Settings.h"
 #include "..\Utils\Utils.h"
 #include "..\SDK\IVEngineClient.h"
 #include "..\SDK\PlayerInfo.h"
@@ -15,7 +16,6 @@ void ESP::RenderBox(C_BaseEntity* pEnt)
     vecBottom.z += (pEnt->GetFlags() & FL_DUCKING) ? 54.f : 72.f;
     if (!Utils::WorldToScreen(vecBottom, vecScreenBottom))
         return;
-
 
     const auto sx = int(std::roundf(vecScreenOrigin.x)),
                sy = int(std::roundf(vecScreenOrigin.y)),
@@ -54,17 +54,17 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
                     g_Fonts.pFontTahoma10.get(), pInfo.szName);
 }
 
-void ESP::RenderWeaponName(C_BaseEntity* pEnt, int pEntIndex)
+void ESP::RenderWeaponName(C_BaseEntity* pEnt)
 {
     Vector vecScreenOrigin, vecOrigin = pEnt->GetRenderOrigin();
     if (!Utils::WorldToScreen(vecOrigin, vecScreenOrigin))
         return;
 
-    WeaponInfo_t weapon = g_WeaponInfoCopy[pEntIndex];
-    if (!weapon.szWeaponName)
+    auto weapon = pEnt->GetActiveWeapon();
+    if (!weapon)
         return;
 
-    std::string strWeaponName = std::string(weapon.szWeaponName);
+    auto strWeaponName = weapon->GetName();
 
     /* Remove "weapon_" prefix */
     strWeaponName.erase(0, 7); 
@@ -87,15 +87,13 @@ void ESP::Render()
     for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
     {
         C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
-
-
+        
         if (!pPlayerEntity
             || pPlayerEntity == g::pLocalEntity
             || pPlayerEntity->IsDormant()
             || !pPlayerEntity->IsAlive())
             continue;
-
-
+        
         if (g_Settings.bShowBoxes)
             this->RenderBox(pPlayerEntity);
 
@@ -103,6 +101,6 @@ void ESP::Render()
             this->RenderName(pPlayerEntity, it);
 
         if (g_Settings.bShowWeapons)
-            this->RenderWeaponName(pPlayerEntity, it);
+            this->RenderWeaponName(pPlayerEntity);
     }
 }

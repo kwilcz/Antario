@@ -84,24 +84,6 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     if (!g::pLocalEntity)
         return oCreateMove;
 
-    // Create a copy of CSWpnData for every live player in game as it's not always accessable in the present hook
-    for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
-    {
-	    C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
-
-	    if (!pPlayerEntity
-		    || pPlayerEntity->IsDormant()
-		    || !pPlayerEntity->IsAlive())
-		    continue;
-
-	    auto weapon = pPlayerEntity->GetActiveWeapon();
-	    if (!weapon)
-	        continue;
-
-        g::pWeaponInfo[it] = *weapon->GetCSWpnData();
-    }
-	
-
     g_Misc.OnCreateMove();
     // run shit outside enginepred
 

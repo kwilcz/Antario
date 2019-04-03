@@ -127,10 +127,11 @@ public:
         return GetValue<int>(m_iClip1);
     }
 
-    WeaponInfo_t* GetCSWpnData()
-    {
-        return Utils::CallVFunc<448, WeaponInfo_t*>(this);
-    }
+	WeaponInfo_t* GetCSWpnData()
+	{
+        static auto system = *reinterpret_cast<CWeaponSystem**>(Utils::FindSignature("client_panorama.dll", "8B 35 ? ? ? ? FF 10 0F B7 C0") + 0x2u);
+        return system->GetWpnData(this->GetItemDefinitionIndex());
+	}
 
     std::string GetName()
     {

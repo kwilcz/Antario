@@ -7,5 +7,4 @@ namespace g
     extern CUserCmd*      pCmd;
     extern C_BaseEntity*  pLocalEntity;
     extern std::uintptr_t uRandomSeed;
-    extern WeaponInfo_t   pWeaponInfo[64];
 }

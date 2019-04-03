@@ -19,7 +19,6 @@
 // Releasing makro making sure we dont try to release a null pointer
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p) = NULL; } }
 
-
 enum FontFlags : int
 { 
     FONT_NONE = 0,
@@ -34,25 +33,31 @@ struct GlyphInfo
     SPoint bearing;    /* x and y - offsets from baseline to left / top of glyph*/
     uintptr_t advance; /* width + bearing */
     LPDIRECT3DTEXTURE9 texture; /* pointer to the glyph texture */
+    bool colored;   /* if the glyph has its own color */
 };
 
 class Font
 {
 public:
     Font() = delete;
-    Font(const char* strFontName, int height, LPDIRECT3DDEVICE9 pDevice, int outlineThickness = 0);
+    Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVICE9 pDevice, int outlineThickness = 0);
 
     void Release();
     void Reset(LPDIRECT3DDEVICE9  pDevice);
-    void Render(const std::string& strToRender, SPoint ptPos, DWORD flags, Color color, float scale);
-    void Render(const std::wstring& strToRender, SPoint ptPos, DWORD flags, Color color = Color::White(), float scale = 1.f);
-    SPoint GetTextDimensions(const std::wstring& str, bool bDropShadow = false);
+    template <typename T>
+    void Render(const T* strToRender, SPoint ptPos, DWORD flags, Color color = Color::White(), float scale = 1.f);
+    template <typename T>
+    void Render(const T& strToRender, SPoint ptPos, DWORD flags, Color color = Color::White(), float scale = 1.f);
+    template <typename T>
+    SPoint GetTextDimensions(const T& str, bool bDropShadow = false);
 
     int iHeight;
 private:
-    void CreateCharTexture(wchar_t ch);
+    template <typename T>
+    void CreateCharTexture(T ch);
     void GenerateAsciiChars();
     void SetupRenderStates();
+    std::string GetFontPath(const char* strFontName);
 
     int iOutlineThickness;
     LPDIRECT3DDEVICE9  pDevice;
@@ -65,5 +70,7 @@ private:
     FT_Face     ftFace;
     FT_Stroker  ftStroker;
 
+    bool bIsAntialiased;
     std::map<int, GlyphInfo> mapGlyphs;
 };
+

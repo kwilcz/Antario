@@ -82,7 +82,7 @@ public:
     template <typename ... Args>
     static void Log(const std::string& str, Args ...arguments)
     {
-        Utils::Log(Utils::SetupStringParams(str.c_str(), arguments...));
+        Utils::Log(Utils::SetupStringParams(str, arguments...));
     }
 
 

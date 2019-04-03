@@ -1,7 +1,6 @@
 #pragma once
-#include "..\Utils\DrawManager.h"
 #include "..\Utils\GlobalVars.h"
-#include "..\Settings.h"
+#include "..\Utils\DrawManager.h"
 
 
 class ESP
@@ -11,7 +10,7 @@ public:
 private:
     void RenderBox(C_BaseEntity* pEnt);
     void RenderName(C_BaseEntity* pEnt, int iterator);
-    void RenderWeaponName(C_BaseEntity* pEnt, int pEntIndex);
+    void RenderWeaponName(C_BaseEntity* pEnt);
 
     int localTeam{};
     Color teamColor{ 195, 240, 100, 255 };
