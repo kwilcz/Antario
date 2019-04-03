@@ -33,9 +33,6 @@
     <ClCompile Include="Antario\Features\EnginePrediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Antario\Utils\D3DFont.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Antario\Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -138,9 +135,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\Features\EnginePrediction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Antario\Utils\D3DFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\SDK\IGameEvent.h">

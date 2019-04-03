@@ -85,7 +85,7 @@ namespace ui
         /* Non-inline, it breaks sharedpointers */
         static MenuStyle style;                          /* Struct containing all colors / paddings in our menu.    */
         static Control*  pFocusedObject;                 /* Pointer to the focused object                           */
-        static std::shared_ptr<CD3DFont>    pFont;       /* Pointer to the font used in the menu.                   */
+        static std::shared_ptr<Font>    pFont;       /* Pointer to the font used in the menu.                   */
         static std::unique_ptr<MouseCursor> mouseCursor; /* Pointer to our mouse cursor                             */
 
         std::vector<ObjectPtr> vecChildren;
@@ -185,7 +185,7 @@ namespace ui
     {
     public:
         Window() : bIsDragged(false), iHeaderHeight(0), tSelectedTab(nullptr), pHeaderFont(nullptr) { }
-        Window(const std::string& strLabel, SPoint ptSize, std::shared_ptr<CD3DFont> pMainFont, std::shared_ptr<CD3DFont> pFontHeader);
+        Window(const std::string& strLabel, SPoint ptSize, std::shared_ptr<Font> pMainFont, std::shared_ptr<Font> pFontHeader);
     
         void Render()           override;
         void Initialize()       override;
@@ -200,7 +200,7 @@ namespace ui
         TabPtr tSelectedTab;   /* Actual selected window tab               */
         SRect  rcHeader;       /* Header bounding box                      */
         SPoint ptOldMousePos;  /* Old mouse position used for dragging     */
-        std::shared_ptr<CD3DFont> pHeaderFont; /* Header only font         */
+        std::shared_ptr<Font> pHeaderFont; /* Header only font         */
     };
 
 

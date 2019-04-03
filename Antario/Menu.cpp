@@ -12,7 +12,7 @@ void MenuMain::Initialize()
     static int testint3 = 2;
     static float float123 = 10.f;
     /* Create our main window (Could have multiple if you'd create vec. for it) */
-    auto mainWindow = std::make_shared<Window>("Antario - Main", SSize(360, 256), g_Fonts.pFontTahoma8, g_Fonts.pFontTahoma10);
+    auto mainWindow = std::make_shared<Window>("Antario - Main", SSize(360, 256), g_Fonts.vecFonts[FONT_TAHOMA_8], g_Fonts.vecFonts[FONT_TAHOMA_10]);
     {
         ///TODO: window->AddTab()
         auto tab1 = std::make_shared<Tab>("Main Tab", 2, mainWindow);

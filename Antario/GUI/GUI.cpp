@@ -14,7 +14,7 @@ using namespace ui;
 /* No inline vars for shared pointers I guess */
 MenuStyle MenuMain::style;                          /* Struct containing all colors / paddings in our menu.    */
 Control*  MenuMain::pFocusedObject;                 /* Pointer to the focused object                           */
-std::shared_ptr<CD3DFont>    MenuMain::pFont;       /* Pointer to the font used in the menu.                   */
+std::shared_ptr<Font>    MenuMain::pFont;       /* Pointer to the font used in the menu.                   */
 std::unique_ptr<MouseCursor> MenuMain::mouseCursor; /* Pointer to our mouse cursor                             */
 
 
@@ -213,7 +213,7 @@ void ControlManager::SetupChildPositions()
 }
 
 
-Window::Window(const std::string& strLabel, SPoint szSize, std::shared_ptr<CD3DFont> pMainFont, std::shared_ptr<CD3DFont> pFontHeader)
+Window::Window(const std::string& strLabel, SPoint szSize, std::shared_ptr<Font> pMainFont, std::shared_ptr<Font> pFontHeader)
 {
     this->pFont          = pMainFont;
     this->pHeaderFont    = pFontHeader;
@@ -236,8 +236,8 @@ void Window::Render()
         Color(35, 35, 35, 230), GradientType::GRADIENT_VERTICAL);
 
     // Draw header string, defined as label.
-    g_Render.String(this->rcBoundingBox.Mid().x, this->rcBoundingBox.top + int(float(iHeaderHeight) * 0.5f), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y,
-                    style.colHeaderText, this->pHeaderFont.get(), this->strLabel.c_str());
+    g_Render.String(this->rcBoundingBox.Mid().x, this->rcBoundingBox.top + int(float(iHeaderHeight) * 0.5f), FONT_CENTERED_X | FONT_CENTERED_Y,
+                    style.colHeaderText, this->pHeaderFont, this->strLabel.c_str());
 
     // Render all children
     this->RenderChildObjects();
@@ -602,7 +602,7 @@ void Tab::Render()
     g_Render.Rect(rcBoundingBox, style.colSectionOutl);
 
     /* Render tab name */
-    g_Render.String(rcBoundingBox.Mid(), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y | CD3DFONT_DROPSHADOW, style.colText(bIsActive ? 255 : 150), pFont.get(), strLabel.c_str());
+    g_Render.String(rcBoundingBox.Mid(), FONT_CENTERED_X | FONT_CENTERED_Y | FONT_DROPSHADOW, style.colText(bIsActive ? 255 : 150), pFont, strLabel.c_str());
 
     
 
@@ -873,7 +873,7 @@ void Checkbox::Render()
 
     /* Render button label as its name */
     g_Render.String(this->rcBox.right + int(float(style.iPaddingX) * 0.5f), this->rcBoundingBox.Mid().y,
-                    CD3DFONT_DROPSHADOW | CD3DFONT_CENTERED_Y, style.colText, pFont.get(), this->strLabel.c_str());
+                    FONT_DROPSHADOW | FONT_CENTERED_Y, style.colText, pFont, this->strLabel.c_str());
 
 }
 
@@ -930,7 +930,7 @@ void Button::Render()
     g_Render.Rect(this->rcBoundingBox, style.colSectionOutl);
 
     /* Text inside the button */
-    g_Render.String(this->rcBoundingBox.Mid(), CD3DFONT_DROPSHADOW | CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colText, pFont.get(), this->strLabel.c_str());
+    g_Render.String(this->rcBoundingBox.Mid(), FONT_DROPSHADOW | FONT_CENTERED_X | FONT_CENTERED_Y, style.colText, pFont, this->strLabel.c_str());
     
     if (this->bIsHovered)
         g_Render.RectFilled(this->rcBoundingBox, style.colHover);
@@ -985,7 +985,7 @@ void ComboBox::Initialize()
 void ComboBox::Render()
 {
     /* Render the label (name) above the combo */
-    g_Render.String(this->rcBoundingBox.Pos(), CD3DFONT_DROPSHADOW, style.colText, pFont.get(), this->strLabel.c_str());
+    g_Render.String(this->rcBoundingBox.Pos(), FONT_DROPSHADOW, style.colText, pFont, this->strLabel.c_str());
 
 
     /* Render the selectable with the value in the middle and highlight if hovered */
@@ -995,7 +995,7 @@ void ComboBox::Render()
         g_Render.RectFilled(this->rcSelectable, style.colComboBoxRect);
 
     /* Render the selectable with the value in the middle */
-    g_Render.String(this->rcSelectable.Mid(), CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colText, pFont.get(),
+    g_Render.String(this->rcSelectable.Mid(), FONT_CENTERED_X | FONT_CENTERED_Y, style.colText, pFont,
                     this->vecSelectables[*this->iCurrentValue].c_str());
 
     /* Render the small triangle */
@@ -1152,7 +1152,7 @@ void ComboBox::RenderSelectables()
     const auto ptMid = this->rcSelectable.Mid();
     for (const auto& it : vecSelectables)
         g_Render.String({ ptMid.x, ptMid.y + this->rcSelectable.Height() * (index++ + 1) },
-                        CD3DFONT_CENTERED_X | CD3DFONT_CENTERED_Y, style.colText, pFont.get(), it.c_str());
+                        FONT_CENTERED_X | FONT_CENTERED_Y, style.colText, pFont, it.c_str());
 }
 
 
@@ -1187,7 +1187,7 @@ void Slider<T>::Render()
     ssToRender << strLabel << ": " << std::fixed << std::setprecision(2) << *this->nValue;
 
     /* Render the label (name) above the combo */
-    g_Render.String(this->rcBoundingBox.Pos(), CD3DFONT_DROPSHADOW, style.colText, pFont.get(), ssToRender.str().c_str());
+    g_Render.String(this->rcBoundingBox.Pos(), FONT_DROPSHADOW, style.colText, pFont, ssToRender.str().c_str());
 
     /* Render the selectable with the value in the middle */
     g_Render.RectFilled(this->rcSelectable, style.colComboBoxRect);

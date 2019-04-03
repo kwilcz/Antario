@@ -126,7 +126,7 @@ public:
     {
 #ifdef _DEBUG
         std::stringstream strFormatted;
-        strFormatted << "Operation failed, error code = 0x" << std::hex << hr;
+        strFormatted << "Error code: 0x" << std::hex << hr;
 
         Utils::Log(strFormatted.str());
 #endif // _DEBUG

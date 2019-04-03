@@ -32,7 +32,9 @@ void ESP::RenderBox(C_BaseEntity* pEnt)
 
 void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
 {
-    Vector vecScreenOrigin, vecOrigin = pEnt->GetRenderOrigin();
+    Vector vecScreenOrigin, 
+           vecOrigin = pEnt->GetRenderOrigin();
+
     if (!Utils::WorldToScreen(vecOrigin, vecScreenOrigin))
         return;
 
@@ -45,13 +47,13 @@ void ESP::RenderName(C_BaseEntity* pEnt, int iterator)
     PlayerInfo_t pInfo;
     g_pEngine->GetPlayerInfo(iterator, &pInfo);
 
-    auto sx = int(std::roundf(vecScreenOrigin.x)),
-         sy = int(std::roundf(vecScreenOrigin.y)),
-         h  = int(std::roundf(vecScreenBottom.y - vecScreenOrigin.y));
+    const auto sx = int(std::roundf(vecScreenOrigin.x)),
+               sy = int(std::roundf(vecScreenOrigin.y)),
+               h  = int(std::roundf(vecScreenBottom.y - vecScreenOrigin.y));
 
-    g_Render.String(sx, sy + h - 16, CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+    g_Render.String(sx, sy + h - 16, FONT_CENTERED_X | FONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
-                    g_Fonts.pFontTahoma10.get(), pInfo.szName);
+                    g_Fonts.vecFonts[FONT_TAHOMA_10], pInfo.szName);
 }
 
 void ESP::RenderWeaponName(C_BaseEntity* pEnt)
@@ -71,9 +73,9 @@ void ESP::RenderWeaponName(C_BaseEntity* pEnt)
     /* All uppercase */
     std::transform(strWeaponName.begin(), strWeaponName.end(), strWeaponName.begin(), ::toupper);
 
-    g_Render.String(int(vecScreenOrigin.x), int(vecScreenOrigin.y), CD3DFONT_CENTERED_X | CD3DFONT_DROPSHADOW,
+    g_Render.String(int(vecScreenOrigin.x), int(vecScreenOrigin.y), FONT_CENTERED_X | FONT_DROPSHADOW,
                     (localTeam == pEnt->GetTeam()) ? teamColor : enemyColor,
-                    g_Fonts.pFontTahoma10.get(), strWeaponName.c_str());
+                    g_Fonts.vecFonts[FONT_TAHOMA_10], strWeaponName.c_str());
 }
 
 

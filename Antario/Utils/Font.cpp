@@ -84,7 +84,7 @@ void Font::Release()
 
 void Font::Reset(LPDIRECT3DDEVICE9 pDevice)
 {
-    this->pDevice->Release();
+    SAFE_RELEASE(this->pDevice);
     this->pDevice = pDevice;
 
     SAFE_RELEASE(pVertexBuffer);
@@ -272,7 +272,7 @@ void Font::CreateCharTexture(T ch)
 
     /* create new texture for our glyph */
     IDirect3DTexture9* tx = nullptr;
-    err = D3DXCreateTexture(pDevice, bmp.width, bmp.rows, 1, 0, glyph.colored ? D3DFMT_A8R8G8B8 : D3DFMT_A8, D3DPOOL_MANAGED, &tx);
+    HRESULT error = D3DXCreateTexture(pDevice, bmp.width, bmp.rows, 1, 0, glyph.colored ? D3DFMT_A8R8G8B8 : D3DFMT_A8, D3DPOOL_MANAGED, &tx);
     ///TODO: Catch the errors
 
     /* Render to texture by copying bitmap data to locked rect */

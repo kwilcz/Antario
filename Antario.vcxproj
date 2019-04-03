@@ -105,7 +105,6 @@
     <ClCompile Include="Antario\DLLMain.cpp" />
     <ClCompile Include="Antario\Menu.cpp" />
     <ClCompile Include="Antario\Settings.cpp" />
-    <ClCompile Include="Antario\Utils\D3DFont.cpp" />
     <ClCompile Include="Antario\Utils\DrawManager.cpp" />
     <ClCompile Include="Antario\Utils\Font.cpp" />
     <ClCompile Include="Antario\Utils\GlobalVars.cpp" />
@@ -141,7 +140,6 @@
     <ClInclude Include="Antario\SDK\KeyValues.h" />
     <ClInclude Include="Antario\SDK\PlayerInfo.h" />
     <ClInclude Include="Antario\Settings.h" />
-    <ClInclude Include="Antario\Utils\D3DFont.h" />
     <ClInclude Include="Antario\Utils\DrawManager.h" />
     <ClInclude Include="Antario\EventListener.h" />
     <ClInclude Include="Antario\Utils\Font.h" />

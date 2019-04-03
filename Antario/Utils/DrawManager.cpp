@@ -14,8 +14,9 @@ struct Vertex
 DrawManager::DrawManager()
 {
     this->pDevice = nullptr;
-    g_Fonts.pFontTahoma8  = nullptr;
-    g_Fonts.pFontTahoma10 = nullptr;
+
+    for (auto& ft : g_Fonts.vecFonts)
+        ft = nullptr;
 
     this->pViewPort = { 0 };
 }
@@ -43,29 +44,27 @@ void DrawManager::InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     /* ---------------- */
 
     // Create new fonts
-    g_Fonts.pFontTahoma8  = std::make_unique<CD3DFont>(L"Tahoma", 8,  FW_NORMAL);
-    g_Fonts.pFontTahoma10 = std::make_unique<CD3DFont>(L"Tahoma", 10, FW_MEDIUM);
-
-    // Init font device objects
-    g_Fonts.InitDeviceObjects(pDevice);
+    g_Fonts.vecFonts.push_back(std::make_unique<Font>("Tahoma", 8, false, pDevice));
+    g_Fonts.vecFonts.push_back(std::make_unique<Font>("Tahoma", 10, false, pDevice));
 }
 
 
-void DrawManager::InvalidateDeviceObjects()
+void DrawManager::Reset(LPDIRECT3DDEVICE9 pDevice)
 {
     // Remove a pointer to game device
-    this->pDevice = nullptr;
+    SAFE_RELEASE(this->pDevice);
+    this->pDevice = pDevice;
+    this->pDevice->GetViewport(&pViewPort);
     
-    g_Fonts.InvalidateDeviceObjects();
+    g_Fonts.Reset(pDevice);
 }
 
-
-void DrawManager::RestoreDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
+void DrawManager::Release()
 {
-    this->pDevice = pDevice;
-    this->pDevice->GetViewport(&pViewPort); 
+    SAFE_RELEASE(this->pDevice);
+    this->pDevice = nullptr;
 
-    g_Fonts.InitDeviceObjects(pDevice);
+    g_Fonts.Release();
 }
 
 
@@ -276,17 +275,6 @@ void DrawManager::RectFilledGradientMultiColor(int posx1, int posy1, int posx2, 
     this->pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, &vert, sizeof(Vertex));
 }
 
-
-void DrawManager::String(SPoint vecPos, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText) const
-{
-    pFont->DrawString(vecPos.x, vecPos.y, COL2DWORD(color), szText, dwFlags);
-}
-
-
-void DrawManager::String(int posx, int posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText) const
-{
-    pFont->DrawString(FLOAT(posx), FLOAT(posy), COL2DWORD(color), szText, dwFlags);
-}
 
 
 /*
