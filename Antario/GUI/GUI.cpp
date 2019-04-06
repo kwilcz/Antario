@@ -12,8 +12,8 @@ using namespace ui;
 #define GET_Y_LPARAM(lp)                        (int(short(HIWORD(lp))))
 
 /* No inline vars for shared pointers I guess */
-MenuStyle MenuMain::style;                          /* Struct containing all colors / paddings in our menu.    */
-Control*  MenuMain::pFocusedObject;                 /* Pointer to the focused object                           */
+MenuStyle MenuMain::style;                      /* Struct containing all colors / paddings in our menu.    */
+Control*  MenuMain::pFocusedObject;             /* Pointer to the focused object                           */
 std::shared_ptr<Font>    MenuMain::pFont;       /* Pointer to the font used in the menu.                   */
 std::unique_ptr<MouseCursor> MenuMain::mouseCursor; /* Pointer to our mouse cursor                             */
 
@@ -53,14 +53,14 @@ void MouseCursor::RunThink(const UINT uMsg, const LPARAM lParam)
         this->bLMBPressed = true;
         break;
     case WM_LBUTTONUP:
-        this->bLMBHeld = false;
+        this->bLMBHeld    = false;
         this->bLMBPressed = false;
         break;
     case WM_RBUTTONDOWN:
         this->bRMBPressed = true;
         break;
     case WM_RBUTTONUP:
-        this->bRMBHeld = false;
+        this->bRMBHeld    = false;
         this->bRMBPressed = false;
         break;
     }
@@ -221,7 +221,7 @@ Window::Window(const std::string& strLabel, SPoint szSize, std::shared_ptr<Font>
     this->szSizeObject   = szSize;
     this->bIsDragged     = false;
 
-    this->iHeaderHeight = pFont->iHeight + 2;
+    this->iHeaderHeight = pFont->iHeight + 6;
     UIObject::SetPos(g_Render.GetScreenCenter() - (szSize * .5f));
     this->type = TYPE_WINDOW;
 }
@@ -273,7 +273,7 @@ void Window::SetupPositions()
     int iUsedSpace = 0;
     for (auto& it : vecChildren)
     {
-        it->SetSize({ iSingleTabWidth, pFont->iHeight + 2 });
+        it->SetSize({ iSingleTabWidth, pFont->iHeight + 6 });
         it->SetPos({ this->GetPos().x + iUsedSpace, this->GetPos().y + iHeaderHeight });
         iUsedSpace += iSingleTabWidth;
         it->SetupPositions();
@@ -1214,7 +1214,7 @@ void Slider<T>::SetupPositions()
     this->rcSelectable =
     {
         rcBoundingBox.left,
-        rcBoundingBox.top + pFont->iHeight,
+        rcBoundingBox.top + pFont->iHeight + int(float(style.iPaddingY) * 0.5f),
         rcBoundingBox.right,
         rcBoundingBox.bottom
     };
