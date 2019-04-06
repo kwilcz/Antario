@@ -169,15 +169,16 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
 
             static std::string szWatermark = "Antario";
             g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
-
-            if (g_Settings.bMenuOpened)
+			
+            // Put your draw calls here
+            g_ESP.Render();
+			
+	    	// Render menu after ESP so menu overlaps ESP
+	    	if (g_Settings.bMenuOpened)
             {
                 g_Hooks.nMenu.Render();             // Render our menu
                 g_Hooks.nMenu.mouseCursor->Render();// Render mouse cursor in the end so its not overlapped
             }
-
-            // Put your draw calls here
-            g_ESP.Render();
         }
     }();
 
