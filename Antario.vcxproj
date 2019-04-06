@@ -48,16 +48,16 @@
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(LibraryPath);$(DXSDK_DIR)Lib\x86</LibraryPath>
+    <IncludePath>$(SolutionDir)Antario\LIB\freetype;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
+    <LibraryPath>$(SolutionDir)Antario\LIB\freetype;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(LibraryPath);$(DXSDK_DIR)Lib\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(LibraryPath);$(DXSDK_DIR)Lib\x86</LibraryPath>
+    <IncludePath>$(SolutionDir)Antario\LIB\freetype;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
+    <LibraryPath>$(SolutionDir)Antario\LIB\freetype;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(LibraryPath);$(DXSDK_DIR)Lib\x86</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -67,10 +67,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;ANTARIO_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,12 +87,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;ANTARIO_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -98,8 +105,8 @@
     <ClCompile Include="Antario\DLLMain.cpp" />
     <ClCompile Include="Antario\Menu.cpp" />
     <ClCompile Include="Antario\Settings.cpp" />
-    <ClCompile Include="Antario\Utils\D3DFont.cpp" />
     <ClCompile Include="Antario\Utils\DrawManager.cpp" />
+    <ClCompile Include="Antario\Utils\Font.cpp" />
     <ClCompile Include="Antario\Utils\GlobalVars.cpp" />
     <ClCompile Include="Antario\Utils\Interfaces.cpp" />
     <ClCompile Include="Antario\Utils\NetvarManager.cpp" />
@@ -133,9 +140,9 @@
     <ClInclude Include="Antario\SDK\KeyValues.h" />
     <ClInclude Include="Antario\SDK\PlayerInfo.h" />
     <ClInclude Include="Antario\Settings.h" />
-    <ClInclude Include="Antario\Utils\D3DFont.h" />
     <ClInclude Include="Antario\Utils\DrawManager.h" />
     <ClInclude Include="Antario\EventListener.h" />
+    <ClInclude Include="Antario\Utils\Font.h" />
     <ClInclude Include="Antario\Utils\GlobalVars.h" />
     <ClInclude Include="Antario\Utils\Interfaces.h" />
     <ClInclude Include="Antario\SDK\Recv.h" />

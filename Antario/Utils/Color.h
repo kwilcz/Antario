@@ -115,7 +115,7 @@ struct Color
         const float chroma = col[0] - (col[1] < col[2] ? col[1] : col[2]);
         h = colfabs(K + (col[1] - col[2]) / (6.f * chroma + 1e-20f));
         s = chroma / (col[0] + 1e-20f);
-        v = col[1];
+        v = col[0];
     }
 
 

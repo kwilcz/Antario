@@ -1,9 +1,11 @@
 #pragma once
-#include <memory>
+
+#include "Font.h"
 #include "SRect.h"      // Includes both SPoint and SRect
-#include "D3DFont.h"
 #include "..\Utils\Color.h"
 #include "..\Utils\Utils.h"
+
+#include <memory>
 #include <queue>
 
 #define GET_D3DCOLOR_ALPHA(x) (( x >> 24) & 255)
@@ -18,10 +20,11 @@ public: // Function members
 
     DrawManager();
 
-    void InitDeviceObjects      (LPDIRECT3DDEVICE9 pDevice);
-    void RestoreDeviceObjects   (LPDIRECT3DDEVICE9 pDevice);
-    void InvalidateDeviceObjects();
-    void SetupRenderStates      () const;
+    void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice);
+    void OnLostDevice();
+    void OnResetDevice(LPDIRECT3DDEVICE9 pDevice);
+    void Release();
+    void SetupRenderStates() const;
 
 
     // Drawing functions
@@ -52,8 +55,15 @@ public: // Function members
     void RectFilledGradientMultiColor(SPoint vecPos1, SPoint vecPos2, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const;
     void RectFilledGradientMultiColor(int posx1, int posy1, int posx2, int posy2, Color colTopLeft, Color colTopRight, Color colBottomLeft, Color colBottomRight) const;
 
-    void String(SPoint vecPos, DWORD dwFlags, Color color, CD3DFont * pFont, const char * szText) const;
-    void String(int posx, int posy, DWORD dwFlags, Color color, CD3DFont* pFont, const char* szText) const;
+    template <typename... Targs>
+    void String(SPoint ptPos, DWORD dwFlags, Color color, std::shared_ptr<Font> pFont, const char * szText, Targs... args) const;
+    template <typename... Targs>
+    void String(int posx, int posy, DWORD dwFlags, Color color, std::shared_ptr<Font> pFont, const char* szText, Targs... args) const;
+    template <typename... Targs>
+    void String(SPoint ptPos, DWORD dwFlags, Color color, float scale, std::shared_ptr<Font> pFont, const char * szText, Targs... args) const;
+    template <typename... Targs>
+    void String(int posx, int posy, DWORD dwFlags, Color color, float scale, std::shared_ptr<Font> pFont, const char* szText, Targs... args) const;
+
 
     // Helpers
     SPoint            GetScreenCenter() const;
@@ -75,60 +85,63 @@ private: // Variable members
 extern DrawManager g_Render;
 
 
+/* fonts */
+
+enum FontNames : int
+{
+    FONT_TAHOMA_8 = 0,
+    FONT_TAHOMA_10 = 1
+};
+
 ///TODO: Change these logs
 struct Fonts
 {
 public:
-    void DeleteDeviceObjects()
+    void Release()
     {
-        Utils::Log("Deleting device objects...");
+        Utils::Log("Font: Release");
         try
         {
-            pFontTahoma8->DeleteDeviceObjects();
-            pFontTahoma10->DeleteDeviceObjects();
+            for (auto& ft : vecFonts)
+                ft->Release();
         }
         catch (const HRESULT& hr)
         {
-            Utils::Log("Deleting device objects failed.");
+            Utils::Log("Font: Release failed.");
             Utils::Log(hr);
         }
     };
-
-    void InvalidateDeviceObjects()
+    void OnLostDevice()
     {
-        Utils::Log("Invalidating device objects...");
+        Utils::Log("Font: OnLostDevice");
         try
         {
-            pFontTahoma8->InvalidateDeviceObjects();
-            pFontTahoma10->InvalidateDeviceObjects();
+            for (auto& ft : vecFonts)
+                ft->OnLostDevice();
         }
         catch (const HRESULT& hr)
         {
-            Utils::Log("Invalidation of the device objects failed.");
+            Utils::Log("Font: OnLostDevice failed.");
             Utils::Log(hr);
         }
     };
-
-    void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
+    void OnResetDevice(LPDIRECT3DDEVICE9 pDevice)
     {
-        Utils::Log("Initalizing device objects.");
+        Utils::Log("Font: OnResetDevice");
         try
         {
-            pFontTahoma8 ->InitDeviceObjects(pDevice);
-            pFontTahoma10->InitDeviceObjects(pDevice);
-            pFontTahoma8 ->RestoreDeviceObjects();
-            pFontTahoma10->RestoreDeviceObjects();
+            for (auto& ft : vecFonts)
+                ft->OnResetDevice(pDevice);
         }
         catch (const HRESULT& hr)
         {
-            Utils::Log("Initialization of the device objects failed.");
+            Utils::Log("Font: OnResetDevice failed.");
             Utils::Log(hr);
         }
     };
 
     // Fonts
-    std::shared_ptr<CD3DFont> pFontTahoma8;
-    std::shared_ptr<CD3DFont> pFontTahoma10;
+    std::vector<std::shared_ptr<Font>> vecFonts;
 };
 extern Fonts g_Fonts;
 
@@ -138,3 +151,32 @@ enum GradientType
     GRADIENT_VERTICAL,
     GRADIENT_HORIZONTAL
 };
+
+
+template <typename... Targs>
+void DrawManager::String(SPoint ptPos, DWORD dwFlags, Color color, std::shared_ptr<Font> pFont, const char* szText, Targs... args) const
+{
+    const std::string retString = Utils::SetupStringParams(szText, args...);
+    pFont->Render(retString, ptPos, dwFlags, color);
+}
+
+template <typename... Targs>
+void DrawManager::String(int posx, int posy, DWORD dwFlags, Color color, std::shared_ptr<Font> pFont, const char* szText, Targs... args) const
+{
+    const std::string retString = Utils::SetupStringParams(szText, args...);
+    pFont->Render(retString, { posx , posy }, dwFlags, color);
+}
+
+template <typename... Targs>
+void DrawManager::String(SPoint ptPos, DWORD dwFlags, Color color, float scale, std::shared_ptr<Font> pFont, const char * szText, Targs... args) const
+{
+    const std::string retString = Utils::SetupStringParams(szText, args...);
+    pFont->Render(retString, ptPos, dwFlags, color);
+}
+
+template <typename... Targs>
+void DrawManager::String(int posx, int posy, DWORD dwFlags, Color color, float scale, std::shared_ptr<Font> pFont, const char* szText, Targs... args) const
+{
+    const std::string retString = Utils::SetupStringParams(szText, args...);
+    pFont->Render(retString, { posx , posy }, dwFlags, color, scale);
+}
