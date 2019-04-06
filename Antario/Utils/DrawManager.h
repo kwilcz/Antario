@@ -21,7 +21,8 @@ public: // Function members
     DrawManager();
 
     void InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice);
-    void Reset(LPDIRECT3DDEVICE9 pDevice);
+    void OnLostDevice();
+    void OnResetDevice(LPDIRECT3DDEVICE9 pDevice);
     void Release();
     void SetupRenderStates() const;
 
@@ -98,7 +99,7 @@ struct Fonts
 public:
     void Release()
     {
-        Utils::Log("Releasing font device objects...");
+        Utils::Log("Font: Release");
         try
         {
             for (auto& ft : vecFonts)
@@ -106,22 +107,35 @@ public:
         }
         catch (const HRESULT& hr)
         {
-            Utils::Log("Releasing font device objects failed.");
+            Utils::Log("Font: Release failed.");
             Utils::Log(hr);
         }
     };
-
-    void Reset(LPDIRECT3DDEVICE9 pDevice)
+    void OnLostDevice()
     {
-        Utils::Log("Resetting font device objects...");
+        Utils::Log("Font: OnLostDevice");
         try
         {
             for (auto& ft : vecFonts)
-                ft->Reset(pDevice);
+                ft->OnLostDevice();
         }
         catch (const HRESULT& hr)
         {
-            Utils::Log("Resetting of the font device objects failed.");
+            Utils::Log("Font: OnLostDevice failed.");
+            Utils::Log(hr);
+        }
+    };
+    void OnResetDevice(LPDIRECT3DDEVICE9 pDevice)
+    {
+        Utils::Log("Font: OnResetDevice");
+        try
+        {
+            for (auto& ft : vecFonts)
+                ft->OnResetDevice(pDevice);
+        }
+        catch (const HRESULT& hr)
+        {
+            Utils::Log("Font: OnResetDevice failed.");
             Utils::Log(hr);
         }
     };

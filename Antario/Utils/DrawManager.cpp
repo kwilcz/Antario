@@ -49,14 +49,21 @@ void DrawManager::InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
 }
 
 
-void DrawManager::Reset(LPDIRECT3DDEVICE9 pDevice)
+void DrawManager::OnLostDevice()
 {
     // Remove a pointer to game device
-    SAFE_RELEASE(this->pDevice);
+    this->pDevice = nullptr;
+
+    g_Fonts.OnLostDevice();
+}
+
+
+void DrawManager::OnResetDevice(LPDIRECT3DDEVICE9 pDevice)
+{
     this->pDevice = pDevice;
     this->pDevice->GetViewport(&pViewPort);
-    
-    g_Fonts.Reset(pDevice);
+
+    g_Fonts.OnResetDevice(pDevice);
 }
 
 void DrawManager::Release()

@@ -43,7 +43,8 @@ public:
     Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVICE9 pDevice, int outlineThickness = 0);
 
     void Release();
-    void Reset(LPDIRECT3DDEVICE9  pDevice);
+    void OnLostDevice();
+    void OnResetDevice(LPDIRECT3DDEVICE9  pDevice);
     template <typename T>
     void Render(const T* strToRender, SPoint ptPos, DWORD flags, Color color = Color::White(), float scale = 1.f);
     template <typename T>

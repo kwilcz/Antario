@@ -112,8 +112,9 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
     if (g_Hooks.bInitializedDrawManager)
     {
         Utils::Log("Reseting draw manager.");
-        g_Render.Reset(pDevice);
+        g_Render.OnLostDevice();
         HRESULT hr = oReset(pDevice, pPresentationParameters);
+        g_Render.OnResetDevice(pDevice);
         Utils::Log("DrawManager reset succeded.");
         return hr;
     }

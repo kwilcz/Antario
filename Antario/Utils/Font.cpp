@@ -52,7 +52,7 @@ Font::Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVIC
     GenerateAsciiChars();
 
     /* Create vertex buffer for rendering purposes */
-    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 6, NULL, D3DFVF_TLVERTEX,
+    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, NULL, D3DFVF_TLVERTEX,
                                       D3DPOOL_MANAGED, &pVertexBuffer, nullptr);
 
     SetupRenderStates();
@@ -75,6 +75,7 @@ void Font::Release()
     SAFE_RELEASE(pStateBlockOld);
     SAFE_RELEASE(pStateBlockRender);
 
+    /* Clear all glyphs data */
     for (auto x : mapGlyphs)
         SAFE_RELEASE(x.second.texture);
 
@@ -82,25 +83,21 @@ void Font::Release()
 }
 
 
-void Font::Reset(LPDIRECT3DDEVICE9 pDevice)
+void Font::OnLostDevice()
 {
-    SAFE_RELEASE(this->pDevice);
-    this->pDevice = pDevice;
-
+    pDevice = nullptr;
     SAFE_RELEASE(pVertexBuffer);
-    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 6, NULL, D3DFVF_TLVERTEX,
-                                      D3DPOOL_MANAGED, &pVertexBuffer, nullptr);
-
     SAFE_RELEASE(pStateBlockOld);
     SAFE_RELEASE(pStateBlockRender);
+}
+
+
+void Font::OnResetDevice(LPDIRECT3DDEVICE9 pDevice)
+{
+    this->pDevice = pDevice;
+    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, NULL, D3DFVF_TLVERTEX,
+                                      D3DPOOL_MANAGED, &pVertexBuffer, nullptr);
     SetupRenderStates();
-
-    /* Clear all glyphs data and generate it once again. */
-    for (auto x : mapGlyphs)
-        SAFE_RELEASE(x.second.texture);
-
-    mapGlyphs.clear();
-    GenerateAsciiChars();
 }
 
 template <typename T>
@@ -139,7 +136,7 @@ void Font::Render(const T& strToRender, SPoint ptPos, DWORD flags, Color color, 
 
     for (auto it : strToRender)
     {
-        GlyphInfo glyph = mapGlyphs[it];
+        const GlyphInfo glyph = mapGlyphs[it];
 
         /* no texture so default generated - non-ascii char or never used before */
         if (!glyph.texture)
