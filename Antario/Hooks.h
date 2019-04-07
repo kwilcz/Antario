@@ -76,7 +76,6 @@ public:
 
         const std::size_t kSizeTable = this->indexCount * sizeof(std::uintptr_t);
 
-
         this->pOriginalVMT = *this->ppBaseClass;
         this->pNewVMT      = std::make_unique<std::uintptr_t[]>(this->indexCount);
 
@@ -114,7 +113,7 @@ public:
 
 private:
     std::unique_ptr<std::uintptr_t[]> pNewVMT      = nullptr;    // Actual used vtable
-    std::uintptr_t**                  ppBaseClass  = nullptr;             // Saved pointer to original class
-    std::uintptr_t*                   pOriginalVMT = nullptr;             // Saved original pointer to the VMT
-    std::size_t                       indexCount   = 0;                     // Count of indexes inside out f-ction
+    std::uintptr_t** ppBaseClass  = nullptr; // Saved pointer to original class
+    std::uintptr_t*  pOriginalVMT = nullptr; // Saved original pointer to the VMT
+    std::size_t      indexCount   = 0;       // Count of indexes inside out f-ction
 };

@@ -8,8 +8,6 @@ Hooks    g_Hooks;
 Settings g_Settings;
 
 
-WeaponInfo_t g_WeaponInfoCopy[255];
-
 void Hooks::Init()
 {
     // Get window handle
@@ -34,7 +32,7 @@ void Hooks::Init()
     // VMTHooks
     g_Hooks.pD3DDevice9Hook = std::make_unique<VMTHook>(reinterpret_cast<void*>(d3dDevice));
     g_Hooks.pClientModeHook = std::make_unique<VMTHook>(g_pClientMode);
-    g_Hooks.pSurfaceHook	= std::make_unique<VMTHook>(g_pSurface);
+    g_Hooks.pSurfaceHook    = std::make_unique<VMTHook>(g_pSurface);
 
     // Hook the table functions
     g_Hooks.pD3DDevice9Hook->Hook(vtable_indexes::reset,      Hooks::Reset);
@@ -58,7 +56,7 @@ void Hooks::Restore()
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::reset);
         g_Hooks.pD3DDevice9Hook->Unhook(vtable_indexes::present);
         g_Hooks.pClientModeHook->Unhook(vtable_indexes::createMove);
-        g_Hooks.pSurfaceHook->Unhook(vtable_indexes::lockCursor);
+        g_Hooks.pSurfaceHook   ->Unhook(vtable_indexes::lockCursor);
         SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.pOriginalWNDProc));
 
         g_pNetvars.reset();   /* Need to reset by-hand, global pointer so doesnt go out-of-scope */
@@ -66,8 +64,7 @@ void Hooks::Restore()
     Utils::Log("Unhooking succeded!");
 
     // Destroy fonts and all textures we created
-    g_Render.InvalidateDeviceObjects();
-    g_Fonts.DeleteDeviceObjects();
+    g_Render.Release();
 }
 
 
@@ -85,24 +82,6 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
     g::pLocalEntity = g_pEntityList->GetClientEntity(g_pEngine->GetLocalPlayer());
     if (!g::pLocalEntity)
         return oCreateMove;
-
-    // Create a copy of CSWpnData for every live player in game as it's not always accessable in the present hook
-    for (int it = 1; it <= g_pEngine->GetMaxClients(); ++it)
-    {
-	    C_BaseEntity* pPlayerEntity = g_pEntityList->GetClientEntity(it);
-
-	    if (!pPlayerEntity
-		    || pPlayerEntity->IsDormant()
-		    || !pPlayerEntity->IsAlive())
-		    continue;
-
-	    auto weapon = pPlayerEntity->GetActiveWeapon();
-	    if (!weapon)
-	        continue;
-
-        g_WeaponInfoCopy[it] = *weapon->GetCSWpnData();
-    }
-	
 
     g_Misc.OnCreateMove();
     // run shit outside enginepred
@@ -133,9 +112,9 @@ HRESULT __stdcall Hooks::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS*
     if (g_Hooks.bInitializedDrawManager)
     {
         Utils::Log("Reseting draw manager.");
-        g_Render.InvalidateDeviceObjects();
+        g_Render.OnLostDevice();
         HRESULT hr = oReset(pDevice, pPresentationParameters);
-        g_Render.RestoreDeviceObjects(pDevice);
+        g_Render.OnResetDevice(pDevice);
         Utils::Log("DrawManager reset succeded.");
         return hr;
     }
@@ -168,12 +147,14 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
             g_Render.SetupRenderStates(); // Sets up proper render states for our state block
 
             static std::string szWatermark = "Antario";
-            g_Render.String(8, 8, CD3DFONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.pFontTahoma8.get(), szWatermark.c_str());
-			
-            // Put your draw calls here
-            g_ESP.Render();
-			
-	    	// Render menu after ESP so menu overlaps ESP
+          
+            /* Put your draw calls here */
+            g_ESP.Render();            
+            /* ------------------------ */
+          
+	    	    // Render menu after ESP so menu overlaps ESP
+            g_Render.String(8, 8, FONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.vecFonts[FONT_TAHOMA_8], szWatermark.c_str());
+
             if (g_Settings.bMenuOpened)
             {
                 g_Hooks.nMenu.Render();             // Render our menu
@@ -198,7 +179,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     // Working when you HOLD th button, not when you press it.
     const auto getButtonHeld = [uMsg, wParam](bool& bButton, int vKey)
     {
-		if (wParam != vKey) return;
+        if (wParam != vKey) return;
 
         if (uMsg == WM_KEYDOWN)
             bButton = true;
@@ -206,15 +187,15 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             bButton = false;
     };
 
-	const auto getButtonToggle = [uMsg, wParam](bool& bButton, int vKey)
-	{
-		if (wParam != vKey) return;
+    const auto getButtonToggle = [uMsg, wParam](bool& bButton, int vKey)
+    {
+        if (wParam != vKey) return;
 
-		if (uMsg == WM_KEYUP)
-			bButton = !bButton;
-	};
+        if (uMsg == WM_KEYUP)
+            bButton = !bButton;
+    };
 
-	getButtonToggle(g_Settings.bMenuOpened, VK_INSERT);
+    getButtonToggle(g_Settings.bMenuOpened, VK_INSERT);
 
     if (g_Hooks.bInitializedDrawManager)
     {

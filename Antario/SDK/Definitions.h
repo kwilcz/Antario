@@ -494,3 +494,11 @@ public:
 	bool bHasBurstMode;                  // 0x0234
 	bool bIsRevolver;                    // 0x0235
 };                                     // Size: 0x0236
+
+class CWeaponSystem
+{
+    virtual void placeholder0();
+    virtual void placeholder1();
+public:
+    virtual WeaponInfo_t* GetWpnData(ItemDefinitionIndex idx);
+};

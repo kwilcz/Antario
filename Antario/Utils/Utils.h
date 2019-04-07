@@ -82,7 +82,7 @@ public:
     template <typename ... Args>
     static void Log(const std::string& str, Args ...arguments)
     {
-        Utils::Log(Utils::SetupStringParams(str.c_str(), arguments...));
+        Utils::Log(Utils::SetupStringParams(str, arguments...));
     }
 
 
@@ -126,7 +126,7 @@ public:
     {
 #ifdef _DEBUG
         std::stringstream strFormatted;
-        strFormatted << "Operation failed, error code = 0x" << std::hex << hr;
+        strFormatted << "Error code: 0x" << std::hex << hr;
 
         Utils::Log(strFormatted.str());
 #endif // _DEBUG

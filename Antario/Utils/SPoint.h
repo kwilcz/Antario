@@ -88,5 +88,5 @@ public:
 private:
 
     /* No constexpr in cmath yet */
-    constexpr int roundFloat(const float x) const { return int(x >= 0 ? x + 0.5f : x - 0.5f); }
+    constexpr int roundFloat(const float sx) const { return int(sx >= 0 ? x + 0.5f : x - 0.5f); }
 };

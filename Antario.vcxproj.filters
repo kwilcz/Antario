@@ -33,9 +33,6 @@
     <ClCompile Include="Antario\Features\EnginePrediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Antario\Utils\D3DFont.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Antario\Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +46,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Antario\GUI\GUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Antario\Utils\Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -137,9 +137,6 @@
     <ClInclude Include="Antario\Features\EnginePrediction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Antario\Utils\D3DFont.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Antario\SDK\IGameEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -171,6 +168,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Antario\GUI\GUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\Utils\Font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
