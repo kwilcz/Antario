@@ -147,6 +147,12 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
             g_Render.SetupRenderStates(); // Sets up proper render states for our state block
 
             static std::string szWatermark = "Antario";
+          
+            /* Put your draw calls here */
+            g_ESP.Render();            
+            /* ------------------------ */
+          
+	    	    // Render menu after ESP so menu overlaps ESP
             g_Render.String(8, 8, FONT_DROPSHADOW, Color(250, 150, 200, 180), g_Fonts.vecFonts[FONT_TAHOMA_8], szWatermark.c_str());
 
             if (g_Settings.bMenuOpened)
@@ -154,9 +160,6 @@ HRESULT __stdcall Hooks::Present(IDirect3DDevice9* pDevice, const RECT* pSourceR
                 g_Hooks.nMenu.Render();             // Render our menu
                 g_Hooks.nMenu.mouseCursor->Render();// Render mouse cursor in the end so its not overlapped
             }
-
-            // Put your draw calls here
-            g_ESP.Render();
         }
     }();
 
