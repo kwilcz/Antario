@@ -51,10 +51,10 @@ Font::Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVIC
     /* Prerender ASCII printable char textures so it wont have to do it later on. Leave special chars for runtime. */
     GenerateAsciiChars();
 
-    /* Create vertex buffer for rendering purposes */
-    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, NULL, D3DFVF_TLVERTEX,
-                                      D3DPOOL_MANAGED, &pVertexBuffer, nullptr);
-
+    /* Create vertex buffer for rendering purposes */    
+    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, D3DUSAGE_DYNAMIC, D3DFVF_TLVERTEX,
+									  D3DPOOL_DEFAULT, &pVertexBuffer, nullptr);
+    
     SetupRenderStates();
 
     /* Get height of the string  */
@@ -95,8 +95,8 @@ void Font::OnLostDevice()
 void Font::OnResetDevice(LPDIRECT3DDEVICE9 pDevice)
 {
     this->pDevice = pDevice;
-    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, NULL, D3DFVF_TLVERTEX,
-                                      D3DPOOL_MANAGED, &pVertexBuffer, nullptr);
+    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, D3DUSAGE_DYNAMIC, D3DFVF_TLVERTEX,
+									  D3DPOOL_DEFAULT, &pVertexBuffer, nullptr);
     SetupRenderStates();
 }
 
@@ -269,7 +269,7 @@ void Font::CreateCharTexture(T ch)
 
     /* create new texture for our glyph */
     IDirect3DTexture9* tx = nullptr;
-    HRESULT error = D3DXCreateTexture(pDevice, bmp.width, bmp.rows, 1, 0, glyph.colored ? D3DFMT_A8R8G8B8 : D3DFMT_A8, D3DPOOL_MANAGED, &tx);
+    HRESULT error = D3DXCreateTexture(pDevice, bmp.width, bmp.rows, 1, D3DUSAGE_DYNAMIC, glyph.colored ? D3DFMT_A8R8G8B8 : D3DFMT_A8, D3DPOOL_DEFAULT, &tx);
     ///TODO: Catch the errors
 
     /* Render to texture by copying bitmap data to locked rect */
