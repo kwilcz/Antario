@@ -21,10 +21,9 @@ struct Vertex
 };
 
 
-Font::Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVICE9 pDevice, int outlineThickness)
+Font::Font(const char* strFontName, int height, LPDIRECT3DDEVICE9 pDevice, int outlineThickness, bool fixedPath)
 {
     this->pDevice =           pDevice;
-    this->bIsAntialiased =    bAntialias;
     this->iOutlineThickness = outlineThickness;
 
     /* Init freetype library  */
@@ -32,7 +31,7 @@ Font::Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVIC
         throw std::exception("An error occured during library initialization.");
     
     /* Load font face */
-    if (FT_New_Face(ftLibrary, GetFontPath(strFontName).c_str(), 0, &ftFace))
+	if (FT_New_Face(ftLibrary, (fixedPath) ? strFontName : GetFontPath(strFontName).c_str(), 0, &ftFace))
         throw std::exception("An error occured while creating the font.");
 
     ///* Generate stroked outlines of the font */
@@ -52,8 +51,8 @@ Font::Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVIC
     GenerateAsciiChars();
 
     /* Create vertex buffer for rendering purposes */
-    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, NULL, D3DFVF_TLVERTEX,
-                                      D3DPOOL_MANAGED, &pVertexBuffer, nullptr);
+	this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_TLVERTEX,
+		D3DPOOL_DEFAULT, &pVertexBuffer, nullptr);
 
     SetupRenderStates();
 
@@ -95,8 +94,9 @@ void Font::OnLostDevice()
 void Font::OnResetDevice(LPDIRECT3DDEVICE9 pDevice)
 {
     this->pDevice = pDevice;
-    this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, NULL, D3DFVF_TLVERTEX,
-                                      D3DPOOL_MANAGED, &pVertexBuffer, nullptr);
+	this->pDevice->CreateVertexBuffer(sizeof(Vertex) * 12, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_TLVERTEX,
+		D3DPOOL_DEFAULT, &pVertexBuffer, nullptr);
+
     SetupRenderStates();
 }
 
@@ -165,19 +165,25 @@ void Font::Render(const T& strToRender, SPoint ptPos, DWORD flags, Color color, 
             pDevice->SetTexture(0, glyph.texture);
 
             Vertex* vertices;
+			Vertex temp[6];
 
             /* Create lambda function so we wont write the same code twice... */
             const auto addVertices = [&](float xpos, float ypos, D3DCOLOR dwcol)
             {
                 /* Lock the vertex buffer */
-                pVertexBuffer->Lock(0, 0, (void**)&vertices, NULL);
-                *vertices++ = {xpos,     ypos + h, 1.0, 1.0, dwcol, 0.0, 1.0};
-                *vertices++ = {xpos + w, ypos + h, 1.0, 1.0, dwcol, 1.0, 1.0};
-                *vertices++ = {xpos,     ypos,     1.0, 1.0, dwcol, 0.0, 0.0};
+				temp[0] = { xpos,     ypos + h, 1.0, 1.0, dwcol, 0.0, 1.0 };
+				temp[1] = { xpos + w, ypos + h, 1.0, 1.0, dwcol, 1.0, 1.0 };
+				temp[2] = { xpos,     ypos,     1.0, 1.0, dwcol, 0.0, 0.0 };
 
-                *vertices++ = {xpos + w, ypos + h, 1.0, 1.0, dwcol, 1.0, 1.0};
-                *vertices++ = {xpos + w, ypos,     1.0, 1.0, dwcol, 1.0, 0.0};
-                *vertices++ = {xpos,     ypos,     1.0, 1.0, dwcol, 0.0, 0.0};
+				temp[3] = { xpos + w, ypos + h, 1.0, 1.0, dwcol, 1.0, 1.0 };
+				temp[4] = { xpos + w, ypos,     1.0, 1.0, dwcol, 1.0, 0.0 };
+				temp[5] = { xpos,     ypos,     1.0, 1.0, dwcol, 0.0, 0.0 };
+
+				/* Lock the vertex buffer */
+				pVertexBuffer->Lock(0, 0, (void**)&vertices, D3DLOCK_DISCARD);
+
+				/* copy to buffer */
+				memcpy(vertices, temp, sizeof(Vertex) * 6);
 
                 /* Unlock the vertex buffer */
                 pVertexBuffer->Unlock();
@@ -242,7 +248,7 @@ void Font::CreateCharTexture(T ch)
     D3DLOCKED_RECT lockRect;
 
     uint32_t flags = FT_LOAD_RENDER;
-    flags |= bIsAntialiased       ? FT_LOAD_TARGET_NORMAL : FT_LOAD_TARGET_MONO;    
+	flags |= FT_LOAD_TARGET_NORMAL;
     flags |= FT_HAS_COLOR(ftFace) ? FT_LOAD_COLOR : 0;         /* Some fonts (emoji lol) contain colors. */
 
     /* Load character from font and render it to bitmap */
@@ -260,20 +266,17 @@ void Font::CreateCharTexture(T ch)
     glyph.bearing = {int(ftFace->glyph->bitmap_left), int(ftFace->glyph->bitmap_top)};
     glyph.advance = ftFace->glyph->advance.x;
 
-    /* Monochrome mode contains only 1 and 0 (lit / not lit). Change it to 0 - 255 for A8 format. */
-    if (!bIsAntialiased)        
-        for (auto it = bmp.buffer; it != &bmp.buffer[bmp.rows * bmp.pitch]; it++)
-            *it *= 255;
-
     glyph.colored = ftFace->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_BGRA;
 
     /* create new texture for our glyph */
-    IDirect3DTexture9* tx = nullptr;
-    HRESULT error = D3DXCreateTexture(pDevice, bmp.width, bmp.rows, 1, 0, glyph.colored ? D3DFMT_A8R8G8B8 : D3DFMT_A8, D3DPOOL_MANAGED, &tx);
+	IDirect3DTexture9* tx = nullptr;
+	IDirect3DTexture9* temptexture = nullptr;
+	HRESULT error = D3DXCreateTexture(pDevice, bmp.width, bmp.rows, 1, NULL, glyph.colored ? D3DFMT_A8R8G8B8 : D3DFMT_A8, D3DPOOL_SYSTEMMEM, &temptexture);
+	error = D3DXCreateTexture(pDevice, bmp.width, bmp.rows, 1, NULL, glyph.colored ? D3DFMT_A8R8G8B8 : D3DFMT_A8, D3DPOOL_DEFAULT, &tx);
     ///TODO: Catch the errors
 
     /* Render to texture by copying bitmap data to locked rect */
-    tx->LockRect(0, &lockRect, nullptr, D3DLOCK_DISCARD);
+	temptexture->LockRect(0, &lockRect, 0, D3DLOCK_DISCARD);
 
     /* If the glyph is colored - use original non-converted bitmap(since its using argb/brga format) */
     if (glyph.colored)
@@ -281,7 +284,11 @@ void Font::CreateCharTexture(T ch)
     else
         memcpy(lockRect.pBits, bmp.buffer, glyph.size.y * bmp.pitch);
 
-    tx->UnlockRect(0);
+	temptexture->UnlockRect(0);
+
+	error = pDevice->UpdateTexture(temptexture, tx);
+
+	temptexture->Release();
 
     /* Save texture pointer within stored glyph info */
     glyph.texture = tx;
