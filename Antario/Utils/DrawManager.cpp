@@ -44,8 +44,8 @@ void DrawManager::InitDeviceObjects(LPDIRECT3DDEVICE9 pDevice)
     /* ---------------- */
 
     // Create new fonts
-    g_Fonts.vecFonts.push_back(std::make_unique<Font>("Tahoma", 8, false, pDevice));
-    g_Fonts.vecFonts.push_back(std::make_unique<Font>("Tahoma", 10, false, pDevice));
+	g_Fonts.vecFonts.push_back(std::make_unique<Font>("Tahoma", 8, pDevice));
+	g_Fonts.vecFonts.push_back(std::make_unique<Font>("Tahoma", 10, pDevice));
 }
 
 
