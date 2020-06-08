@@ -1,8 +1,5 @@
 ## Antario - CSGO Base
 
-As this base is NOT finished yet, feel free to post issues / pull requests with everything you think shoud be included. 
-
-
 ### Features:
 
  * D3D9 menu with automatically adjusted positions of tabs, sections and selectables
