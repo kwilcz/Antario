@@ -40,7 +40,7 @@ class Font
 {
 public:
     Font() = delete;
-    Font(const char* strFontName, int height, bool bAntialias, LPDIRECT3DDEVICE9 pDevice, int outlineThickness = 0);
+	Font(const char* strFontName, int height, LPDIRECT3DDEVICE9 pDevice, int outlineThickness = 0, bool fixedPath = false);
 
     void Release();
     void OnLostDevice();
